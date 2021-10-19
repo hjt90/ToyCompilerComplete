@@ -1,5 +1,6 @@
 # ToyCompiler
 同济大学编译原理课上的大作业，实现一个语法分析器
+<br>本项目由[pamnso(JackyWu)](https://github.com/pamnso)和[hjt90](https://github.com/hjt90)共同合作完成
 ## 关于词法分析器的讨论内容
 ### 输入方式
 1.使用ifstream读取文件，再用getline处理每一行<br>
