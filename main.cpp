@@ -1,6 +1,7 @@
 #include<iostream>
 #include<vector>
 #include<fstream>
+#include<string>
 using namespace std;
 
 enum class Token
@@ -23,13 +24,16 @@ enum class Status
 };
 class Lexer
 {
+public:
+	Lexer() = default;
+	void printresult();//打印结果
+	void analyze(ifstream& file);//分析
 private:
 	vector<string> keywordlist = { "int","void","if","else","while","return" };//保留字表（里面顺序必须严格和Token中顺序一样）
 	vector<string> idtlist;//标识符表
 	bool annflag = false;//控制注释开关，用来判断是否处于/**/内
 	vector<pair<Token, string>> result;//结果
 
-	void analyze(ifstream file);//分析
 	Ftype chtype(char ch);//查看字符是什么类型
 	Status dealnumber(char* templine, int& cr, int len);//处理开头是数字的词
 	Status dealalpha(char* templine, int& cr, int len);//处理开头是字母的词
@@ -37,7 +41,6 @@ private:
 	void dealerror(int line, int cr);//输出错误
 	Token search_keyword(string& s);//查询关键字表
 	int search_identifier(string& s);//查标识符表
-	void printresult();//打印结果
 };
 
 void Lexer::printresult()
@@ -45,7 +48,7 @@ void Lexer::printresult()
 	int len = this->result.size();
 	for (int i = 0; i < len; i++)
 	{
-		cout << this->result[i].first << ' ' << this->result[i].second << endl;
+		cout << int(this->result[i].first) << ' ' << this->result[i].second << endl;
 	}
 }
 
@@ -60,7 +63,7 @@ Token Lexer::search_keyword(string& s)
 	{
 		if (s == this->keywordlist[i])//如果查到是关键字
 		{
-			return Token::Int + i;//返回这个关键字的类别号
+			return Token(int(Token::Int) + i);//返回这个关键字的类别号
 		}
 	}
 	return Token::Id;//是标识符不是关键字
@@ -68,7 +71,8 @@ Token Lexer::search_keyword(string& s)
 
 int Lexer::search_identifier(string& s)
 {
-	for (int i = 0; i < this->idtlist.size(); i++)
+	int i;
+	for (i = 0; i < this->idtlist.size(); i++)
 	{
 		if (s == this->idtlist[i])//如果查到是标识符
 		{
@@ -100,7 +104,7 @@ Status Lexer::dealnumber(char* templine, int& cr, int len)
 		tempstr += templine[cr];
 		cr++;
 	}
-	this->result.push_back(pair<Token::Number, tempstr>);//把这一个数字的结果加入result
+	this->result.push_back({Token::Number, tempstr});//把这一个数字的结果加入result
 	return Status::Success;//成功
 }
 
@@ -121,11 +125,11 @@ Status Lexer::dealalpha(char* templine, int& cr, int len)
 	Token tk;
 	tk = search_keyword(tempstr);//查是不是关键字
 	if (tk != Token::Id)//是关键字
-		this->result.push_back(pair<tk, "">);
+		this->result.push_back({tk, ""});
 	else//是标识符
 	{
 		int index = search_identifier(tempstr);//查有没有登记，如果没有自动创建
-		this->result.push_back(pair<Token::Id, to_string(index)>);//这里我返回的值是它的索引而不是名字，可以再改
+		this->result.push_back({Token::Id, to_string(index)});//这里我返回的值是它的索引而不是名字，可以再改
 	}
 	return Status::Success;
 }
@@ -134,78 +138,78 @@ Status Lexer::dealsymbol(char* templine, int& cr, int len)
 {
 	if (templine[cr] == '+')
 	{
-		this->result.push_back(pair<Token::Plus, "">);
+		this->result.push_back({Token::Plus, ""});
 		cr++;
 		return Status::Success;
 	}
 	else if (templine[cr] == '-')
 	{
-		this->result.push_back(pair<Token::Minus, "">);
+		this->result.push_back({Token::Minus, ""});
 		cr++;
 		return Status::Success;
 	}
 	else if (templine[cr] == '*')
 	{
-		this->result.push_back(pair<Token::Multiply, "">);
+		this->result.push_back({Token::Multiply, ""});
 		cr++;
 		return Status::Success;
 	}
 	else if (templine[cr] == '/')
 	{
-		this->result.push_back(pair<Token::Divide, "">);
+		this->result.push_back({Token::Divide, ""});
 		cr++;
 		return Status::Success;
 	}
 	else if (templine[cr] == '=')
 	{
-		if (cr + 1 < len && chtype(templine[cr + 1]) == '=')
+		if (cr + 1 < len && templine[cr + 1] == '=')
 		{
-			this->result.push_back(pair<Token::Equal2, "">);
+			this->result.push_back({Token::Equal2, ""});
 			cr += 2;
 			return Status::Success;
 		}
 		else
 		{
-			this->result.push_back(pair<Token::Equal, "">);
+			this->result.push_back({Token::Equal, ""});
 			cr++;
 			return Status::Success;
 		}
 	}
 	else if (templine[cr] == '>')
 	{
-		if (cr + 1 < len && chtype(templine[cr + 1]) == '=')
+		if (cr + 1 < len && templine[cr + 1] == '=')
 		{
-			this->result.push_back(pair<Token::BiggerEqual, "">);
+			this->result.push_back({Token::BiggerEqual, ""});
 			cr += 2;
 			return Status::Success;
 		}
 		else
 		{
-			this->result.push_back(pair<Token::Bigger, "">);
+			this->result.push_back({Token::Bigger, ""});
 			cr++;
 			return Status::Success;
 		}
 	}
 	else if (templine[cr] == '<')
 	{
-		if (cr + 1 < len && chtype(templine[cr + 1]) == '=')
+		if (cr + 1 < len && templine[cr + 1] == '=')
 		{
-			this->result.push_back(pair<Token::SmallerEqual, "">);
+			this->result.push_back({Token::SmallerEqual, ""});
 			cr += 2;
 			return Status::Success;
 		}
 		else
 		{
-			this->result.push_back(pair<Token::Smaller, "">);
+			this->result.push_back({Token::Smaller, ""});
 			cr++;
 			return Status::Success;
 		}
 	}
 	else if (templine[cr] == '!')
 	{
-		if (cr + 1 < len && chtype(templine[cr + 1]) == '=')
+		if (cr + 1 < len && templine[cr + 1] == '=')
 		{
-			this->result.push_back(pair<Token::NotEqual, "">);
+			this->result.push_back({Token::NotEqual, ""});
 			cr += 2;
 			return Status::Success;
 		}
@@ -214,13 +218,13 @@ Status Lexer::dealsymbol(char* templine, int& cr, int len)
 	}
 	else if (templine[cr] == ',')
 	{
-		this->result.push_back(pair<Token::Comma, "">);
+		this->result.push_back({Token::Comma, ""});
 		cr++;
 		return Status::Success;
 	}
 	else if (templine[cr] == ';')
 	{
-		this->result.push_back(pair<Token::Semi, "">);
+		this->result.push_back({Token::Semi, ""});
 		cr++;
 		return Status::Success;
 	}
@@ -245,32 +249,32 @@ Status Lexer::dealsymbol(char* templine, int& cr, int len)
 	//特别需要注意，我们这里不判断*/，留到analyze里处理
 	else if (templine[cr] == '(')
 	{
-		this->result.push_back(pair<Token::LeftBracket, "">);
+		this->result.push_back({Token::LeftBracket, ""});
 		cr++;
 		return Status::Success;
 	}
 	else if (templine[cr] == ')')
 	{
-		this->result.push_back(pair<Token::RightBracket, "">);
+		this->result.push_back({Token::RightBracket, ""});
 		cr++;
 		return Status::Success;
 	}
 	else if (templine[cr] == '{')
 	{
-		this->result.push_back(pair<Token::LeftBrace, "">);
+		this->result.push_back({Token::LeftBrace, ""});
 		cr++;
 		return Status::Success;
 	}
 	else if (templine[cr] == '}')
 	{
 
-		this->result.push_back(pair<Token::RightBrace, "">);
+		this->result.push_back({Token::RightBrace, ""});
 		cr++;
 		return Status::Success;
 	}
 	else if (templine[cr] == '#')
 	{
-		this->result.push_back(pair<Token::End, "">);
+		this->result.push_back({Token::End, ""});
 		cr++;
 		return Status::Success;
 	}
@@ -280,7 +284,7 @@ Status Lexer::dealsymbol(char* templine, int& cr, int len)
 	}
 }
 
-void Lexer::analyze(ifstream file)
+void Lexer::analyze(ifstream& file)
 {
 	int line = 0;//记录是哪一行
 	char templine[1024];//存一行
@@ -328,4 +332,18 @@ void Lexer::analyze(ifstream file)
 			}
 		}
 	}
+}
+
+int main()
+{
+	ifstream fin("test.c");//读取文件的名字，可以相对或绝对
+	if (!fin)
+	{
+		cout << "open fail." << endl;
+		exit(1);
+	}
+	Lexer lex;
+	lex.analyze(fin);
+	lex.printresult();
+	return 0;
 }
