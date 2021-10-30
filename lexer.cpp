@@ -7,8 +7,75 @@ void Lexer::printresult()
     int len = this->result.size();
     for (int i = 0; i < len; i++)
     {
-        cout << int(this->result[i].first) << ' ' << this->result[i].second << endl;
+        cout << translatetoken(this->result[i].first) << ' ' <<(this->result[i].first==Token::Id? this->idtlist[stoi(this->result[i].second)]:this->result[i].second) << endl;
     }
+}
+string Lexer::translatetoken(Token i)//·­ÒëtokenÒÔ±ãÊä³ö
+{
+    switch (int(i))
+    {
+        case int(Token::Id):
+            return "Id";
+        case int(Token::Int):
+            return "Int";
+        case int(Token::Void) :
+            return "Void";
+        case int(Token::If) :
+            return "If";
+        case int(Token::Else) :
+            return "Else";
+        case int(Token::While) :
+            return "While";
+        case int(Token::Return) :
+            return "Return";
+        case int(Token::Plus) :
+            return "Plus";
+        case int(Token::Minus) :
+            return "Minus";
+        case int(Token::Multiply) :
+            return "Multiply";
+        case int(Token::Divide) :
+            return "Divide";
+        case int(Token::Equal) :
+            return "Equal";
+        case int(Token::Equal2) :
+            return "Equal2";
+        case int(Token::Bigger) :
+            return "Bigger";
+        case int(Token::BiggerEqual):
+            return "BiggerEqual";
+        case int(Token::Smaller):
+            return "Smaller";
+        case int(Token::SmallerEqual) :
+            return "SmallerEqual";
+        case int(Token::NotEqual) :
+            return "NotEqual";
+        case int(Token::Semi) :
+            return "Semi";
+        case int(Token::Comma) :
+            return "Comma";
+        case int(Token::LeftAnno) :
+            return "LeftAnno";
+        case int(Token::RightAnno) :
+            return "RightAnno";
+        case int(Token::Anno) :
+            return "Anno";
+        case int(Token::LeftBracket) :
+            return "LeftBracket";
+        case int(Token::RightBracket) :
+            return "RightBracket";
+        case int(Token::LeftBrace) :
+            return "LeftBrace";
+        case int(Token::RightBrace) :
+            return "RightBrace";
+        case int(Token::Number) :
+            return "Number";
+        case int(Token::End) :
+            return "End";
+        default:
+            return "Unknown";
+    }
+    return "Unknown";
 }
 
 void Lexer::dealerror(int line, int cr)

@@ -34,3 +34,5 @@ tcc
 
 .vs/*
 .vscode/*
+/test.txt
+/CppProperties.json

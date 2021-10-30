@@ -22,6 +22,7 @@ class Lexer
 {
 public:
     Lexer() = default;
+    string translatetoken(Token i);        //翻译token以便输出
     void printresult();           //打印结果
     void analyze(ifstream &file); //分析
 private:
