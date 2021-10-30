@@ -11,7 +11,7 @@ using namespace std;
 
 class DFA_item;
 typedef int symbolTableIndex;
-typedef int syntacticTableIndex;
+typedef int syntaxTableIndex;
 typedef int syntaxTreeNodeIndex;
 typedef int DFA_statusIndex;
 typedef std::set<symbolTableIndex> firstTableItem;
@@ -43,7 +43,7 @@ class syntaxTreeNode
 public:
 	syntaxTreeNodeIndex parent;
 	vector<syntaxTreeNodeIndex> children;
-	syntacticTableIndex productions;//产生式
+	syntaxTableIndex productions;//产生式
 	symbolTableIndex type;
 	string val;
 };
@@ -76,5 +76,5 @@ class parsing
 public:
 	void clear();
 	void initSyntax(ifstream&);
-	void analyze(vector<pair<Token, string>>&);
+	void analyze(const vector<pair<Token, string>>&);
 };
