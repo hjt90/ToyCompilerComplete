@@ -3,7 +3,7 @@
 
 enum class Token
 {
-	Id,
+	Id = 0,
 	Int, Void, If, Else, While, Return,
 	Plus, Minus, Multiply, Divide, Equal, Equal2, Bigger, BiggerEqual, Smaller, SmallerEqual, NotEqual,
 	Semi, Comma, LeftAnno, RightAnno, Anno, LeftBracket, RightBracket, LeftBrace, RightBrace,

@@ -41,11 +41,14 @@ public:
 class syntaxTreeNode
 {
 public:
+	syntaxTreeNodeIndex index;
 	syntaxTreeNodeIndex parent;
 	vector<syntaxTreeNodeIndex> children;
 	syntaxTableIndex productions; //产生式
 	symbolTableIndex type;
 	string val;
+	syntaxTreeNode() = default;
+	syntaxTreeNode(const pair<Token, string>&);
 };
 
 //文法分析器

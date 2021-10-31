@@ -5,7 +5,15 @@
 #include "Parsing.h"
 using namespace std;
 
+<<<<<<< Updated upstream
 
+=======
+syntaxTreeNode::syntaxTreeNode(const pair<Token, string>& rhs)
+{
+	this->type = int(rhs.first);
+	this->val = rhs.second;
+}
+>>>>>>> Stashed changes
 
 /*********
  * 插入到 symbolTable 中，同时更新 symbol2Index 表
@@ -23,7 +31,6 @@ symbolTableIndex parsing::insertSymbol(symbolItem insrt)
 
 void parsing::initTerminalSymbol()
 {
-	insertSymbol("$End");
 	insertSymbol("$ID");
 	insertSymbol("$Int");
 	insertSymbol("$Void");
@@ -52,6 +59,7 @@ void parsing::initTerminalSymbol()
 	insertSymbol("$LeftBrace");
 	insertSymbol("$RightBrace");
 	insertSymbol("$Number");
+	insertSymbol("$End");
 	insertSymbol("$Empty");
 	insertSymbol("$Start0");
 	insertSymbol("$Start");
@@ -391,6 +399,73 @@ void parsing::initSyntax(ifstream& fin)
 	this->initAnalyseTable();
 }
 
-void parsing::analyze(const vector<pair<Token, string>>&)
+void parsing::analyze(const vector<pair<Token, string>>& lexs)
 {
+	//初始化输入符号栈
+	this->syntaxTree.push_back(pair<Token, string>{Token::End, ""});
+	this->syntaxTree.back().index = syntaxTree.size() - 1;
+	this->inputSymbolvector.push(syntaxTree.size() - 1);
+	for (int i = lexs.size() - 1; i >= 0; i--)
+	{
+		this->syntaxTree.push_back(lexs[i]);
+		syntaxTreeNodeIndex index = syntaxTree.size() - 1;
+		this->syntaxTree.back().index = index;
+		this->inputSymbolvector.push(index);
+	}
+	//初始化分析状态栈
+	this->statusStack.push(0);
+	//初始化分析符号栈
+	this->syntaxTree.push_back(pair<Token, string>{Token::End, ""});
+	this->syntaxTree.back().index = syntaxTree.size() - 1;
+	this->analyseSymbolStack.push(syntaxTree.size() - 1);
+
+	while (1)
+	{
+		analyseTableItem nextAction = this->analyseTable[this->statusStack.top()][this->syntaxTree[this->inputSymbolvector.top()].type];
+		if (nextAction.first == 'a')	//成功
+			break;
+		else if (nextAction.first == 's')	//移进
+		{
+			this->statusStack.push(nextAction.second);
+			syntaxTreeNodeIndex tmp = this->inputSymbolvector.top();
+			this->inputSymbolvector.pop();
+			this->analyseSymbolStack.push(tmp);
+		}
+		else if (nextAction.first == 'r')	//归约
+		{
+			const syntaxTableItem& useSyntax = this->syntaxTable[nextAction.second];
+			vector<syntaxTreeNodeIndex> rhsTmp;
+			for (int i = 0; i < useSyntax.rhs.size(); i++)
+			{
+				syntaxTreeNodeIndex tmp = this->analyseSymbolStack.top();
+				this->analyseSymbolStack.pop();
+				this->statusStack.pop();
+				rhsTmp.push_back(tmp);
+				syntaxTree[tmp].parent = syntaxTree.size();
+			}
+			syntaxTreeNode lhsTmp;
+			lhsTmp.children = rhsTmp;
+			lhsTmp.productions = nextAction.second;
+			lhsTmp.type = useSyntax.lhs;
+			syntaxTree.push_back(lhsTmp);
+			this->syntaxTree.back().index = syntaxTree.size() - 1;
+			this->analyseSymbolStack.push(syntaxTree.size() - 1);
+
+			nextAction = this->analyseTable[this->statusStack.top()][this->syntaxTree[this->analyseSymbolStack.top()].type];
+			if (nextAction.first == 's')
+			{
+				this->statusStack.push(nextAction.second);
+			}
+			else
+			{
+				cout << "语法分析出错" << endl;
+				break;
+			}
+		}
+		else								//错误
+		{
+			cout << "语法分析出错" << endl;
+			break;
+		}
+	}
 }
