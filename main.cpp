@@ -1,17 +1,29 @@
 #include <iostream>
 #include "lexer.h"
+#include "Parsing.h"
 using namespace std;
 
 int main()
 {
-	ifstream fin("test.c"); //读取文件的名字，可以相对或绝对
+	ifstream fin("D:\\workspace\\GitHub\\ToyCompiler\\test.c");
+	ifstream finSyntax("D:\\workspace\\GitHub\\ToyCompiler\\part_parser.cc");
 	if (!fin)
 	{
 		cout << "open fail." << endl;
 		exit(1);
 	}
+	if (!finSyntax)
+	{
+		cout << "open fail." << endl;
+		exit(1);
+	}
+
 	Lexer lex;
+	parsing parser;
+
 	lex.analyze(fin);
-	lex.printresult();
+	//lex.printresult();
+
+	parser.initSyntax(finSyntax);
 	return 0;
 }

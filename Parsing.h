@@ -73,6 +73,7 @@ class parsing
 	void initSymbolTable(ifstream &);
 	void initFirstTable();
 	void initAnalyseTable();
+	void initTerminalSymbol();
 	symbolTableIndex insertSymbol(symbolItem);
 
 public:
