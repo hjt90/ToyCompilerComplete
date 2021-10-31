@@ -17,7 +17,7 @@ typedef int DFA_statusIndex;
 typedef std::set<symbolTableIndex> firstTableItem;
 typedef std::pair<char, int> analyseTableItem;
 typedef std::string symbolItem;
-typedef std::vector<DFA_item> DFA_status;
+typedef std::set<DFA_item> DFA_status;
 
 //项目
 class DFA_item
@@ -26,7 +26,7 @@ public:
 	symbolTableIndex lhs;
 	vector<symbolTableIndex> rhs;
 	int pos;
-	vector<symbolTableIndex> forecast;
+	set<symbolTableIndex> forecast;
 };
 
 //文法
