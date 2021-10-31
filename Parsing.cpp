@@ -90,7 +90,9 @@ void parsing::initSymbolTable(ifstream& infile)
 			this->syntaxTable.push_back(tmpSyntax);
 		}
 	}
-	searchSyntaxByLhs = vector<set<syntaxTableIndex>>(syntaxTable.size());
+
+	this->syntaxTable.push_back({ this->startIndex,{this->symbol2Index["$Start"]} });	//添加S' ==> S
+	searchSyntaxByLhs = vector<set<syntaxTableIndex>>(symbolTable.size());
 	for (int i = 0; i < syntaxTable.size(); i++)
 	{
 		searchSyntaxByLhs[syntaxTable[i].lhs].insert(i);
@@ -122,6 +124,7 @@ void parsing::initFirstTable()
 	bool inc = false;
 	do
 	{
+		inc = false;
 		for (int i = this->terminalSymbolMax + 1; i < this->symbolTable.size(); i++)	//对于每一个非终结符集
 		{
 			int cntTmp = this->firstTable[i].size();
