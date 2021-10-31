@@ -5,15 +5,11 @@
 #include "Parsing.h"
 using namespace std;
 
-<<<<<<< Updated upstream
-
-=======
 syntaxTreeNode::syntaxTreeNode(const pair<Token, string>& rhs)
 {
 	this->type = int(rhs.first);
 	this->val = rhs.second;
 }
->>>>>>> Stashed changes
 
 /*********
  * 插入到 symbolTable 中，同时更新 symbol2Index 表
@@ -230,7 +226,7 @@ bool operator<(const DFA_item& A, const DFA_item& B)
 	else if (A.pos > B.pos)
 		return false;
 
-	if (A.forecast< B.forecast)
+	if (A.forecast < B.forecast)
 		return true;
 	else if (A.forecast > B.forecast)
 		return false;
@@ -285,18 +281,18 @@ pair<int, bool>  parsing::createClosure(DFA_status& sta)
 	for (int i = 0; i < DFA.size(); i++)
 	{
 		if (DFA[i] == sta)
-			return <i,false>;
+			return <i, false>;
 	}
 	DFA.push_back(sta);
-	return <DFA.size() - 1,true>;
+	return <DFA.size() - 1, true>;
 }
 /*********
  * 初始化 DFA、analyseTable
  * ********/
 void parsing::initAnalyseTable()
 {
-	DFA_status temps,temptopstatus;
-	DFA_item temptop,tempd;
+	DFA_status temps, temptopstatus;
+	DFA_item temptop, tempd;
 	set<int> tempfirst;
 	vector<symbolTableIndex> restsentence;
 	pair<int, bool>  gt;
@@ -307,9 +303,9 @@ void parsing::initAnalyseTable()
 	tempd.lhs = symbol2Index["$Start0"];
 	tempd.rhs.push_back(symbol2Index["$Start"]);
 	tempd.pos = 0;
-	tempd.forecast=symbol2Index["$End"];
+	tempd.forecast = symbol2Index["$End"];
 	temps.insert(tempd);
-	
+
 	createClosure(temps);//创建0号状态
 
 	si.push(0);//把状态0入栈
@@ -330,23 +326,23 @@ void parsing::initAnalyseTable()
 			if ((*it).pos < (*it).rhs.size())
 			{
 				transflag.insert((*it).rhs[(*it).pos]);
-			}			
+			}
 		}
 		for (auto it = transflag.begin(); it != transflag.end(); it++)//对于每个可引发转移的字符，找移进状态
 		{
 			for (auto it2 = temptopstatus.begin(); it2 != temptopstatus.end(); it2++)//对于每一条语句
 			{
-				if ((*it2).pos< (*it2).rhs.size()&&(*it2).rhs[(*it2).pos] == *it)
+				if ((*it2).pos < (*it2).rhs.size() && (*it2).rhs[(*it2).pos] == *it)
 				{
 					tempd.lhs = (*it2).lhs;
 					tempd.rhs = (*it2).rhs;
-					tempd.pos = (*it2).pos+1;
+					tempd.pos = (*it2).pos + 1;
 					tempd.forecast = (*it2).forecast;
 					temps.insert(tempd);
 				}
 			}
-			gt=createClosure(temps);
-			analyseTable[statusno][*it] = pair<char,int>('s',gt.first);
+			gt = createClosure(temps);
+			analyseTable[statusno][*it] = pair<char, int>('s', gt.first);
 			if (gt.second == ture)//是新的状态
 			{
 				si.push(gt.first);
@@ -367,7 +363,7 @@ void parsing::initAnalyseTable()
 					}
 				}
 				//填规约表
-				if((*it).lhs== symbol2Index["$Start0"] && (*it).rhs[0]== symbol2Index["$Start"]&&(*it).forecast== symbol2Index["$End"])
+				if ((*it).lhs == symbol2Index["$Start0"] && (*it).rhs[0] == symbol2Index["$Start"] && (*it).forecast == symbol2Index["$End"])
 					analyseTable[statusno][(*it).forecast] = pair<char, int>('a', -1);
 				else
 					analyseTable[statusno][(*it).forecast] = pair<char, int>('r', synno);
