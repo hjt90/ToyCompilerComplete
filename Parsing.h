@@ -55,9 +55,11 @@ class parsing
 	vector<symbolItem> symbolTable;
 	symbolTableIndex terminalSymbolMax; //终结符的最后一个
 	symbolTableIndex startIndex;		//开始符
+	symbolTableIndex emptyIndex;		//空
 	map<symbolItem, int> symbol2Index;
 	//文法
 	vector<syntaxTableItem> syntaxTable;
+	vector<syntaxTableIndex> searchSyntaxByLhs;	//通过文法的左侧找产生式
 	//first表
 	vector<firstTableItem> firstTable;
 	//项目集
@@ -70,14 +72,14 @@ class parsing
 	stack<syntaxTreeNodeIndex> analyseSymbolStack; //分析符号栈
 	stack<syntaxTreeNodeIndex> inputSymbolvector;  //输入符号栈
 
-	void initSymbolTable(ifstream &);
+	void initSymbolTable(ifstream&);
 	void initFirstTable();
 	void initAnalyseTable();
 	void initTerminalSymbol();
 	symbolTableIndex insertSymbol(symbolItem);
-
+	set<symbolTableIndex> firstForPhrase(vector<symbolTableIndex> p);
 public:
 	void clear();
-	void initSyntax(ifstream &);
-	void analyze(const vector<pair<Token, string>> &);
+	void initSyntax(ifstream&);
+	void analyze(const vector<pair<Token, string>>&);
 };
