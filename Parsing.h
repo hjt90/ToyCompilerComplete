@@ -26,7 +26,7 @@ public:
 	symbolTableIndex lhs;
 	vector<symbolTableIndex> rhs;
 	int pos;
-	set<symbolTableIndex> forecast;
+	symbolTableIndex forecast;
 };
 
 //ÎÄ·¨
