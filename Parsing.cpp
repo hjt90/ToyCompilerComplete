@@ -1,8 +1,11 @@
 #include <sstream>
 #include <string>
 #include <iostream>
+#include<algorithm>
 #include "Parsing.h"
 using namespace std;
+
+
 
 /*********
  * 插入到 symbolTable 中，同时更新 symbol2Index 表
@@ -188,10 +191,182 @@ set<symbolTableIndex> parsing::firstForPhrase(vector<symbolTableIndex> rhsTmp)
 }
 
 /*********
+ * 重载<用于比较DFA_item
+ * ********/
+bool operator<(const DFA_item& A, const DFA_item& B)
+{
+	if (A.lhs < B.lhs)
+		return true;
+	else if (A.lhs > B.lhs)
+		return false;
+
+	if (A.rhs.size() < B.rhs.size())
+		return true;
+	else if (A.rhs.size() > B.rhs.size())
+		return false;
+	else
+	{
+		int i;
+		int mm = A.rhs.size();
+		for (i = 0; i < mm; i++)
+		{
+			if (A.rhs[i] < B.rhs[i])
+				return true;
+			else if (A.rhs[i] > B.rhs[i])
+				return false;
+		}
+	}
+
+	if (A.pos < B.pos)
+		return true;
+	else if (A.pos > B.pos)
+		return false;
+
+	if (A.forecast< B.forecast)
+		return true;
+	else if (A.forecast > B.forecast)
+		return false;
+
+	return false;
+}
+
+/*********
+ * 构造closure
+ * ********/
+pair<int, bool>  parsing::createClosure(DFA_status& sta)
+{
+	vector<symbolTableIndex> restsentence;
+	stack<DFA_item> sd;
+	DFA_item temptop, tempd;
+	//先把所有入栈
+	for (auto it = sta.begin(); it != sta.end(); it++)
+	{
+		sd.push(*it);
+	}
+	while (!sd.empty())
+	{
+		temptop = sd.top();
+		sd.pop();//栈顶的语句出栈
+		if (temptop.pos<temptop.rhs.size() && temptop.rhs[temptop.pos]>terminalSymbolMax)//点后面是非终结符
+		{
+			restsentence.clear();
+			for (int i = temptop.pos + 1; i < temptop.rhs.size(); i++)//提取需要找first集的语句
+			{
+				restsentence.push_back(temptop.rhs[i]);
+			}
+			restsentence.push_back(temptop.forecast);
+			tempfirst = firstForPhrase(restsentence);//查first集
+			//查完了first集，开始构造新的句子
+			for (auto it = tempfirst.begin(); it != tempfirst.end(); it++)
+			{
+				for (auto it2 = searchSyntaxByLhs[temptop.rhs[temptop.pos]].begin(); it2 != searchSyntaxByLhs[temptop.rhs[temptop.pos]].end(); it2++)
+				{
+					tempd.lhs = temptop.rhs[temptop.pos];
+					tempd.rhs = syntaxTable[*it2].rhs;
+					tempd.pos = 0;
+					tempd.forecast = *it;
+					if (sta.insert(tempd).second == true)//成功插入
+					{
+						sd.push(tempd);//作为一个新的式子入栈
+					}
+				}
+			}
+		}
+	}
+	//检查是否是新状态
+	for (int i = 0; i < DFA.size(); i++)
+	{
+		if (DFA[i] == sta)
+			return <i,false>;
+	}
+	DFA.push_back(sta);
+	return <DFA.size() - 1,true>;
+}
+/*********
  * 初始化 DFA、analyseTable
  * ********/
 void parsing::initAnalyseTable()
 {
+	DFA_status temps,temptopstatus;
+	DFA_item temptop,tempd;
+	set<int> tempfirst;
+	vector<symbolTableIndex> restsentence;
+	pair<int, bool>  gt;
+	int statusno;
+	stack<int> si;
+	//先手动构造初始状态0
+	//第一条S'->.S,#
+	tempd.lhs = symbol2Index["$Start0"];
+	tempd.rhs.push_back(symbol2Index["$Start"]);
+	tempd.pos = 0;
+	tempd.forecast=symbol2Index["$End"];
+	temps.insert(tempd);
+	
+	createClosure(temps);//创建0号状态
+
+	si.push(0);//把状态0入栈
+
+	//至此第0号状态构建完成
+	//接下来开始推导剩余状态
+	set<int>transflag;//记录有哪些符号可以用来转移
+
+	while (!si.empty())
+	{
+		temps.clear();
+		statusno = si.top();
+		temptopstatus = DFA[statusno];
+		si.pop();
+		transflag.clear();
+		for (auto it = temptopstatus.begin(); it != temptopstatus.end(); it++)//找到这个集合中所有可以转移的字符
+		{
+			if ((*it).pos < (*it).rhs.size())
+			{
+				transflag.insert((*it).rhs[(*it).pos]);
+			}			
+		}
+		for (auto it = transflag.begin(); it != transflag.end(); it++)//对于每个可引发转移的字符，找移进状态
+		{
+			for (auto it2 = temptopstatus.begin(); it2 != temptopstatus.end(); it2++)//对于每一条语句
+			{
+				if ((*it2).pos< (*it2).rhs.size()&&(*it2).rhs[(*it2).pos] == *it)
+				{
+					tempd.lhs = (*it2).lhs;
+					tempd.rhs = (*it2).rhs;
+					tempd.pos = (*it2).pos+1;
+					tempd.forecast = (*it2).forecast;
+					temps.insert(tempd);
+				}
+			}
+			gt=createClosure(temps);
+			analyseTable[statusno][*it] = pair<char,int>('s',gt.first);
+			if (gt.second == ture)//是新的状态
+			{
+				si.push(gt.first);
+			}
+		}
+		for (auto it = temptopstatus.begin(); it != temptopstatus.end(); it++)//找规约状态
+		{
+			if ((*it).pos >= (*it).rhs.size())
+			{
+				int synno;
+				//找到是哪一个规约文法
+				for (auto it2 = searchSyntaxByLhs[(*it).lhs].begin(); it2 != searchSyntaxByLhs[(*it).lhs].end(); it2++)
+				{
+					if (syntaxTable[*it2].rhs == (*it).rhs)
+					{
+						synno = *it2;
+						break;
+					}
+				}
+				//填规约表
+				if((*it).lhs== symbol2Index["$Start0"] && (*it).rhs[0]== symbol2Index["$Start"]&&(*it).forecast== symbol2Index["$End"])
+					analyseTable[statusno][(*it).forecast] = pair<char, int>('a', -1);
+				else
+					analyseTable[statusno][(*it).forecast] = pair<char, int>('r', synno);
+			}
+		}
+	}
+
 }
 
 void parsing::clear()
