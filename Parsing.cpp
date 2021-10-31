@@ -20,8 +20,6 @@ symbolTableIndex parsing::insertSymbol(symbolItem insrt)
 
 void parsing::initTerminalSymbol()
 {
-	insertSymbol("$Start0");
-	insertSymbol("$Start");
 	insertSymbol("$End");
 	insertSymbol("$ID");
 	insertSymbol("$Int");
@@ -52,8 +50,11 @@ void parsing::initTerminalSymbol()
 	insertSymbol("$RightBrace");
 	insertSymbol("$Number");
 	insertSymbol("$Empty");
-	this->terminalSymbolMax = symbolTable.size() - 1;
-	this->startIndex = 0;
+	insertSymbol("$Start0");
+	insertSymbol("$Start");
+	this->terminalSymbolMax = symbolTable.size() - 1 - 2;
+	this->startIndex = this->symbol2Index["$Start0"];
+	this->emptyIndex = this->symbol2Index["$Empty"];
 }
 
 /*********
@@ -89,6 +90,11 @@ void parsing::initSymbolTable(ifstream& infile)
 			this->syntaxTable.push_back(tmpSyntax);
 		}
 	}
+	searchSyntaxByLhs = vector<set<syntaxTableIndex>>(syntaxTable.size());
+	for (int i = 0; i < syntaxTable.size(); i++)
+	{
+		searchSyntaxByLhs[syntaxTable[i].lhs].insert(i);
+	}
 }
 
 /*********
@@ -96,6 +102,86 @@ void parsing::initSymbolTable(ifstream& infile)
  * ********/
 void parsing::initFirstTable()
 {
+	this->firstTable = vector<firstTableItem>(symbolTable.size());
+	//终结符 FIRST集为其自身
+	for (int i = 0; i <= this->terminalSymbolMax; i++)
+	{
+		this->firstTable[i].insert(i);
+	}
+	//非终结符FIRST集加入产生式的左侧
+	for (int i = this->terminalSymbolMax + 1; i < this->symbolTable.size(); i++)
+	{
+		for (auto syntaxIndexTmp : this->searchSyntaxByLhs[i])
+		{
+			symbolTableIndex symbolTmp = this->syntaxTable[syntaxIndexTmp].rhs[0];
+			if (symbolTmp <= this->terminalSymbolMax)	//产生式右侧首项为终结符
+				this->firstTable[i].insert(symbolTmp);
+		}
+	}
+	//非终结符FIRST集互推
+	bool inc = false;
+	do
+	{
+		for (int i = this->terminalSymbolMax + 1; i < this->symbolTable.size(); i++)	//对于每一个非终结符集
+		{
+			int cntTmp = this->firstTable[i].size();
+			for (auto syntaxIndexTmp : this->searchSyntaxByLhs[i])	//对于其为左项的产生式
+			{
+				const vector<symbolTableIndex>& rhsTmp = this->syntaxTable[syntaxIndexTmp].rhs;
+				for (int rhsIndex = 0; rhsIndex < rhsTmp.size(); rhsIndex++)	//遍历其右项
+				{
+					const firstTableItem& firstSymbolSet = this->firstTable[rhsTmp[rhsIndex]];
+					if (rhsTmp[rhsIndex] <= this->terminalSymbolMax)	//为终结符
+					{
+						this->firstTable[i].insert(rhsTmp[rhsIndex]);
+						break;
+					}
+
+					bool haveEmpty = this->firstTable[i].count(this->emptyIndex);
+					this->firstTable[i].insert(firstSymbolSet.cbegin(), firstSymbolSet.cend());
+					if (!haveEmpty && firstSymbolSet.count(this->emptyIndex))
+						this->firstTable[i].erase(this->emptyIndex);
+
+					if (!firstSymbolSet.count(this->emptyIndex))	//不含空
+						break;
+					if (rhsIndex == rhsTmp.size() - 1)	//如果产生式右侧全为空，加入空
+						this->firstTable[i].insert(this->emptyIndex);
+				}
+			}
+			if (this->firstTable[i].size() > cntTmp)
+				inc = true;
+		}
+	} while (inc);	//直到不再增长
+}
+
+/*********
+ * 计算句子的FIRST集
+ * ********/
+set<symbolTableIndex> parsing::firstForPhrase(vector<symbolTableIndex> rhsTmp)
+{
+	set<symbolTableIndex> res;
+
+	for (int rhsIndex = 0; rhsIndex < rhsTmp.size(); rhsIndex++)	//遍历其右项
+	{
+		const firstTableItem& firstSymbolSet = this->firstTable[rhsTmp[rhsIndex]];
+		if (rhsTmp[rhsIndex] <= this->terminalSymbolMax)	//为终结符
+		{
+			res.insert(rhsTmp[rhsIndex]);
+			break;
+		}
+
+		bool haveEmpty = res.count(this->emptyIndex);
+		res.insert(firstSymbolSet.cbegin(), firstSymbolSet.cend());
+		if (!haveEmpty && firstSymbolSet.count(this->emptyIndex))
+			res.erase(this->emptyIndex);
+
+		if (!firstSymbolSet.count(this->emptyIndex))	//不含空
+			break;
+		if (rhsIndex == rhsTmp.size() - 1)	//如果产生式右侧全为空，加入空
+			res.insert(this->emptyIndex);
+	}
+
+	return res;
 }
 
 /*********
@@ -110,6 +196,7 @@ void parsing::clear()
 	symbolTable.clear();
 	symbol2Index.clear();
 	syntaxTable.clear();
+	searchSyntaxByLhs.clear();
 	firstTable.clear();
 	DFA.clear();
 	analyseTable.clear();
