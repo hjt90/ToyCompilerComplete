@@ -59,7 +59,7 @@ class parsing
 	map<symbolItem, int> symbol2Index;
 	//文法
 	vector<syntaxTableItem> syntaxTable;
-	vector<syntaxTableIndex> searchSyntaxByLhs;	//通过文法的左侧找产生式
+	vector<set<syntaxTableIndex>> searchSyntaxByLhs;	//通过文法的左侧找产生式
 	//first表
 	vector<firstTableItem> firstTable;
 	//项目集
