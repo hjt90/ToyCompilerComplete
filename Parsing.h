@@ -19,7 +19,7 @@ typedef std::pair<char, int> analyseTableItem;
 typedef std::string symbolItem;
 typedef std::set<DFA_item> DFA_status;
 
-//ÏîÄ¿
+//é¡¹ç›®
 class DFA_item
 {
 public:
@@ -29,7 +29,7 @@ public:
 	symbolTableIndex forecast;
 };
 
-//ÎÄ·¨
+//æ–‡æ³•
 class syntaxTableItem
 {
 public:
@@ -37,40 +37,40 @@ public:
 	vector<symbolTableIndex> rhs;
 };
 
-//Óï·¨Ê÷½Úµã
+//è¯­æ³•æ ‘èŠ‚ç‚¹
 class syntaxTreeNode
 {
 public:
 	syntaxTreeNodeIndex parent;
 	vector<syntaxTreeNodeIndex> children;
-	syntaxTableIndex productions; //²úÉúÊ½
+	syntaxTableIndex productions; //äº§ç”Ÿå¼
 	symbolTableIndex type;
 	string val;
 };
 
-//ÎÄ·¨·ÖÎöÆ÷
+//æ–‡æ³•åˆ†æå™¨
 class parsing
 {
-	//·ûºÅ±í
+	//ç¬¦å·è¡¨
 	vector<symbolItem> symbolTable;
-	symbolTableIndex terminalSymbolMax; //ÖÕ½á·ûµÄ×îºóÒ»¸ö
-	symbolTableIndex startIndex;		//¿ªÊ¼·û
-	symbolTableIndex emptyIndex;		//¿Õ
+	symbolTableIndex terminalSymbolMax; //ç»ˆç»“ç¬¦çš„æœ€åä¸€ä¸ª
+	symbolTableIndex startIndex;		//å¼€å§‹ç¬¦
+	symbolTableIndex emptyIndex;		//ç©º
 	map<symbolItem, int> symbol2Index;
-	//ÎÄ·¨
+	//æ–‡æ³•
 	vector<syntaxTableItem> syntaxTable;
-	vector<set<syntaxTableIndex>> searchSyntaxByLhs;	//Í¨¹ıÎÄ·¨µÄ×ó²àÕÒ²úÉúÊ½
-	//first±í
+	vector<set<syntaxTableIndex>> searchSyntaxByLhs;	//é€šè¿‡æ–‡æ³•çš„å·¦ä¾§æ‰¾äº§ç”Ÿå¼
+	//firstè¡¨
 	vector<firstTableItem> firstTable;
-	//ÏîÄ¿¼¯
+	//é¡¹ç›®é›†
 	vector<DFA_status> DFA;
-	//·ÖÎö±í
+	//åˆ†æè¡¨
 	vector<vector<analyseTableItem>> analyseTable;
-	//·ÖÎö¹ı³Ì
-	vector<syntaxTreeNode> syntaxTree;			   //Óï·¨Ê÷½Úµã
-	stack<DFA_statusIndex> statusStack;			   //·ÖÎö×´Ì¬Õ»
-	stack<syntaxTreeNodeIndex> analyseSymbolStack; //·ÖÎö·ûºÅÕ»
-	stack<syntaxTreeNodeIndex> inputSymbolvector;  //ÊäÈë·ûºÅÕ»
+	//åˆ†æè¿‡ç¨‹
+	vector<syntaxTreeNode> syntaxTree;			   //è¯­æ³•æ ‘èŠ‚ç‚¹
+	stack<DFA_statusIndex> statusStack;			   //åˆ†æçŠ¶æ€æ ˆ
+	stack<syntaxTreeNodeIndex> analyseSymbolStack; //åˆ†æç¬¦å·æ ˆ
+	stack<syntaxTreeNodeIndex> inputSymbolvector;  //è¾“å…¥ç¬¦å·æ ˆ
 
 	void initSymbolTable(ifstream&);
 	void initFirstTable();
@@ -78,6 +78,7 @@ class parsing
 	void initTerminalSymbol();
 	symbolTableIndex insertSymbol(symbolItem);
 	set<symbolTableIndex> firstForPhrase(vector<symbolTableIndex> p);
+	pair<int,bool> createClosure(DFA_status &sta);
 public:
 	void clear();
 	void initSyntax(ifstream&);
