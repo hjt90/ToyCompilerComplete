@@ -235,10 +235,22 @@ bool operator<(const DFA_item& A, const DFA_item& B)
 }
 
 /*********
+ * 重载==用于比较DFA_item
+ * ********/
+bool operator==(const DFA_item& A, const DFA_item& B)
+{
+	if (A.lhs == B.lhs && A.rhs == B.rhs && A.pos == B.pos&& A.forecast == B.forecast)
+		return true;
+	else
+		return false;
+}
+
+/*********
  * 构造closure
  * ********/
 pair<int, bool>  parsing::createClosure(DFA_status& sta)
 {
+	set<int> tempfirst;
 	vector<symbolTableIndex> restsentence;
 	stack<DFA_item> sd;
 	DFA_item temptop, tempd;
@@ -281,10 +293,10 @@ pair<int, bool>  parsing::createClosure(DFA_status& sta)
 	for (int i = 0; i < DFA.size(); i++)
 	{
 		if (DFA[i] == sta)
-			return <i, false>;
+			return pair<int, bool>(i, false);
 	}
 	DFA.push_back(sta);
-	return <DFA.size() - 1, true>;
+	return pair<int, bool>(DFA.size() - 1, true);
 }
 
 /*********
@@ -314,10 +326,9 @@ void parsing::initAnalyseTable()
 	//至此第0号状态构建完成
 	//接下来开始推导剩余状态
 	set<int>transflag;//记录有哪些符号可以用来转移
-
+	analyseTable.push_back(vector<analyseTableItem>(symbolTable.size(), pair<char, int>('\0', -1)));
 	while (!si.empty())
 	{
-		temps.clear();
 		statusno = si.top();
 		temptopstatus = DFA[statusno];
 		si.pop();
@@ -331,6 +342,7 @@ void parsing::initAnalyseTable()
 		}
 		for (auto it = transflag.begin(); it != transflag.end(); it++)//对于每个可引发转移的字符，找移进状态
 		{
+			temps.clear();
 			for (auto it2 = temptopstatus.begin(); it2 != temptopstatus.end(); it2++)//对于每一条语句
 			{
 				if ((*it2).pos < (*it2).rhs.size() && (*it2).rhs[(*it2).pos] == *it)
@@ -347,6 +359,7 @@ void parsing::initAnalyseTable()
 			if (gt.second == true)//是新的状态
 			{
 				si.push(gt.first);
+				analyseTable.push_back(vector<analyseTableItem>(symbolTable.size(), pair<char, int>('\0', -1)));
 			}
 		}
 		for (auto it = temptopstatus.begin(); it != temptopstatus.end(); it++)//找规约状态
@@ -364,6 +377,8 @@ void parsing::initAnalyseTable()
 					}
 				}
 				//填规约表
+				if (analyseTable[statusno][(*it).forecast].first != '\0')
+					cout << "wrong" << endl;
 				if ((*it).lhs == symbol2Index["$Start0"] && (*it).rhs[0] == symbol2Index["$Start"] && (*it).forecast == symbol2Index["$End"])
 					analyseTable[statusno][(*it).forecast] = pair<char, int>('a', -1);
 				else
