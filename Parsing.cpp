@@ -286,6 +286,7 @@ pair<int, bool>  parsing::createClosure(DFA_status& sta)
 	DFA.push_back(sta);
 	return <DFA.size() - 1, true>;
 }
+
 /*********
  * 初始化 DFA、analyseTable
  * ********/
@@ -343,7 +344,7 @@ void parsing::initAnalyseTable()
 			}
 			gt = createClosure(temps);
 			analyseTable[statusno][*it] = pair<char, int>('s', gt.first);
-			if (gt.second == ture)//是新的状态
+			if (gt.second == true)//是新的状态
 			{
 				si.push(gt.first);
 			}
@@ -446,6 +447,7 @@ void parsing::analyze(const vector<pair<Token, string>>& lexs)
 			syntaxTree.push_back(lhsTmp);
 			this->syntaxTree.back().index = syntaxTree.size() - 1;
 			this->analyseSymbolStack.push(syntaxTree.size() - 1);
+			this->topNode = syntaxTree.size() - 1;
 
 			nextAction = this->analyseTable[this->statusStack.top()][this->syntaxTree[this->analyseSymbolStack.top()].type];
 			if (nextAction.first == 's')
@@ -464,4 +466,9 @@ void parsing::analyze(const vector<pair<Token, string>>& lexs)
 			break;
 		}
 	}
+}
+
+void parsing::output(ofstream& struction, ofstream& graph)
+{
+
 }

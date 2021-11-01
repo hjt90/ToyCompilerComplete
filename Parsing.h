@@ -74,6 +74,7 @@ class parsing
 	stack<DFA_statusIndex> statusStack;			   //分析状态栈
 	stack<syntaxTreeNodeIndex> analyseSymbolStack; //分析符号栈
 	stack<syntaxTreeNodeIndex> inputSymbolvector;  //输入符号栈
+	syntaxTreeNodeIndex topNode;
 
 	void initSymbolTable(ifstream&);
 	void initFirstTable();
@@ -81,9 +82,10 @@ class parsing
 	void initTerminalSymbol();
 	symbolTableIndex insertSymbol(symbolItem);
 	set<symbolTableIndex> firstForPhrase(vector<symbolTableIndex> p);
-	pair<int,bool> createClosure(DFA_status &sta);
+	pair<int, bool> createClosure(DFA_status& sta);
 public:
 	void clear();
 	void initSyntax(ifstream&);
 	void analyze(const vector<pair<Token, string>>&);
+	void output(ofstream& struction, ofstream& graph);
 };
