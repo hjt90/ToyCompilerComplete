@@ -239,7 +239,7 @@ bool operator<(const DFA_item& A, const DFA_item& B)
  * ********/
 bool operator==(const DFA_item& A, const DFA_item& B)
 {
-	if (A.lhs == B.lhs && A.rhs == B.rhs && A.pos == B.pos&& A.forecast == B.forecast)
+	if (A.lhs == B.lhs && A.rhs == B.rhs && A.pos == B.pos && A.forecast == B.forecast)
 		return true;
 	else
 		return false;
@@ -483,7 +483,61 @@ void parsing::analyze(const vector<pair<Token, string>>& lexs)
 	}
 }
 
+void parsing::outputStruction(ofstream& struction, syntaxTreeNodeIndex Node, int pad)
+{
+	struction << string("\t", pad) << "{" << endl;
+	struction << string("\t", pad + 1) << "kind: " << this->symbolTable[this->syntaxTree[Node].type] << "," << endl;
+	if (!this->syntaxTree[Node].val.empty())
+		struction << string("\t", pad + 1) << "val: " << this->syntaxTree[Node].val << "," << endl;
+	if (this->syntaxTree[Node].productions)
+	{
+		struction << string("\t", pad + 1) << "type: ";
+		for (auto rhs : this->syntaxTable[this->syntaxTree[Node].productions].rhs)
+			struction << this->symbolTable[rhs] << " ";
+		struction << "," << endl;
+	}
+	if (!this->syntaxTree[Node].children.empty())
+	{
+		struction << string("\t", pad + 1) << "inner: [" << endl;
+		for (auto child : this->syntaxTree[Node].children)
+		{
+			struction << string("\t", pad + 2) << "{" << endl;
+			this->outputStruction(struction, child, pad + 2);
+			struction << string("\t", pad + 2) << "}," << endl;
+		}
+		struction << string("\t", pad + 1) << "]" << endl;
+	}
+	struction << string("\t", pad) << "}" << endl;
+}
+
+void parsing::outputDot(ofstream& graph, syntaxTreeNodeIndex Node)
+{
+	if (!this->syntaxTree[Node].children.empty())
+	{
+		for (auto child : this->syntaxTree[Node].children)
+		{
+			graph << "\t" << "Node" << Node << "->" << "Node" << child << endl;
+		}
+		for (auto child : this->syntaxTree[Node].children)
+		{
+			this->outputDot(graph, child);
+		}
+	}
+}
+
+
 void parsing::output(ofstream& struction, ofstream& graph)
 {
+	this->outputStruction(struction, this->topNode, 0);
+	graph << "#@startdot" << endl << endl;
+	graph << "digraph demo {" << endl << endl;
 
+	for (int i = 0; i < syntaxTree.size(); i++)
+		graph << "\t" << "Node" << i << "[label=\"" << this->symbolTable[this->syntaxTree[i].type] << "\", shape=\"box\"]" << endl;
+
+	graph << endl;
+	this->outputDot(graph, this->topNode);
+
+	graph << endl << "}" << endl << endl;
+	graph << "#@enddot" << endl;
 }

@@ -83,6 +83,8 @@ class parsing
 	symbolTableIndex insertSymbol(symbolItem);
 	set<symbolTableIndex> firstForPhrase(vector<symbolTableIndex> p);
 	pair<int, bool> createClosure(DFA_status& sta);
+	void outputStruction(ofstream&, syntaxTreeNodeIndex, int);
+	void outputDot(ofstream&, syntaxTreeNodeIndex);
 public:
 	void clear();
 	void initSyntax(ifstream&);
