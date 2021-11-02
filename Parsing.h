@@ -86,6 +86,7 @@ class parsing
 	pair<int, bool> createClosure(DFA_status& sta);
 	void outputStruction(ofstream&, syntaxTreeNodeIndex, int);
 	void outputDot(ofstream&, syntaxTreeNodeIndex);
+	void debugdfa();//用来调试dfa
 public:
 	void clear();
 	void initSyntax(ifstream&);
