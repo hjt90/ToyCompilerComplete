@@ -26,5 +26,8 @@ int main()
 	parser.analyze(lex.output());
 	parser.output(struction, graph);
 
+	struction.close();
+	graph.close();
+
 	return 0;
 }

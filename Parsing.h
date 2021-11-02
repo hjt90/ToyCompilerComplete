@@ -47,7 +47,8 @@ public:
 	syntaxTableIndex productions; //产生式
 	symbolTableIndex type;
 	string val;
-	syntaxTreeNode() = default;
+	bool inTree;
+	syntaxTreeNode();
 	syntaxTreeNode(const pair<Token, string>&);
 };
 

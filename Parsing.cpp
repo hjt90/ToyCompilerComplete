@@ -5,10 +5,14 @@
 #include "Parsing.h"
 using namespace std;
 
-syntaxTreeNode::syntaxTreeNode(const pair<Token, string>& rhs)
+syntaxTreeNode::syntaxTreeNode(const pair<Token, string>& rhs) : index(0), parent(-1), productions(-1), type(0), inTree(false)
 {
 	this->type = int(rhs.first);
 	this->val = rhs.second;
+}
+
+syntaxTreeNode::syntaxTreeNode() : index(0), parent(-1), productions(-1), type(0), inTree(false)
+{
 }
 
 /*********
@@ -433,6 +437,8 @@ void parsing::analyze(const vector<pair<Token, string>>& lexs)
 
 	while (1)
 	{
+		if (this->syntaxTree[this->analyseSymbolStack.top()].type == this->symbol2Index["$Start"] && this->syntaxTree[this->inputSymbolvector.top()].type == this->symbol2Index["$End"])
+			break;
 		analyseTableItem nextAction = this->analyseTable[this->statusStack.top()][this->syntaxTree[this->inputSymbolvector.top()].type];
 		if (nextAction.first == 'a')	//³É¹¦
 			break;
@@ -485,29 +491,30 @@ void parsing::analyze(const vector<pair<Token, string>>& lexs)
 
 void parsing::outputStruction(ofstream& struction, syntaxTreeNodeIndex Node, int pad)
 {
-	struction << string("\t", pad) << "{" << endl;
-	struction << string("\t", pad + 1) << "kind: " << this->symbolTable[this->syntaxTree[Node].type] << "," << endl;
+	this->syntaxTree[Node].inTree = true;
+	struction << string(pad, '	') << "{" << endl;
+	struction << string(pad + 1, '	') << "kind: " << this->symbolTable[this->syntaxTree[Node].type] << "," << endl;
 	if (!this->syntaxTree[Node].val.empty())
-		struction << string("\t", pad + 1) << "val: " << this->syntaxTree[Node].val << "," << endl;
-	if (this->syntaxTree[Node].productions)
+		struction << string(pad + 1, '	') << "val: " << this->syntaxTree[Node].val << "," << endl;
+	if (this->syntaxTree[Node].productions != -1)
 	{
-		struction << string("\t", pad + 1) << "type: ";
+		struction << string(pad + 1, '	') << "type: ";
 		for (auto rhs : this->syntaxTable[this->syntaxTree[Node].productions].rhs)
 			struction << this->symbolTable[rhs] << " ";
 		struction << "," << endl;
 	}
 	if (!this->syntaxTree[Node].children.empty())
 	{
-		struction << string("\t", pad + 1) << "inner: [" << endl;
+		struction << string(pad + 1, '	') << "inner: [" << endl;
 		for (auto child : this->syntaxTree[Node].children)
 		{
-			struction << string("\t", pad + 2) << "{" << endl;
+			struction << string(pad + 2, '	') << "{" << endl;
 			this->outputStruction(struction, child, pad + 2);
-			struction << string("\t", pad + 2) << "}," << endl;
+			struction << string(pad + 2, '	') << "}," << endl;
 		}
-		struction << string("\t", pad + 1) << "]" << endl;
+		struction << string(pad + 1, '	') << "]" << endl;
 	}
-	struction << string("\t", pad) << "}" << endl;
+	struction << string(pad, '	') << "}" << endl;
 }
 
 void parsing::outputDot(ofstream& graph, syntaxTreeNodeIndex Node)
@@ -516,7 +523,7 @@ void parsing::outputDot(ofstream& graph, syntaxTreeNodeIndex Node)
 	{
 		for (auto child : this->syntaxTree[Node].children)
 		{
-			graph << "\t" << "Node" << Node << "->" << "Node" << child << endl;
+			graph << "	" << "Node" << Node << "->" << "Node" << child << endl;
 		}
 		for (auto child : this->syntaxTree[Node].children)
 		{
@@ -525,7 +532,6 @@ void parsing::outputDot(ofstream& graph, syntaxTreeNodeIndex Node)
 	}
 }
 
-
 void parsing::output(ofstream& struction, ofstream& graph)
 {
 	this->outputStruction(struction, this->topNode, 0);
@@ -533,7 +539,8 @@ void parsing::output(ofstream& struction, ofstream& graph)
 	graph << "digraph demo {" << endl << endl;
 
 	for (int i = 0; i < syntaxTree.size(); i++)
-		graph << "\t" << "Node" << i << "[label=\"" << this->symbolTable[this->syntaxTree[i].type] << "\", shape=\"box\"]" << endl;
+		if (this->syntaxTree[i].inTree)
+			graph << "	" << "Node" << i << "[label=\"" << this->symbolTable[this->syntaxTree[i].type] << "\", shape=\"box\"]" << endl;
 
 	graph << endl;
 	this->outputDot(graph, this->topNode);
