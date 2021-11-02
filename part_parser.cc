@@ -27,7 +27,7 @@ $Start ::= <声明串> $End
 <内部声明> ::= <内部变量声明>
 <内部声明> ::= <内部声明> $Semi <内部变量声明>
 
-<内部变量声明> ::= $Int $ID
+<内部变量声明> ::= $Int $ID $Semi
 
 <语句串> ::= <语句>
 <语句串> ::= <语句串> <语句>
@@ -39,8 +39,8 @@ $Start ::= <声明串> $End
 
 <赋值语句> ::= $ID $Equal <表达式> $Semi
 
-<return语句> ::= $Return
-<return语句> ::= $Return <表达式>
+<return语句> ::= $Return $Semi
+<return语句> ::= $Return <表达式> $Semi
 
 <while语句> ::= $While $LeftBracket <表达式> $RightBracket <语句块>
 
