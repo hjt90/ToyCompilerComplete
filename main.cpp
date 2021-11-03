@@ -7,8 +7,8 @@ using namespace std;
 int main()
 {
 	ifstream fin("D:\\workspace\\GitHub\\ToyCompiler\\test.c");
-	ifstream finSyntax("D:\\workspace\\GitHub\\ToyCompiler\\part_parser.cc");
-	ofstream struction("D:\\workspace\\GitHub\\ToyCompiler\\test.out");
+	ifstream finSyntax("D:\\workspace\\GitHub\\ToyCompiler\\part_parser_without_empty.cc");
+	ofstream struction("D:\\workspace\\GitHub\\ToyCompiler\\test.json");
 	ofstream graph("D:\\workspace\\GitHub\\ToyCompiler\\test.dot");
 	if (!fin || !finSyntax || !struction || !graph)
 	{

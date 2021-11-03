@@ -1,11 +1,11 @@
 #include <sstream>
 #include <string>
 #include <iostream>
-#include<algorithm>
+#include <algorithm>
 #include "Parsing.h"
 using namespace std;
 
-syntaxTreeNode::syntaxTreeNode(const pair<Token, string>& rhs) : index(0), parent(-1), productions(-1), type(0), inTree(false)
+syntaxTreeNode::syntaxTreeNode(const pair<Token, string> &rhs) : index(0), parent(-1), productions(-1), type(0), inTree(false)
 {
 	this->type = int(rhs.first);
 	this->val = rhs.second;
@@ -72,7 +72,7 @@ void parsing::initTerminalSymbol()
  * 初始化 symbolTable、terminalSymbolMax、startIndex
  * 		symbol2Index、syntaxTable
  * ********/
-void parsing::initSymbolTable(ifstream& infile)
+void parsing::initSymbolTable(ifstream &infile)
 {
 	initTerminalSymbol();
 	int line = 0;
@@ -87,13 +87,13 @@ void parsing::initSymbolTable(ifstream& infile)
 		{
 			if (!((tmpstr[0] == '<' && tmpstr.back() == '>') || tmpstr[0] == '$'))
 				cout << "语法分析器错误:"
-				<< "语法输入第" << line << "行，左侧不是非终结符 " << tmpstr << endl;
+					 << "语法输入第" << line << "行，左侧不是非终结符 " << tmpstr << endl;
 			tmpSyntax.lhs = insertSymbol(tmpstr);
 
 			ss >> tmpstr;
 			if (tmpstr != "::=")
 				cout << "语法分析器错误:"
-				<< "语法输入第" << line << "行，未找到赋值符(::=)，现为" << tmpstr << endl;
+					 << "语法输入第" << line << "行，未找到赋值符(::=)，现为" << tmpstr << endl;
 			while (ss >> tmpstr)
 			{
 				tmpSyntax.rhs.push_back(insertSymbol(tmpstr));
@@ -102,7 +102,7 @@ void parsing::initSymbolTable(ifstream& infile)
 		}
 	}
 
-	this->syntaxTable.push_back({ this->startIndex,{this->symbol2Index["$Start"]} });	//添加S' ==> S
+	this->syntaxTable.push_back({this->startIndex, {this->symbol2Index["$Start"]}}); //添加S' ==> S
 	searchSyntaxByLhs = vector<set<syntaxTableIndex>>(symbolTable.size());
 	for (int i = 0; i < syntaxTable.size(); i++)
 	{
@@ -127,7 +127,7 @@ void parsing::initFirstTable()
 		for (auto syntaxIndexTmp : this->searchSyntaxByLhs[i])
 		{
 			symbolTableIndex symbolTmp = this->syntaxTable[syntaxIndexTmp].rhs[0];
-			if (symbolTmp <= this->terminalSymbolMax)	//产生式右侧首项为终结符
+			if (symbolTmp <= this->terminalSymbolMax) //产生式右侧首项为终结符
 				this->firstTable[i].insert(symbolTmp);
 		}
 	}
@@ -136,16 +136,16 @@ void parsing::initFirstTable()
 	do
 	{
 		inc = false;
-		for (int i = this->terminalSymbolMax + 1; i < this->symbolTable.size(); i++)	//对于每一个非终结符集
+		for (int i = this->terminalSymbolMax + 1; i < this->symbolTable.size(); i++) //对于每一个非终结符集
 		{
 			int cntTmp = this->firstTable[i].size();
-			for (auto syntaxIndexTmp : this->searchSyntaxByLhs[i])	//对于其为左项的产生式
+			for (auto syntaxIndexTmp : this->searchSyntaxByLhs[i]) //对于其为左项的产生式
 			{
-				const vector<symbolTableIndex>& rhsTmp = this->syntaxTable[syntaxIndexTmp].rhs;
-				for (int rhsIndex = 0; rhsIndex < rhsTmp.size(); rhsIndex++)	//遍历其右项
+				const vector<symbolTableIndex> &rhsTmp = this->syntaxTable[syntaxIndexTmp].rhs;
+				for (int rhsIndex = 0; rhsIndex < rhsTmp.size(); rhsIndex++) //遍历其右项
 				{
-					const firstTableItem& firstSymbolSet = this->firstTable[rhsTmp[rhsIndex]];
-					if (rhsTmp[rhsIndex] <= this->terminalSymbolMax)	//为终结符
+					const firstTableItem &firstSymbolSet = this->firstTable[rhsTmp[rhsIndex]];
+					if (rhsTmp[rhsIndex] <= this->terminalSymbolMax) //为终结符
 					{
 						this->firstTable[i].insert(rhsTmp[rhsIndex]);
 						break;
@@ -156,16 +156,16 @@ void parsing::initFirstTable()
 					if (!haveEmpty && firstSymbolSet.count(this->emptyIndex))
 						this->firstTable[i].erase(this->emptyIndex);
 
-					if (!firstSymbolSet.count(this->emptyIndex))	//不含空
+					if (!firstSymbolSet.count(this->emptyIndex)) //不含空
 						break;
-					if (rhsIndex == rhsTmp.size() - 1)	//如果产生式右侧全为空，加入空
+					if (rhsIndex == rhsTmp.size() - 1) //如果产生式右侧全为空，加入空
 						this->firstTable[i].insert(this->emptyIndex);
 				}
 			}
 			if (this->firstTable[i].size() > cntTmp)
 				inc = true;
 		}
-	} while (inc);	//直到不再增长
+	} while (inc); //直到不再增长
 }
 
 /*********
@@ -175,10 +175,10 @@ set<symbolTableIndex> parsing::firstForPhrase(vector<symbolTableIndex> rhsTmp)
 {
 	set<symbolTableIndex> res;
 
-	for (int rhsIndex = 0; rhsIndex < rhsTmp.size(); rhsIndex++)	//遍历其右项
+	for (int rhsIndex = 0; rhsIndex < rhsTmp.size(); rhsIndex++) //遍历其右项
 	{
-		const firstTableItem& firstSymbolSet = this->firstTable[rhsTmp[rhsIndex]];
-		if (rhsTmp[rhsIndex] <= this->terminalSymbolMax)	//为终结符
+		const firstTableItem &firstSymbolSet = this->firstTable[rhsTmp[rhsIndex]];
+		if (rhsTmp[rhsIndex] <= this->terminalSymbolMax) //为终结符
 		{
 			res.insert(rhsTmp[rhsIndex]);
 			break;
@@ -189,9 +189,9 @@ set<symbolTableIndex> parsing::firstForPhrase(vector<symbolTableIndex> rhsTmp)
 		if (!haveEmpty && firstSymbolSet.count(this->emptyIndex))
 			res.erase(this->emptyIndex);
 
-		if (!firstSymbolSet.count(this->emptyIndex))	//不含空
+		if (!firstSymbolSet.count(this->emptyIndex)) //不含空
 			break;
-		if (rhsIndex == rhsTmp.size() - 1)	//如果产生式右侧全为空，加入空
+		if (rhsIndex == rhsTmp.size() - 1) //如果产生式右侧全为空，加入空
 			res.insert(this->emptyIndex);
 	}
 
@@ -201,7 +201,7 @@ set<symbolTableIndex> parsing::firstForPhrase(vector<symbolTableIndex> rhsTmp)
 /*********
  * 重载<用于比较DFA_item
  * ********/
-bool operator<(const DFA_item& A, const DFA_item& B)
+bool operator<(const DFA_item &A, const DFA_item &B)
 {
 	if (A.lhs < B.lhs)
 		return true;
@@ -241,7 +241,7 @@ bool operator<(const DFA_item& A, const DFA_item& B)
 /*********
  * 重载==用于比较DFA_item
  * ********/
-bool operator==(const DFA_item& A, const DFA_item& B)
+bool operator==(const DFA_item &A, const DFA_item &B)
 {
 	if (A.lhs == B.lhs && A.rhs == B.rhs && A.pos == B.pos && A.forecast == B.forecast)
 		return true;
@@ -252,7 +252,7 @@ bool operator==(const DFA_item& A, const DFA_item& B)
 /*********
  * 构造closure
  * ********/
-pair<int, bool>  parsing::createClosure(DFA_status& sta)
+pair<int, bool> parsing::createClosure(DFA_status &sta)
 {
 	set<int> tempfirst;
 	vector<symbolTableIndex> restsentence;
@@ -266,16 +266,16 @@ pair<int, bool>  parsing::createClosure(DFA_status& sta)
 	while (!sd.empty())
 	{
 		temptop = sd.top();
-		sd.pop();//栈顶的语句出栈
-		if (temptop.pos<temptop.rhs.size() && temptop.rhs[temptop.pos]>terminalSymbolMax)//点后面是非终结符
+		sd.pop();																			  //栈顶的语句出栈
+		if (temptop.pos < temptop.rhs.size() && temptop.rhs[temptop.pos] > terminalSymbolMax) //点后面是非终结符
 		{
 			restsentence.clear();
-			for (int i = temptop.pos + 1; i < temptop.rhs.size(); i++)//提取需要找first集的语句
+			for (int i = temptop.pos + 1; i < temptop.rhs.size(); i++) //提取需要找first集的语句
 			{
 				restsentence.push_back(temptop.rhs[i]);
 			}
 			restsentence.push_back(temptop.forecast);
-			tempfirst = firstForPhrase(restsentence);//查first集
+			tempfirst = firstForPhrase(restsentence); //查first集
 			//查完了first集，开始构造新的句子
 			for (auto it = tempfirst.begin(); it != tempfirst.end(); it++)
 			{
@@ -285,9 +285,9 @@ pair<int, bool>  parsing::createClosure(DFA_status& sta)
 					tempd.rhs = syntaxTable[*it2].rhs;
 					tempd.pos = 0;
 					tempd.forecast = *it;
-					if (sta.insert(tempd).second == true)//成功插入
+					if (sta.insert(tempd).second == true) //成功插入
 					{
-						sd.push(tempd);//作为一个新的式子入栈
+						sd.push(tempd); //作为一个新的式子入栈
 					}
 				}
 			}
@@ -312,7 +312,7 @@ void parsing::initAnalyseTable()
 	DFA_item temptop, tempd;
 	set<int> tempfirst;
 	vector<symbolTableIndex> restsentence;
-	pair<int, bool>  gt;
+	pair<int, bool> gt;
 	int statusno;
 	stack<int> si;
 	//先手动构造初始状态0
@@ -323,13 +323,13 @@ void parsing::initAnalyseTable()
 	tempd.forecast = symbol2Index["$End"];
 	temps.insert(tempd);
 
-	createClosure(temps);//创建0号状态
+	createClosure(temps); //创建0号状态
 
-	si.push(0);//把状态0入栈
+	si.push(0); //把状态0入栈
 
 	//至此第0号状态构建完成
 	//接下来开始推导剩余状态
-	set<int>transflag;//记录有哪些符号可以用来转移
+	set<int> transflag; //记录有哪些符号可以用来转移
 	analyseTable.push_back(vector<analyseTableItem>(symbolTable.size(), pair<char, int>('\0', -1)));
 	while (!si.empty())
 	{
@@ -337,17 +337,17 @@ void parsing::initAnalyseTable()
 		temptopstatus = DFA[statusno];
 		si.pop();
 		transflag.clear();
-		for (auto it = temptopstatus.begin(); it != temptopstatus.end(); it++)//找到这个集合中所有可以转移的字符
+		for (auto it = temptopstatus.begin(); it != temptopstatus.end(); it++) //找到这个集合中所有可以转移的字符
 		{
 			if ((*it).pos < (*it).rhs.size())
 			{
 				transflag.insert((*it).rhs[(*it).pos]);
 			}
 		}
-		for (auto it = transflag.begin(); it != transflag.end(); it++)//对于每个可引发转移的字符，找移进状态
+		for (auto it = transflag.begin(); it != transflag.end(); it++) //对于每个可引发转移的字符，找移进状态
 		{
 			temps.clear();
-			for (auto it2 = temptopstatus.begin(); it2 != temptopstatus.end(); it2++)//对于每一条语句
+			for (auto it2 = temptopstatus.begin(); it2 != temptopstatus.end(); it2++) //对于每一条语句
 			{
 				if ((*it2).pos < (*it2).rhs.size() && (*it2).rhs[(*it2).pos] == *it)
 				{
@@ -360,13 +360,13 @@ void parsing::initAnalyseTable()
 			}
 			gt = createClosure(temps);
 			analyseTable[statusno][*it] = pair<char, int>('s', gt.first);
-			if (gt.second == true)//是新的状态
+			if (gt.second == true) //是新的状态
 			{
 				si.push(gt.first);
 				analyseTable.push_back(vector<analyseTableItem>(symbolTable.size(), pair<char, int>('\0', -1)));
 			}
 		}
-		for (auto it = temptopstatus.begin(); it != temptopstatus.end(); it++)//找规约状态
+		for (auto it = temptopstatus.begin(); it != temptopstatus.end(); it++) //找规约状态
 		{
 			if ((*it).pos >= (*it).rhs.size())
 			{
@@ -390,7 +390,6 @@ void parsing::initAnalyseTable()
 			}
 		}
 	}
-
 }
 
 void parsing::clear()
@@ -408,14 +407,14 @@ void parsing::clear()
 	inputSymbolvector = stack<syntaxTreeNodeIndex>();
 }
 
-void parsing::initSyntax(ifstream& fin)
+void parsing::initSyntax(ifstream &fin)
 {
 	this->initSymbolTable(fin);
 	this->initFirstTable();
 	this->initAnalyseTable();
 }
 
-void parsing::analyze(const vector<pair<Token, string>>& lexs)
+void parsing::analyze(const vector<pair<Token, string>> &lexs)
 {
 	//初始化输入符号栈
 	this->syntaxTree.push_back(pair<Token, string>{Token::End, ""});
@@ -440,18 +439,18 @@ void parsing::analyze(const vector<pair<Token, string>>& lexs)
 		if (this->syntaxTree[this->analyseSymbolStack.top()].type == this->symbol2Index["$Start"] && this->syntaxTree[this->inputSymbolvector.top()].type == this->symbol2Index["$End"])
 			break;
 		analyseTableItem nextAction = this->analyseTable[this->statusStack.top()][this->syntaxTree[this->inputSymbolvector.top()].type];
-		if (nextAction.first == 'a')	//成功
+		if (nextAction.first == 'a') //成功
 			break;
-		else if (nextAction.first == 's')	//移进
+		else if (nextAction.first == 's') //移进
 		{
 			this->statusStack.push(nextAction.second);
 			syntaxTreeNodeIndex tmp = this->inputSymbolvector.top();
 			this->inputSymbolvector.pop();
 			this->analyseSymbolStack.push(tmp);
 		}
-		else if (nextAction.first == 'r')	//归约
+		else if (nextAction.first == 'r') //归约
 		{
-			const syntaxTableItem& useSyntax = this->syntaxTable[nextAction.second];
+			const syntaxTableItem &useSyntax = this->syntaxTable[nextAction.second];
 			vector<syntaxTreeNodeIndex> rhsTmp;
 			for (int i = 0; i < useSyntax.rhs.size(); i++)
 			{
@@ -481,7 +480,7 @@ void parsing::analyze(const vector<pair<Token, string>>& lexs)
 				break;
 			}
 		}
-		else								//错误
+		else //错误
 		{
 			cout << "语法分析出错" << endl;
 			break;
@@ -489,41 +488,57 @@ void parsing::analyze(const vector<pair<Token, string>>& lexs)
 	}
 }
 
-void parsing::outputStruction(ofstream& struction, syntaxTreeNodeIndex Node, int pad)
+void parsing::outputStruction(ofstream &struction, syntaxTreeNodeIndex Node, int pad)
 {
 	this->syntaxTree[Node].inTree = true;
 	struction << string(pad, '	') << "{" << endl;
-	struction << string(pad + 1, '	') << "kind: " << this->symbolTable[this->syntaxTree[Node].type] << "," << endl;
+	struction << string(pad + 1, '	') << "\"kind\": \"" << this->symbolTable[this->syntaxTree[Node].type] << "\"";
+	if (!this->syntaxTree[Node].val.empty() || this->syntaxTree[Node].productions != -1 || !this->syntaxTree[Node].children.empty())
+		struction << ",";
+	struction << endl;
+
 	if (!this->syntaxTree[Node].val.empty())
-		struction << string(pad + 1, '	') << "val: " << this->syntaxTree[Node].val << "," << endl;
+	{
+		struction << string(pad + 1, '	') << "\"val\": \"" << this->syntaxTree[Node].val << "\"";
+		if (this->syntaxTree[Node].productions != -1 || !this->syntaxTree[Node].children.empty())
+			struction << ",";
+		struction << endl;
+	}
+
 	if (this->syntaxTree[Node].productions != -1)
 	{
-		struction << string(pad + 1, '	') << "type: ";
+		struction << string(pad + 1, '	') << "\"type\": \"";
 		for (auto rhs : this->syntaxTable[this->syntaxTree[Node].productions].rhs)
 			struction << this->symbolTable[rhs] << " ";
-		struction << "," << endl;
+		struction << "\"";
+		if (!this->syntaxTree[Node].children.empty())
+			struction << ",";
+		struction << endl;
 	}
+
 	if (!this->syntaxTree[Node].children.empty())
 	{
-		struction << string(pad + 1, '	') << "inner: [" << endl;
-		for (auto child : this->syntaxTree[Node].children)
+		struction << string(pad + 1, '	') << "\"inner\": [" << endl;
+		for (int i = 0; i < this->syntaxTree[Node].children.size(); i++)
 		{
-			struction << string(pad + 2, '	') << "{" << endl;
-			this->outputStruction(struction, child, pad + 2);
-			struction << string(pad + 2, '	') << "}," << endl;
+			this->outputStruction(struction, syntaxTree[Node].children[i], pad + 2);
+			if (i != this->syntaxTree[Node].children.size() - 1)
+				struction << "," << endl;
 		}
 		struction << string(pad + 1, '	') << "]" << endl;
 	}
-	struction << string(pad, '	') << "}" << endl;
+	struction << string(pad, '	') << "}";
 }
 
-void parsing::outputDot(ofstream& graph, syntaxTreeNodeIndex Node)
+void parsing::outputDot(ofstream &graph, syntaxTreeNodeIndex Node)
 {
 	if (!this->syntaxTree[Node].children.empty())
 	{
 		for (auto child : this->syntaxTree[Node].children)
 		{
-			graph << "	" << "Node" << Node << "->" << "Node" << child << endl;
+			graph << "	"
+				  << "Node" << Node << "->"
+				  << "Node" << child << endl;
 		}
 		for (auto child : this->syntaxTree[Node].children)
 		{
@@ -532,19 +547,25 @@ void parsing::outputDot(ofstream& graph, syntaxTreeNodeIndex Node)
 	}
 }
 
-void parsing::output(ofstream& struction, ofstream& graph)
+void parsing::output(ofstream &struction, ofstream &graph)
 {
 	this->outputStruction(struction, this->topNode, 0);
-	graph << "#@startdot" << endl << endl;
-	graph << "digraph demo {" << endl << "node [fontname=\"Fangsong\" shape=plaintext]" << endl << endl;
+	graph << "#@startdot" << endl
+		  << endl;
+	graph << "digraph demo {" << endl
+		  << "node [fontname=\"Fangsong\" shape=plaintext]" << endl
+		  << endl;
 
 	for (int i = 0; i < syntaxTree.size(); i++)
 		if (this->syntaxTree[i].inTree)
-			graph << "	" << "Node" << i << "[label=\"" << this->symbolTable[this->syntaxTree[i].type] << "\", shape=\"box\"]" << endl;
+			graph << "	"
+				  << "Node" << i << "[label=\"" << this->symbolTable[this->syntaxTree[i].type] << "\", shape=\"box\"]" << endl;
 
 	graph << endl;
 	this->outputDot(graph, this->topNode);
 
-	graph << endl << "}" << endl << endl;
+	graph << endl
+		  << "}" << endl
+		  << endl;
 	graph << "#@enddot" << endl;
 }
