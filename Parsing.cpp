@@ -392,6 +392,31 @@ void parsing::initAnalyseTable()
 	}
 }
 
+void parsing::debugdfa()//”√¿¥µ˜ ‘dfa
+{
+	ofstream of;
+	of.open("dfadebug.txt");
+	for (int i = 0; i < DFA.size(); i++)
+	{
+		of << "◊¥Ã¨" << i << endl;
+		for (auto it = DFA[i].begin(); it != DFA[i].end(); it++)
+		{
+			of << symbolTable[(*it).lhs] << " ::= ";
+			for (int j =0; j < (*it).rhs.size(); j++)
+			{
+				if (j == (*it).pos)
+					of << " dot ";
+				of << symbolTable[(*it).rhs[j]] << ' ';
+			}
+			if ((*it).pos== (*it).rhs.size())
+				of << " dot ";
+			of << "," << symbolTable[(*it).forecast];
+			of << endl;
+		}
+	}
+	of.close();
+}
+
 void parsing::clear()
 {
 	symbolTable.clear();
@@ -412,6 +437,7 @@ void parsing::initSyntax(ifstream &fin)
 	this->initSymbolTable(fin);
 	this->initFirstTable();
 	this->initAnalyseTable();
+	this->debugdfa();
 }
 
 void parsing::analyze(const vector<pair<Token, string>> &lexs)
