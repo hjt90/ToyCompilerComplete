@@ -536,7 +536,7 @@ void parsing::output(ofstream& struction, ofstream& graph)
 {
 	this->outputStruction(struction, this->topNode, 0);
 	graph << "#@startdot" << endl << endl;
-	graph << "digraph demo {" << endl << endl;
+	graph << "digraph demo {" << endl << "node [fontname=\"Fangsong\" shape=plaintext]" << endl << endl;
 
 	for (int i = 0; i < syntaxTree.size(); i++)
 		if (this->syntaxTree[i].inTree)
