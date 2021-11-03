@@ -392,7 +392,7 @@ void parsing::initAnalyseTable()
 	}
 }
 
-void parsing::debugdfa()//用来调试dfa
+void parsing::debugdfa() //用来调试dfa
 {
 	ofstream of;
 	of.open("dfadebug.txt");
@@ -402,13 +402,13 @@ void parsing::debugdfa()//用来调试dfa
 		for (auto it = DFA[i].begin(); it != DFA[i].end(); it++)
 		{
 			of << symbolTable[(*it).lhs] << " ::= ";
-			for (int j =0; j < (*it).rhs.size(); j++)
+			for (int j = 0; j < (*it).rhs.size(); j++)
 			{
 				if (j == (*it).pos)
 					of << " dot ";
 				of << symbolTable[(*it).rhs[j]] << ' ';
 			}
-			if ((*it).pos== (*it).rhs.size())
+			if ((*it).pos == (*it).rhs.size())
 				of << " dot ";
 			of << "," << symbolTable[(*it).forecast];
 			of << endl;
@@ -551,7 +551,8 @@ void parsing::outputStruction(ofstream &struction, syntaxTreeNodeIndex Node, int
 			if (i != this->syntaxTree[Node].children.size() - 1)
 				struction << "," << endl;
 		}
-		struction << string(pad + 1, '	') << "]" << endl;
+		struction << endl
+				  << string(pad + 1, '	') << "]" << endl;
 	}
 	struction << string(pad, '	') << "}";
 }
