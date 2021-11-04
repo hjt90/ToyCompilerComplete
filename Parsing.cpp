@@ -5,7 +5,7 @@
 #include "Parsing.h"
 using namespace std;
 
-syntaxTreeNode::syntaxTreeNode(const pair<Token, string> &rhs) : index(0), parent(-1), productions(-1), type(0), inTree(false)
+syntaxTreeNode::syntaxTreeNode(const pair<Token, string>& rhs) : index(0), parent(-1), productions(-1), type(0), inTree(false)
 {
 	this->type = int(rhs.first);
 	this->val = rhs.second;
@@ -72,7 +72,7 @@ void parsing::initTerminalSymbol()
  * 初始化 symbolTable、terminalSymbolMax、startIndex
  * 		symbol2Index、syntaxTable
  * ********/
-void parsing::initSymbolTable(ifstream &infile)
+void parsing::initSymbolTable(ifstream& infile)
 {
 	initTerminalSymbol();
 	int line = 0;
@@ -87,13 +87,13 @@ void parsing::initSymbolTable(ifstream &infile)
 		{
 			if (!((tmpstr[0] == '<' && tmpstr.back() == '>') || tmpstr[0] == '$'))
 				cout << "语法分析器错误:"
-					 << "语法输入第" << line << "行，左侧不是非终结符 " << tmpstr << endl;
+				<< "语法输入第" << line << "行，左侧不是非终结符 " << tmpstr << endl;
 			tmpSyntax.lhs = insertSymbol(tmpstr);
 
 			ss >> tmpstr;
 			if (tmpstr != "::=")
 				cout << "语法分析器错误:"
-					 << "语法输入第" << line << "行，未找到赋值符(::=)，现为" << tmpstr << endl;
+				<< "语法输入第" << line << "行，未找到赋值符(::=)，现为" << tmpstr << endl;
 			while (ss >> tmpstr)
 			{
 				tmpSyntax.rhs.push_back(insertSymbol(tmpstr));
@@ -102,7 +102,7 @@ void parsing::initSymbolTable(ifstream &infile)
 		}
 	}
 
-	this->syntaxTable.push_back({this->startIndex, {this->symbol2Index["$Start"]}}); //添加S' ==> S
+	this->syntaxTable.push_back({ this->startIndex, {this->symbol2Index["$Start"]} }); //添加S' ==> S
 	searchSyntaxByLhs = vector<set<syntaxTableIndex>>(symbolTable.size());
 	for (int i = 0; i < syntaxTable.size(); i++)
 	{
@@ -141,10 +141,10 @@ void parsing::initFirstTable()
 			int cntTmp = this->firstTable[i].size();
 			for (auto syntaxIndexTmp : this->searchSyntaxByLhs[i]) //对于其为左项的产生式
 			{
-				const vector<symbolTableIndex> &rhsTmp = this->syntaxTable[syntaxIndexTmp].rhs;
+				const vector<symbolTableIndex>& rhsTmp = this->syntaxTable[syntaxIndexTmp].rhs;
 				for (int rhsIndex = 0; rhsIndex < rhsTmp.size(); rhsIndex++) //遍历其右项
 				{
-					const firstTableItem &firstSymbolSet = this->firstTable[rhsTmp[rhsIndex]];
+					const firstTableItem& firstSymbolSet = this->firstTable[rhsTmp[rhsIndex]];
 					if (rhsTmp[rhsIndex] <= this->terminalSymbolMax) //为终结符
 					{
 						this->firstTable[i].insert(rhsTmp[rhsIndex]);
@@ -177,7 +177,7 @@ set<symbolTableIndex> parsing::firstForPhrase(vector<symbolTableIndex> rhsTmp)
 
 	for (int rhsIndex = 0; rhsIndex < rhsTmp.size(); rhsIndex++) //遍历其右项
 	{
-		const firstTableItem &firstSymbolSet = this->firstTable[rhsTmp[rhsIndex]];
+		const firstTableItem& firstSymbolSet = this->firstTable[rhsTmp[rhsIndex]];
 		if (rhsTmp[rhsIndex] <= this->terminalSymbolMax) //为终结符
 		{
 			res.insert(rhsTmp[rhsIndex]);
@@ -201,7 +201,7 @@ set<symbolTableIndex> parsing::firstForPhrase(vector<symbolTableIndex> rhsTmp)
 /*********
  * 重载<用于比较DFA_item
  * ********/
-bool operator<(const DFA_item &A, const DFA_item &B)
+bool operator<(const DFA_item& A, const DFA_item& B)
 {
 	if (A.lhs < B.lhs)
 		return true;
@@ -241,7 +241,7 @@ bool operator<(const DFA_item &A, const DFA_item &B)
 /*********
  * 重载==用于比较DFA_item
  * ********/
-bool operator==(const DFA_item &A, const DFA_item &B)
+bool operator==(const DFA_item& A, const DFA_item& B)
 {
 	if (A.lhs == B.lhs && A.rhs == B.rhs && A.pos == B.pos && A.forecast == B.forecast)
 		return true;
@@ -252,7 +252,7 @@ bool operator==(const DFA_item &A, const DFA_item &B)
 /*********
  * 构造closure
  * ********/
-pair<int, bool> parsing::createClosure(DFA_status &sta)
+pair<int, bool> parsing::createClosure(DFA_status& sta)
 {
 	set<int> tempfirst;
 	vector<symbolTableIndex> restsentence;
@@ -432,7 +432,7 @@ void parsing::clear()
 	inputSymbolvector = stack<syntaxTreeNodeIndex>();
 }
 
-void parsing::initSyntax(ifstream &fin)
+void parsing::initSyntax(ifstream& fin)
 {
 	this->initSymbolTable(fin);
 	this->initFirstTable();
@@ -440,7 +440,7 @@ void parsing::initSyntax(ifstream &fin)
 	this->debugdfa();
 }
 
-void parsing::analyze(const vector<pair<Token, string>> &lexs)
+void parsing::analyze(const vector<pair<Token, string>>& lexs)
 {
 	//初始化输入符号栈
 	this->syntaxTree.push_back(pair<Token, string>{Token::End, ""});
@@ -476,7 +476,7 @@ void parsing::analyze(const vector<pair<Token, string>> &lexs)
 		}
 		else if (nextAction.first == 'r') //归约
 		{
-			const syntaxTableItem &useSyntax = this->syntaxTable[nextAction.second];
+			const syntaxTableItem& useSyntax = this->syntaxTable[nextAction.second];
 			vector<syntaxTreeNodeIndex> rhsTmp;
 			for (int i = 0; i < useSyntax.rhs.size(); i++)
 			{
@@ -514,7 +514,7 @@ void parsing::analyze(const vector<pair<Token, string>> &lexs)
 	}
 }
 
-void parsing::outputStruction(ofstream &struction, syntaxTreeNodeIndex Node, int pad)
+void parsing::outputStruction(ofstream& struction, syntaxTreeNodeIndex Node, int pad)
 {
 	this->syntaxTree[Node].inTree = true;
 	struction << string(pad, '	') << "{" << endl;
@@ -552,21 +552,35 @@ void parsing::outputStruction(ofstream &struction, syntaxTreeNodeIndex Node, int
 				struction << "," << endl;
 		}
 		struction << endl
-				  << string(pad + 1, '	') << "]" << endl;
+			<< string(pad + 1, '	') << "]" << endl;
 	}
 	struction << string(pad, '	') << "}";
 }
 
-void parsing::outputDot(ofstream &graph, syntaxTreeNodeIndex Node)
+void parsing::outputDot(ofstream& graph, syntaxTreeNodeIndex Node)
 {
 	if (!this->syntaxTree[Node].children.empty())
 	{
 		for (auto child : this->syntaxTree[Node].children)
 		{
 			graph << "	"
-				  << "Node" << Node << "->"
-				  << "Node" << child << endl;
+				<< "Node" << Node << "->"
+				<< "Node" << child << endl;
 		}
+
+		if (this->syntaxTree[Node].children.size() > 1)
+		{
+			graph << "	" << "{" << endl << "		" << "rank = same;" << endl << "		";
+			for (int i = 0; i < this->syntaxTree[Node].children.size(); i++)
+			{
+				graph
+					<< "Node" << this->syntaxTree[Node].children[i];
+				if (i != this->syntaxTree[Node].children.size() - 1)
+					graph << "->";
+			}
+			graph << "[color=white];" << endl << "		" << "rankdir=LR;" << endl << "	" << "}" << endl;
+		}
+
 		for (auto child : this->syntaxTree[Node].children)
 		{
 			this->outputDot(graph, child);
@@ -574,25 +588,25 @@ void parsing::outputDot(ofstream &graph, syntaxTreeNodeIndex Node)
 	}
 }
 
-void parsing::output(ofstream &struction, ofstream &graph)
+void parsing::output(ofstream& struction, ofstream& graph)
 {
 	this->outputStruction(struction, this->topNode, 0);
 	graph << "#@startdot" << endl
-		  << endl;
+		<< endl;
 	graph << "digraph demo {" << endl
-		  << "node [fontname=\"Fangsong\" shape=plaintext]" << endl
-		  << endl;
+		<< "node [fontname=\"Fangsong\" shape=plaintext]" << endl
+		<< endl;
 
 	for (int i = 0; i < syntaxTree.size(); i++)
 		if (this->syntaxTree[i].inTree)
 			graph << "	"
-				  << "Node" << i << "[label=\"" << this->symbolTable[this->syntaxTree[i].type] << "\", shape=\"box\"]" << endl;
+			<< "Node" << i << "[label=\"" << this->symbolTable[this->syntaxTree[i].type] << "\", shape=\"box\"]" << endl;
 
 	graph << endl;
 	this->outputDot(graph, this->topNode);
 
 	graph << endl
-		  << "}" << endl
-		  << endl;
+		<< "}" << endl
+		<< endl;
 	graph << "#@enddot" << endl;
 }
