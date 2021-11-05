@@ -571,11 +571,11 @@ void parsing::outputDot(ofstream& graph, syntaxTreeNodeIndex Node)
 		if (this->syntaxTree[Node].children.size() > 1)
 		{
 			graph << "	" << "{" << endl << "		" << "rank = same;" << endl << "		";
-			for (int i = 0; i < this->syntaxTree[Node].children.size(); i++)
+			for (int i = this->syntaxTree[Node].children.size() - 1; i >= 0 ; i--)
 			{
 				graph
 					<< "Node" << this->syntaxTree[Node].children[i];
-				if (i != this->syntaxTree[Node].children.size() - 1)
+				if (i != 0)
 					graph << "->";
 			}
 			graph << "[color=white];" << endl << "		" << "rankdir=LR;" << endl << "	" << "}" << endl;
