@@ -19,7 +19,7 @@ typedef std::pair<char, int> analyseTableItem;
 typedef std::string symbolItem;
 typedef std::set<DFA_item> DFA_status;
 
-//é¡¹ç›®
+//ÏîÄ¿
 class DFA_item
 {
 public:
@@ -29,7 +29,7 @@ public:
 	symbolTableIndex forecast;
 };
 
-//æ–‡æ³•
+//ÎÄ·¨
 class syntaxTableItem
 {
 public:
@@ -37,14 +37,14 @@ public:
 	vector<symbolTableIndex> rhs;
 };
 
-//è¯­æ³•æ ‘èŠ‚ç‚¹
+//Óï·¨Ê÷½Úµã
 class syntaxTreeNode
 {
 public:
 	syntaxTreeNodeIndex index;
 	syntaxTreeNodeIndex parent;
 	vector<syntaxTreeNodeIndex> children;
-	syntaxTableIndex productions; //äº§ç”Ÿå¼
+	syntaxTableIndex productions; //²úÉúÊ½
 	symbolTableIndex type;
 	string val;
 	bool inTree;
@@ -52,29 +52,29 @@ public:
 	syntaxTreeNode(const pair<Token, string>&);
 };
 
-//æ–‡æ³•åˆ†æå™¨
+//ÎÄ·¨·ÖÎöÆ÷
 class parsing
 {
-	//ç¬¦å·è¡¨
+	//·ûºÅ±í
 	vector<symbolItem> symbolTable;
-	symbolTableIndex terminalSymbolMax; //ç»ˆç»“ç¬¦çš„æœ€åä¸€ä¸ª
-	symbolTableIndex startIndex;		//å¼€å§‹ç¬¦
-	symbolTableIndex emptyIndex;		//ç©º
+	symbolTableIndex terminalSymbolMax; //ÖÕ½á·ûµÄ×îºóÒ»¸ö
+	symbolTableIndex startIndex;		//¿ªÊ¼·û
+	symbolTableIndex emptyIndex;		//¿Õ
 	map<symbolItem, int> symbol2Index;
-	//æ–‡æ³•
+	//ÎÄ·¨
 	vector<syntaxTableItem> syntaxTable;
-	vector<set<syntaxTableIndex>> searchSyntaxByLhs;	//é€šè¿‡æ–‡æ³•çš„å·¦ä¾§æ‰¾äº§ç”Ÿå¼
-	//firstè¡¨
+	vector<set<syntaxTableIndex>> searchSyntaxByLhs;	//Í¨¹ıÎÄ·¨µÄ×ó²àÕÒ²úÉúÊ½
+	//first±í
 	vector<firstTableItem> firstTable;
-	//é¡¹ç›®é›†
+	//ÏîÄ¿¼¯
 	vector<DFA_status> DFA;
-	//åˆ†æè¡¨
+	//·ÖÎö±í
 	vector<vector<analyseTableItem>> analyseTable;
-	//åˆ†æè¿‡ç¨‹
-	vector<syntaxTreeNode> syntaxTree;			   //è¯­æ³•æ ‘èŠ‚ç‚¹
-	stack<DFA_statusIndex> statusStack;			   //åˆ†æçŠ¶æ€æ ˆ
-	stack<syntaxTreeNodeIndex> analyseSymbolStack; //åˆ†æç¬¦å·æ ˆ
-	stack<syntaxTreeNodeIndex> inputSymbolvector;  //è¾“å…¥ç¬¦å·æ ˆ
+	//·ÖÎö¹ı³Ì
+	vector<syntaxTreeNode> syntaxTree;			   //Óï·¨Ê÷½Úµã
+	stack<DFA_statusIndex> statusStack;			   //·ÖÎö×´Ì¬Õ»
+	stack<syntaxTreeNodeIndex> analyseSymbolStack; //·ÖÎö·ûºÅÕ»
+	stack<syntaxTreeNodeIndex> inputSymbolvector;  //ÊäÈë·ûºÅÕ»
 	syntaxTreeNodeIndex topNode;
 
 	void initSymbolTable(ifstream&);
@@ -86,7 +86,7 @@ class parsing
 	pair<int, bool> createClosure(DFA_status& sta);
 	void outputStruction(ofstream&, syntaxTreeNodeIndex, int);
 	void outputDot(ofstream&, syntaxTreeNodeIndex);
-	void debugdfa();//ç”¨æ¥è°ƒè¯•dfa
+	void debugdfa();//ÓÃÀ´µ÷ÊÔdfa
 public:
 	void clear();
 	void initSyntax(ifstream&);

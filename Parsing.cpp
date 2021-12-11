@@ -478,13 +478,19 @@ void parsing::analyze(const vector<pair<Token, string>>& lexs)
 		{
 			const syntaxTableItem& useSyntax = this->syntaxTable[nextAction.second];
 			vector<syntaxTreeNodeIndex> rhsTmp;
-			for (int i = 0; i < useSyntax.rhs.size(); i++)
+			if (useSyntax.rhs[0] == this->emptyIndex)
 			{
-				syntaxTreeNodeIndex tmp = this->analyseSymbolStack.top();
-				this->analyseSymbolStack.pop();
-				this->statusStack.pop();
-				rhsTmp.push_back(tmp);
-				syntaxTree[tmp].parent = syntaxTree.size();
+			}
+			else
+			{
+				for (int i = 0; i < useSyntax.rhs.size(); i++)
+				{
+					syntaxTreeNodeIndex tmp = this->analyseSymbolStack.top();
+					this->analyseSymbolStack.pop();
+					this->statusStack.pop();
+					rhsTmp.push_back(tmp);
+					syntaxTree[tmp].parent = syntaxTree.size();
+				}
 			}
 			syntaxTreeNode lhsTmp;
 			lhsTmp.children = rhsTmp;
