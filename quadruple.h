@@ -32,7 +32,7 @@ class IntermediateLanguage
 
 public:
     static quadrupleIndex nextquad;
-    void emit_code(const quadruple & newqr);
+    int emit_code(const quadruple & newqr);
     void back_patch(std::vector<quadrupleIndex> qrlist, int pos);
     IntermediateLanguage() = default;
 };

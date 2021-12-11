@@ -1,19 +1,19 @@
 #include "quadruple.h"
-
 int IntermediateLanguage::nextquad = CODE_START_POS;
 
-void IntermediateLanguage::emit_code(const quadruple & newqr)
+int IntermediateLanguage::emit_code(const quadruple & newqr)
 {
     code.push_back(newqr);
+    int quadnow = nextquad;
     nextquad++;
-    return;
+    return quadnow;
 }
 
 void IntermediateLanguage::back_patch(std::vector<quadrupleIndex> qrlist, int pos)
 {
     for (auto it = qrlist.begin(); it != qrlist.end(); it++)
     {
-        code[*it].result = pos;
+        code[(*it)- CODE_START_POS].result =std::to_string(pos);//这里注意减去代码段的初始偏移
     }
     return;
 }

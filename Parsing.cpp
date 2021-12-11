@@ -549,11 +549,15 @@ void parsing::generate_midcode(syntaxTableIndex SyntaxIndex, syntaxTreeNode &lhs
 	{
 	case 0:
 		break;
-	case 1:
+	case 1://<A> ::= $Empty
+		lhs.quad = mid_code.nextquad;
 		break;
-	case 2:
+	case 2://<N> ::= $Empty
+		lhs.nextlist.push_back(mid_code.nextquad);
+		mid_code.emit_code(quadruple(Oper::J, string(""), string(""), string("")));
 		break;
-	case 3:
+	case 3://<M> ::= $Empty
+		lhs.quad = mid_code.nextquad;
 		break;
 	case 4:
 		break;
@@ -591,9 +595,11 @@ void parsing::generate_midcode(syntaxTableIndex SyntaxIndex, syntaxTreeNode &lhs
 		break;
 	case 21:
 		break;
-	case 22:
+	case 22://<Óï¾ä> ::= <ifÓï¾ä>
+		lhs.nextlist = syntaxTree[rhs[0]].nextlist;
 		break;
-	case 23:
+	case 23://<Óï¾ä> :: = <whileÓï¾ä>
+		lhs.nextlist = syntaxTree[rhs[0]].nextlist;
 		break;
 	case 24:
 		break;
@@ -605,11 +611,36 @@ void parsing::generate_midcode(syntaxTableIndex SyntaxIndex, syntaxTreeNode &lhs
 		break;
 	case 28:
 		break;
-	case 29:
+	case 29://<whileÓï¾ä> ::= $While <M> $LeftBracket <±í´ïÊ½> $RightBracket <A> <Óï¾ä¿é>
+		int pos29m1, pos29e, pos29m2, pos29s1;
+		pos29m1 = 1;
+		pos29e = 3;
+		pos29m2 = 5;
+		pos29s1 = 6;
+		mid_code.back_patch(syntaxTree[rhs[pos29s1]].nextlist, syntaxTree[rhs[pos29m1]].quad);
+		mid_code.back_patch(syntaxTree[rhs[pos29e]].truelist, syntaxTree[rhs[pos29m2]].quad);
+		lhs.nextlist = syntaxTree[rhs[pos29e]].falselist;
+		mid_code.emit_code(quadruple(Oper::J, string(""), string(""), to_string(syntaxTree[rhs[pos29m1]].quad)));
 		break;
-	case 30:
+	case 30://<ifÓï¾ä> ::= $If $LeftBracket <±í´ïÊ½> $RightBracket <A> <Óï¾ä¿é> 
+		int pos30e, pos30m, pos30s1;
+		pos30e = 2;
+		pos30m = 4;
+		pos30s1 = 5;
+		mid_code.back_patch(syntaxTree[rhs[pos30e]].truelist, syntaxTree[rhs[pos30m]].quad);
+		lhs.nextlist = mergelist(syntaxTree[rhs[pos30e]].falselist, syntaxTree[rhs[pos30s1]].nextlist);
 		break;
-	case 31:
+	case 31://<ifÓï¾ä> ::= $If $LeftBracket <±í´ïÊ½> $RightBracket <A> <Óï¾ä¿é> <N> $Else <M> <A> <Óï¾ä¿é>
+		int pos31e, pos31m1, pos31s1,pos31n,pos31m2,pos31s2;
+		pos31e = 2;
+		pos31m1 = 4;
+		pos31s1 = 5;
+		pos31n = 6;
+		pos31m2 = 8;
+		pos31s2=10;
+		mid_code.back_patch(syntaxTree[rhs[pos31e]].truelist, syntaxTree[rhs[pos31m1]].quad);
+		mid_code.back_patch(syntaxTree[rhs[pos31e]].falselist, syntaxTree[rhs[pos31m2]].quad);
+		lhs.nextlist = mergelist(syntaxTree[rhs[pos31s1]].nextlist, syntaxTree[rhs[pos31n]].nextlist, syntaxTree[rhs[pos31s2]].nextlist);
 		break;
 	case 32:
 		break;
@@ -766,4 +797,20 @@ void parsing::output(ofstream &struction, ofstream &graph)
 		  << "}" << endl
 		  << endl;
 	graph << "#@enddot" << endl;
+}
+
+vector<quadrupleIndex> parsing::mergelist(vector<quadrupleIndex>& list1, vector<quadrupleIndex>& list2)
+{
+	vector<quadrupleIndex> temp;
+	temp.insert(temp.end(), list1.begin(), list1.end());
+	temp.insert(temp.end(), list2.begin(), list2.end());
+	return temp;
+}
+vector<quadrupleIndex> parsing::mergelist(vector<quadrupleIndex>& list1, vector<quadrupleIndex>& list2, vector<quadrupleIndex>& list3)
+{
+	vector<quadrupleIndex> temp;
+	temp.insert(temp.end(), list1.begin(), list1.end());
+	temp.insert(temp.end(), list2.begin(), list2.end());
+	temp.insert(temp.end(), list3.begin(), list3.end());
+	return temp;
 }

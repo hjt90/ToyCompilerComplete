@@ -103,6 +103,9 @@ class parsing
 	void outputStruction(ofstream &, syntaxTreeNodeIndex, int);
 	void outputDot(ofstream &, syntaxTreeNodeIndex);
 	void debugdfa(); //”√¿¥µ˜ ‘dfa
+	vector<quadrupleIndex> mergelist(vector<quadrupleIndex>& list1, vector<quadrupleIndex>& list2);
+	vector<quadrupleIndex> mergelist(vector<quadrupleIndex>& list1, vector<quadrupleIndex>& list2, vector<quadrupleIndex>& list3);
+
 public:
 	void clear();
 	void initSyntax(ifstream &);
