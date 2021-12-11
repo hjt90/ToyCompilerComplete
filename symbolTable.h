@@ -16,6 +16,7 @@ struct symbolTableItem
     int addr;
 };
 
+class proc_symbolTable;
 struct symbolTableFunction
 {
     std::string name;

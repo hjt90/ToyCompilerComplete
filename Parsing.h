@@ -16,6 +16,7 @@ typedef int symbolTableIndex;
 typedef int syntaxTableIndex;
 typedef int syntaxTreeNodeIndex;
 typedef int DFA_statusIndex;
+typedef int quadrupleIndex;
 typedef std::set<symbolTableIndex> firstTableItem;
 typedef std::pair<char, int> analyseTableItem;
 typedef std::string symbolItem;
