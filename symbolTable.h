@@ -19,15 +19,24 @@ struct symbolTableItem
 struct symbolTableFunction
 {
     std::string name;
-    symbolTable *addr;
+    symbolType return_type;
+    proc_symbolTable *addr;
+    std::vector<symbolTableItem> parm;
 };
 
-class symbolTable
+class proc_symbolTable
 {
-public:
-    static int nextname;
-    symbolTable *returnAddr;
+    proc_symbolTable *returnAddr;
     std::map<std::string, symbolTableItem> itemTable;
     std::map<std::string, symbolTableFunction> functionTable;
-    symbolTable() = default;
+
+public:
+    static int nextname;
+    proc_symbolTable() = default;
+    const symbolTableItem &find_variable(std::string name);
+    const symbolTableFunction &find_function(std::string name);
+    void make_function(const std::vector<symbolTableItem> &parms, std::string name, symbolType return_type);
+    void insert_variable(const symbolTableItem &);
+    int into_function(std::string);
+    int return_function();
 };

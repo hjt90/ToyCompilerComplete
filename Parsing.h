@@ -7,6 +7,8 @@
 #include <string>
 #include <fstream>
 #include "lexer.h"
+#include "symbolTable.h"
+#include "quadruple.h"
 using namespace std;
 
 class DFA_item;
@@ -47,9 +49,17 @@ public:
 	syntaxTableIndex productions; //产生式
 	symbolTableIndex type;
 	string val;
+
+	quadrupleIndex quad;
+	symbolType stype;
+	string place;
+	vector<quadrupleIndex> truelist;
+	vector<quadrupleIndex> falselist;
+
 	bool inTree;
+
 	syntaxTreeNode();
-	syntaxTreeNode(const pair<Token, string>&);
+	syntaxTreeNode(const pair<Token, string> &);
 };
 
 //文法分析器
@@ -63,7 +73,7 @@ class parsing
 	map<symbolItem, int> symbol2Index;
 	//文法
 	vector<syntaxTableItem> syntaxTable;
-	vector<set<syntaxTableIndex>> searchSyntaxByLhs;	//通过文法的左侧找产生式
+	vector<set<syntaxTableIndex>> searchSyntaxByLhs; //通过文法的左侧找产生式
 	//first表
 	vector<firstTableItem> firstTable;
 	//项目集
@@ -76,20 +86,24 @@ class parsing
 	stack<syntaxTreeNodeIndex> analyseSymbolStack; //分析符号栈
 	stack<syntaxTreeNodeIndex> inputSymbolvector;  //输入符号栈
 	syntaxTreeNodeIndex topNode;
+	//中间代码生成部分
+	proc_symbolTable proc_symbolTable;
+	IntermediateLanguage mid_code;
 
-	void initSymbolTable(ifstream&);
+	void initSymbolTable(ifstream &);
 	void initFirstTable();
 	void initAnalyseTable();
 	void initTerminalSymbol();
+	void generate_midcode(syntaxTableIndex SyntaxIndex, syntaxTreeNode& lhs,vector<syntaxTreeNodeIndex>& rhs);
 	symbolTableIndex insertSymbol(symbolItem);
 	set<symbolTableIndex> firstForPhrase(vector<symbolTableIndex> p);
-	pair<int, bool> createClosure(DFA_status& sta);
-	void outputStruction(ofstream&, syntaxTreeNodeIndex, int);
-	void outputDot(ofstream&, syntaxTreeNodeIndex);
-	void debugdfa();//用来调试dfa
+	pair<int, bool> createClosure(DFA_status &sta);
+	void outputStruction(ofstream &, syntaxTreeNodeIndex, int);
+	void outputDot(ofstream &, syntaxTreeNodeIndex);
+	void debugdfa(); //用来调试dfa
 public:
 	void clear();
-	void initSyntax(ifstream&);
-	void analyze(const vector<pair<Token, string>>&);
-	void output(ofstream& struction, ofstream& graph);
+	void initSyntax(ifstream &);
+	void analyze(const vector<pair<Token, string>> &);
+	void output(ofstream &struction, ofstream &graph);
 };

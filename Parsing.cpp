@@ -519,11 +519,12 @@ void parsing::analyze(const vector<pair<Token, string>>& lexs)
 			lhsTmp.children = rhsTmp;
 			lhsTmp.productions = nextAction.second;
 			lhsTmp.type = useSyntax.lhs;
+			this->generate_midcode(nextAction.second, lhsTmp, rhsTmp);
 			syntaxTree.push_back(lhsTmp);
 			this->syntaxTree.back().index = syntaxTree.size() - 1;
 			this->analyseSymbolStack.push(syntaxTree.size() - 1);
 			this->topNode = syntaxTree.size() - 1;
-
+			
 			nextAction = this->analyseTable[this->statusStack.top()][this->syntaxTree[this->analyseSymbolStack.top()].type];
 			if (nextAction.first == 's')
 			{
@@ -541,6 +542,11 @@ void parsing::analyze(const vector<pair<Token, string>>& lexs)
 			break;
 		}
 	}
+}
+
+void parsing::generate_midcode(syntaxTableIndex SyntaxIndex, syntaxTreeNode &lhs, vector<syntaxTreeNodeIndex> &rhs)
+{
+	return;
 }
 
 void parsing::outputStruction(ofstream& struction, syntaxTreeNodeIndex Node, int pad)
