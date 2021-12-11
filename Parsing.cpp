@@ -308,7 +308,7 @@ pair<int, bool> parsing::createClosure(DFA_status& sta)
  * ********/
 void parsing::initAnalyseTable()
 {
-	DFA_status temps, temptopstatus;
+	DFA_status temps;
 	DFA_item temptop, tempd;
 	set<int> tempfirst;
 	vector<symbolTableIndex> restsentence;
@@ -331,13 +331,17 @@ void parsing::initAnalyseTable()
 	//接下来开始推导剩余状态
 	set<int> transflag; //记录有哪些符号可以用来转移
 	analyseTable.push_back(vector<analyseTableItem>(symbolTable.size(), pair<char, int>('\0', -1)));
+	bool empty_flag = 0;//记录是否有推出空
+
 	while (!si.empty())
 	{
+		empty_flag = 0;
+		//debugdfa();//调试
 		statusno = si.top();
-		temptopstatus = DFA[statusno];
+		//DFA_status& DFA[statusno] = DFA[statusno];
 		si.pop();
 		transflag.clear();
-		for (auto it = temptopstatus.begin(); it != temptopstatus.end(); it++) //找到这个集合中所有可以转移的字符
+		for (auto it = DFA[statusno].begin(); it != DFA[statusno].end(); it++) //找到这个集合中所有可以转移的字符
 		{
 			if ((*it).pos < (*it).rhs.size())
 			{
@@ -346,29 +350,51 @@ void parsing::initAnalyseTable()
 		}
 		for (auto it = transflag.begin(); it != transflag.end(); it++) //对于每个可引发转移的字符，找移进状态
 		{
-			temps.clear();
-			for (auto it2 = temptopstatus.begin(); it2 != temptopstatus.end(); it2++) //对于每一条语句
+			if (*it == emptyIndex)//特殊处理生成empty的内容，加入原本状态不写转移表
 			{
-				if ((*it2).pos < (*it2).rhs.size() && (*it2).rhs[(*it2).pos] == *it)
+				//empty_flag = 1;//标记推出空，最后在处理不然会死循环
+				/*
+				for (auto it2 = DFA[statusno].begin(); it2 != DFA[statusno].end(); it2++) //对于每一条语句
 				{
-					tempd.lhs = (*it2).lhs;
-					tempd.rhs = (*it2).rhs;
-					tempd.pos = (*it2).pos + 1;
-					tempd.forecast = (*it2).forecast;
-					temps.insert(tempd);
+					if ((*it2).pos < (*it2).rhs.size() && (*it2).rhs[(*it2).pos] == *it)
+					{
+						tempd.lhs = (*it2).lhs;
+						tempd.rhs = (*it2).rhs;
+						tempd.pos = (*it2).pos + 1;
+						tempd.forecast = (*it2).forecast;
+						DFA[statusno].insert(tempd);
+					}
+				}
+				*/
+				;
+			}
+			else //正常转移写转移表
+			{				
+				temps.clear();
+				for (auto it2 = DFA[statusno].begin(); it2 != DFA[statusno].end(); it2++) //对于每一条语句
+				{
+					if ((*it2).pos < (*it2).rhs.size() && (*it2).rhs[(*it2).pos] == *it)
+					{
+						tempd.lhs = (*it2).lhs;
+						tempd.rhs = (*it2).rhs;
+						tempd.pos = (*it2).pos + 1;
+						tempd.forecast = (*it2).forecast;
+						temps.insert(tempd);
+					}
+				}
+				gt = createClosure(temps);
+				analyseTable[statusno][*it] = pair<char, int>('s', gt.first);
+				if (gt.second == true) //是新的状态
+				{
+					si.push(gt.first);
+					analyseTable.push_back(vector<analyseTableItem>(symbolTable.size(), pair<char, int>('\0', -1)));
 				}
 			}
-			gt = createClosure(temps);
-			analyseTable[statusno][*it] = pair<char, int>('s', gt.first);
-			if (gt.second == true) //是新的状态
-			{
-				si.push(gt.first);
-				analyseTable.push_back(vector<analyseTableItem>(symbolTable.size(), pair<char, int>('\0', -1)));
-			}
+
 		}
-		for (auto it = temptopstatus.begin(); it != temptopstatus.end(); it++) //找规约状态
+		for (auto it = DFA[statusno].begin(); it != DFA[statusno].end(); it++) //找规约状态
 		{
-			if ((*it).pos >= (*it).rhs.size())
+			if ((*it).pos >= (*it).rhs.size()|| (*it).rhs[0] == emptyIndex)
 			{
 				int synno;
 				//找到是哪一个规约文法
