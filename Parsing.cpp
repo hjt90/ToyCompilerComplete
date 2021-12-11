@@ -127,7 +127,7 @@ void parsing::initFirstTable()
 		for (auto syntaxIndexTmp : this->searchSyntaxByLhs[i])
 		{
 			symbolTableIndex symbolTmp = this->syntaxTable[syntaxIndexTmp].rhs[0];
-			if (symbolTmp <= this->terminalSymbolMax) //产生式右侧首项为终结符
+			if (symbolTmp < this->terminalSymbolMax) //产生式右侧首项为终结符,非空
 				this->firstTable[i].insert(symbolTmp);
 		}
 	}
@@ -502,12 +502,9 @@ void parsing::analyze(const vector<pair<Token, string>>& lexs)
 		}
 		else if (nextAction.first == 'r') //归约
 		{
-			const syntaxTableItem& useSyntax = this->syntaxTable[nextAction.second];
+			const syntaxTableItem &useSyntax = this->syntaxTable[nextAction.second];
 			vector<syntaxTreeNodeIndex> rhsTmp;
-			if (useSyntax.rhs[0] == this->emptyIndex)
-			{
-			}
-			else
+			if (useSyntax.rhs[0] != this->emptyIndex)
 			{
 				for (int i = 0; i < useSyntax.rhs.size(); i++)
 				{
