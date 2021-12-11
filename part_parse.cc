@@ -45,8 +45,8 @@ $Start ::= <N> <声明串>
 
 <while语句> ::= $While <M> $LeftBracket <表达式> $RightBracket <A> <语句块>
 
-<if语句> ::= $If $LeftBracket <表达式> <A> $RightBracket <语句块>
-<if语句> ::= $If $LeftBracket <表达式> <A> $RightBracket <语句块> <N> $Else <M> <A> <语句块>
+<if语句> ::= $If $LeftBracket <表达式> $RightBracket <A> <语句块>
+<if语句> ::= $If $LeftBracket <表达式> $RightBracket <A> <语句块> <N> $Else <M> <A> <语句块>
 
 <表达式> ::= <加法表达式>
 <表达式> ::= <表达式> <比较运算符> <加法表达式>

@@ -16,8 +16,10 @@ enum class Oper : char
     Assign
 };
 
-struct quadruple
+class quadruple
 {
+public:
+    quadruple(Oper Op, std::string arg1, std::string arg2, std::string result);
     Oper Op;
     std::string arg1;
     std::string arg2;
@@ -30,7 +32,7 @@ class IntermediateLanguage
 
 public:
     static quadrupleIndex nextquad;
-    int emit_code(const quadruple & newqr);
+    void emit_code(const quadruple & newqr);
     void back_patch(std::vector<quadrupleIndex> qrlist, int pos);
     IntermediateLanguage() = default;
 };

@@ -56,6 +56,7 @@ public:
 	string place;
 	vector<quadrupleIndex> truelist;
 	vector<quadrupleIndex> falselist;
+	vector<quadrupleIndex> nextlist;
 
 	bool inTree;
 

@@ -2,7 +2,7 @@
 
 int IntermediateLanguage::nextquad = CODE_START_POS;
 
-int IntermediateLanguage::emit_code(const quadruple & newqr)
+void IntermediateLanguage::emit_code(const quadruple & newqr)
 {
     code.push_back(newqr);
     nextquad++;
@@ -16,4 +16,12 @@ void IntermediateLanguage::back_patch(std::vector<quadrupleIndex> qrlist, int po
         code[*it].result = pos;
     }
     return;
+}
+
+quadruple::quadruple(Oper Op, std::string arg1, std::string arg2, std::string result)
+{
+    this->Op = Op;
+    this->arg1 = arg1;
+    this->arg2 = arg2;
+    this->result = result;
 }
