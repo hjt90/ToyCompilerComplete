@@ -6,7 +6,8 @@
 enum class symbolType : char
 {
     Int,
-    Real
+    Real,
+    None
 };
 
 struct symbolTableItem
@@ -33,11 +34,12 @@ class proc_symbolTable
 
 public:
     static int nextname;
+    static int nexttmpname;
     proc_symbolTable() = default;
     const symbolTableItem &find_variable(std::string name);
     const symbolTableFunction &find_function(std::string name);
     void make_function(const std::vector<symbolTableItem> &parms, std::string name, symbolType return_type);
     void insert_variable(const symbolTableItem &);
-    int into_function(std::string);
-    int return_function();
+    proc_symbolTable *into_function(std::string);
+    proc_symbolTable *return_function();
 };

@@ -484,6 +484,7 @@ void parsing::analyze(const vector<pair<Token, string>> &lexs)
 	this->syntaxTree.push_back(pair<Token, string>{Token::End, ""});
 	this->syntaxTree.back().index = syntaxTree.size() - 1;
 	this->analyseSymbolStack.push(syntaxTree.size() - 1);
+	this->p_symbolTable = new proc_symbolTable();
 
 	while (1)
 	{
@@ -549,14 +550,14 @@ void parsing::generate_midcode(syntaxTableIndex SyntaxIndex, syntaxTreeNode &lhs
 	{
 	case 0:
 		break;
-	case 1://<A> ::= $Empty
+	case 1: //<A> ::= $Empty
 		lhs.quad = mid_code.nextquad;
 		break;
-	case 2://<N> ::= $Empty
+	case 2: //<N> ::= $Empty
 		lhs.nextlist.push_back(mid_code.nextquad);
 		mid_code.emit_code(quadruple(Oper::J, string(""), string(""), string("")));
 		break;
-	case 3://<M> ::= $Empty
+	case 3: //<M> ::= $Empty
 		lhs.quad = mid_code.nextquad;
 		break;
 	case 4:
@@ -595,10 +596,10 @@ void parsing::generate_midcode(syntaxTableIndex SyntaxIndex, syntaxTreeNode &lhs
 		break;
 	case 21:
 		break;
-	case 22://<Óï¾ä> ::= <ifÓï¾ä>
+	case 22: //<Óï¾ä> ::= <ifÓï¾ä>
 		lhs.nextlist = syntaxTree[rhs[0]].nextlist;
 		break;
-	case 23://<Óï¾ä> :: = <whileÓï¾ä>
+	case 23: //<Óï¾ä> :: = <whileÓï¾ä>
 		lhs.nextlist = syntaxTree[rhs[0]].nextlist;
 		break;
 	case 24:
@@ -611,7 +612,7 @@ void parsing::generate_midcode(syntaxTableIndex SyntaxIndex, syntaxTreeNode &lhs
 		break;
 	case 28:
 		break;
-	case 29://<whileÓï¾ä> ::= $While <M> $LeftBracket <±í´ïÊ½> $RightBracket <A> <Óï¾ä¿é>
+	case 29: //<whileÓï¾ä> ::= $While <M> $LeftBracket <±í´ïÊ½> $RightBracket <A> <Óï¾ä¿é>
 		int pos29m1, pos29e, pos29m2, pos29s1;
 		pos29m1 = 1;
 		pos29e = 3;
@@ -622,7 +623,7 @@ void parsing::generate_midcode(syntaxTableIndex SyntaxIndex, syntaxTreeNode &lhs
 		lhs.nextlist = syntaxTree[rhs[pos29e]].falselist;
 		mid_code.emit_code(quadruple(Oper::J, string(""), string(""), to_string(syntaxTree[rhs[pos29m1]].quad)));
 		break;
-	case 30://<ifÓï¾ä> ::= $If $LeftBracket <±í´ïÊ½> $RightBracket <A> <Óï¾ä¿é> 
+	case 30: //<ifÓï¾ä> ::= $If $LeftBracket <±í´ïÊ½> $RightBracket <A> <Óï¾ä¿é>
 		int pos30e, pos30m, pos30s1;
 		pos30e = 2;
 		pos30m = 4;
@@ -630,14 +631,14 @@ void parsing::generate_midcode(syntaxTableIndex SyntaxIndex, syntaxTreeNode &lhs
 		mid_code.back_patch(syntaxTree[rhs[pos30e]].truelist, syntaxTree[rhs[pos30m]].quad);
 		lhs.nextlist = mergelist(syntaxTree[rhs[pos30e]].falselist, syntaxTree[rhs[pos30s1]].nextlist);
 		break;
-	case 31://<ifÓï¾ä> ::= $If $LeftBracket <±í´ïÊ½> $RightBracket <A> <Óï¾ä¿é> <N> $Else <M> <A> <Óï¾ä¿é>
-		int pos31e, pos31m1, pos31s1,pos31n,pos31m2,pos31s2;
+	case 31: //<ifÓï¾ä> ::= $If $LeftBracket <±í´ïÊ½> $RightBracket <A> <Óï¾ä¿é> <N> $Else <M> <A> <Óï¾ä¿é>
+		int pos31e, pos31m1, pos31s1, pos31n, pos31m2, pos31s2;
 		pos31e = 2;
 		pos31m1 = 4;
 		pos31s1 = 5;
 		pos31n = 6;
 		pos31m2 = 8;
-		pos31s2=10;
+		pos31s2 = 10;
 		mid_code.back_patch(syntaxTree[rhs[pos31e]].truelist, syntaxTree[rhs[pos31m1]].quad);
 		mid_code.back_patch(syntaxTree[rhs[pos31e]].falselist, syntaxTree[rhs[pos31m2]].quad);
 		lhs.nextlist = mergelist(syntaxTree[rhs[pos31s1]].nextlist, syntaxTree[rhs[pos31n]].nextlist, syntaxTree[rhs[pos31s2]].nextlist);
@@ -799,14 +800,15 @@ void parsing::output(ofstream &struction, ofstream &graph)
 	graph << "#@enddot" << endl;
 }
 
-vector<quadrupleIndex> parsing::mergelist(vector<quadrupleIndex>& list1, vector<quadrupleIndex>& list2)
+vector<quadrupleIndex> parsing::mergelist(vector<quadrupleIndex> &list1, vector<quadrupleIndex> &list2)
 {
 	vector<quadrupleIndex> temp;
 	temp.insert(temp.end(), list1.begin(), list1.end());
 	temp.insert(temp.end(), list2.begin(), list2.end());
 	return temp;
 }
-vector<quadrupleIndex> parsing::mergelist(vector<quadrupleIndex>& list1, vector<quadrupleIndex>& list2, vector<quadrupleIndex>& list3)
+
+vector<quadrupleIndex> parsing::mergelist(vector<quadrupleIndex> &list1, vector<quadrupleIndex> &list2, vector<quadrupleIndex> &list3)
 {
 	vector<quadrupleIndex> temp;
 	temp.insert(temp.end(), list1.begin(), list1.end());
