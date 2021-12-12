@@ -19,6 +19,8 @@ enum class Oper : char
     Multiply,
     Divide,
     Assign,
+    Parm,
+    Call,
     Return
 };
 

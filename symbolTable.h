@@ -8,7 +8,8 @@ enum class symbolType : char
     Int,
     Real,
     Void,
-    None
+    None,
+    Unknown
 };
 
 struct symbolTableItem

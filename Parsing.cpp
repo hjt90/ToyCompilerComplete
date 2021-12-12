@@ -546,6 +546,7 @@ void parsing::analyze(const vector<pair<Token, string>> &lexs)
 
 void parsing::generate_midcode(syntaxTableIndex SyntaxIndex, syntaxTreeNode &lhs, vector<syntaxTreeNodeIndex> &rhs)
 {
+	symbolTableFunction functmp;
 	switch (SyntaxIndex)
 	{
 	case 0: //$Start ::= <N> <声明串>
@@ -726,18 +727,45 @@ void parsing::generate_midcode(syntaxTableIndex SyntaxIndex, syntaxTreeNode &lhs
 		mid_code.emit_code(quadruple(Oper::Divide, syntaxTree[rhs[0]].place, syntaxTree[rhs[1]].place, lhs.place));
 		break;
 	case 46: //<因子> ::= $Number
+		lhs.place = syntaxTree[rhs[0]].val;
 		break;
 	case 47: //<因子> ::= $LeftBracket <表达式> $RightBracket
+		lhs.place = syntaxTree[rhs[0]].place;
 		break;
 	case 48: //<因子> ::= $ID $LeftBracket <实参列表> $RightBracket
+		functmp = p_symbolTable->find_function(syntaxTree[rhs[0]].val);
+		if (functmp.return_type != symbolType::None)
+			printf("%s不在函数表中\n", syntaxTree[rhs[0]].val);
+		else if (functmp.parm.size() != syntaxTree[rhs[2]].plist.size())
+			printf("%s函数实参列表不符\n", syntaxTree[rhs[0]].val);
+		else
+		{
+			for (auto i : functmp.parm)
+			{
+				mid_code.emit_code(quadruple(Oper::Parm, string(""), string(""), i.name));
+			}
+			mid_code.emit_code(quadruple(Oper::Call, string(""), string(""), syntaxTree[rhs[0]].val));
+			if (functmp.return_type == symbolType::Int)
+			{
+				lhs.place = p_symbolTable->newtemp();
+				mid_code.emit_code(quadruple(Oper::Assign, lhs.place, string(""), "EAX"));
+			}
+		}
 		break;
 	case 49: //<因子> ::= $ID
+		if (p_symbolTable->find_variable(syntaxTree[rhs[0]].val).type != symbolType::None)
+			printf("%s不在符号表中\n", syntaxTree[rhs[0]].val);
+		else
+			lhs.place = syntaxTree[rhs[0]].place;
 		break;
 	case 50: //<实参列表> ::= $Empty
 		break;
 	case 51: //<实参列表> ::= <表达式>
+		lhs.plist.push_back({symbolType::Unknown, syntaxTree[rhs[0]].place});
 		break;
 	case 52: //<实参列表> ::= <表达式> $Comma <实参列表>
+		lhs.plist.push_back({symbolType::Unknown, syntaxTree[rhs[0]].place});
+		lhs.plist.insert(lhs.plist.end(), syntaxTree[rhs[2]].plist.begin(), syntaxTree[rhs[2]].plist.end());
 		break;
 	default:
 		break;
