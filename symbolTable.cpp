@@ -53,3 +53,11 @@ proc_symbolTable *proc_symbolTable::return_function()
 {
     return this->returnAddr;
 }
+
+string proc_symbolTable::newtemp()
+{
+    string temp="T";
+    temp += std::to_string(nexttmpname);
+    nexttmpname++;
+    return temp;
+}

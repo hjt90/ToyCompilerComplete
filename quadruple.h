@@ -13,6 +13,11 @@ enum class Oper : char
     Jge,
     Jlt,
     Jle,
+    Jne,
+    Plus,
+    Minus,
+    Multiply,
+    Divide,
     Assign,
     Return
 };

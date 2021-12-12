@@ -43,4 +43,5 @@ public:
     void insert_variable(const symbolTableItem &);
     proc_symbolTable *into_function(std::string);
     proc_symbolTable *return_function();
+    string newtemp();
 };

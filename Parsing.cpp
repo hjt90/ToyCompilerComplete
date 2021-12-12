@@ -663,33 +663,67 @@ void parsing::generate_midcode(syntaxTableIndex SyntaxIndex, syntaxTreeNode &lhs
 		lhs.nextlist = mergelist(syntaxTree[rhs[pos31s1]].nextlist, syntaxTree[rhs[pos31n]].nextlist, syntaxTree[rhs[pos31s2]].nextlist);
 		break;
 	case 32: //<表达式> ::= <加法表达式>
-		//lhs.place = syntaxTree[rhs[0]].place;
+		lhs.place = syntaxTree[rhs[0]].place;
 		break;
 	case 33: //<表达式> ::= <表达式> <比较运算符> <加法表达式>
+		lhs.truelist.push_back(mid_code.nextquad);
+		lhs.falselist.push_back(mid_code.nextquad + 1);
+		if (syntaxTree[rhs[1]].place == "$Smaller")
+			mid_code.emit_code(quadruple(Oper::Jlt, syntaxTree[rhs[0]].place, syntaxTree[rhs[2]].place, string("0")));
+		else if (syntaxTree[rhs[1]].place == "$SmallerEqual")
+			mid_code.emit_code(quadruple(Oper::Jle, syntaxTree[rhs[0]].place, syntaxTree[rhs[2]].place, string("0")));
+		else if (syntaxTree[rhs[1]].place == "$Bigger")
+			mid_code.emit_code(quadruple(Oper::Jgt, syntaxTree[rhs[0]].place, syntaxTree[rhs[2]].place, string("0")));
+		else if (syntaxTree[rhs[1]].place == "$BiggerEqual")
+			mid_code.emit_code(quadruple(Oper::Jge, syntaxTree[rhs[0]].place, syntaxTree[rhs[2]].place, string("0")));
+		else if (syntaxTree[rhs[1]].place == "$Equal2")
+			mid_code.emit_code(quadruple(Oper::Jeq, syntaxTree[rhs[0]].place, syntaxTree[rhs[2]].place, string("0")));
+		else if (syntaxTree[rhs[1]].place == "$NotEqual")
+			mid_code.emit_code(quadruple(Oper::Jne, syntaxTree[rhs[0]].place, syntaxTree[rhs[2]].place, string("0")));
+		else
+			cout << "wrong comparation" << endl;
+
+		mid_code.emit_code(quadruple(Oper::J, string(""), string(""), string("0")));
 		break;
 	case 34: //<比较运算符> ::= $Smaller
+		lhs.place = "$Smaller";
 		break;
 	case 35: //<比较运算符> ::= $SmallerEqual
+		lhs.place = "$SmallerEqual";
 		break;
 	case 36: //<比较运算符> ::= $Bigger
+		lhs.place = "$Bigger";
 		break;
 	case 37: //<比较运算符> ::= $BiggerEqual
+		lhs.place = "$BiggerEqual";
 		break;
 	case 38: //<比较运算符> ::= $Equal2
+		lhs.place = "$Equal2";
 		break;
 	case 39: //<比较运算符> ::= $NotEqual
+		lhs.place = "$NotEqual";
 		break;
 	case 40: //<加法表达式> ::= <项>
+		lhs.place = syntaxTree[rhs[0]].place;
 		break;
 	case 41: //<加法表达式> ::= <项> $Plus <加法表达式>
+		lhs.place = p_symbolTable->newtemp();
+		mid_code.emit_code(quadruple(Oper::Plus, syntaxTree[rhs[0]].place, syntaxTree[rhs[1]].place, lhs.place));
 		break;
 	case 42: //<加法表达式> ::= <项> $Minus <加法表达式>
+		lhs.place = p_symbolTable->newtemp();
+		mid_code.emit_code(quadruple(Oper::Minus, syntaxTree[rhs[0]].place, syntaxTree[rhs[1]].place, lhs.place));
 		break;
 	case 43: //<项> ::= <因子>
+		lhs.place = syntaxTree[rhs[0]].place;
 		break;
 	case 44: //<项> ::= <因子> $Multiply <项>
+		lhs.place = p_symbolTable->newtemp();
+		mid_code.emit_code(quadruple(Oper::Multiply, syntaxTree[rhs[0]].place, syntaxTree[rhs[1]].place, lhs.place));
 		break;
 	case 45: //<项> ::= <因子> $Divide <项>
+		lhs.place = p_symbolTable->newtemp();
+		mid_code.emit_code(quadruple(Oper::Divide, syntaxTree[rhs[0]].place, syntaxTree[rhs[1]].place, lhs.place));
 		break;
 	case 46: //<因子> ::= $Number
 		break;
