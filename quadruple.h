@@ -13,7 +13,8 @@ enum class Oper : char
     Jge,
     Jlt,
     Jle,
-    Assign
+    Assign,
+    Return
 };
 
 class quadruple

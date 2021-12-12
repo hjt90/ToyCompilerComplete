@@ -25,12 +25,13 @@ const symbolTableFunction &proc_symbolTable::find_function(std::string name)
     return tmp;
 }
 
-void proc_symbolTable::make_function(const std::vector<symbolTableItem> &parms, std::string name, symbolType return_type)
+void proc_symbolTable::make_function(const std::vector<symbolTableItem> &parms, std::string name, symbolType return_type, int enter_quad)
 {
     symbolTableFunction func;
     func.name = name;
     func.return_type = return_type;
     func.parm = parms;
+    func.enter_quad = enter_quad;
     func.addr = new proc_symbolTable();
     func.addr->returnAddr = this;
 

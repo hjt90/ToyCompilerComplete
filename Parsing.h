@@ -57,6 +57,7 @@ public:
 	vector<quadrupleIndex> truelist;
 	vector<quadrupleIndex> falselist;
 	vector<quadrupleIndex> nextlist;
+	std::vector<symbolTableItem> plist;
 
 	bool inTree;
 

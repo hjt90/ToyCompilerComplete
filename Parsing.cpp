@@ -548,7 +548,8 @@ void parsing::generate_midcode(syntaxTableIndex SyntaxIndex, syntaxTreeNode &lhs
 {
 	switch (SyntaxIndex)
 	{
-	case 0:
+	case 0: //$Start ::= <N> <声明串>
+		mid_code.back_patch(syntaxTree[rhs[0]].nextlist, p_symbolTable->find_function("main").enter_quad);
 		break;
 	case 1: //<A> ::= $Empty
 		lhs.quad = mid_code.nextquad;
@@ -560,41 +561,56 @@ void parsing::generate_midcode(syntaxTableIndex SyntaxIndex, syntaxTreeNode &lhs
 	case 3: //<M> ::= $Empty
 		lhs.quad = mid_code.nextquad;
 		break;
-	case 4:
+	case 4: //<声明串> ::= <声明>
 		break;
-	case 5:
+	case 5: //<声明串> ::= <声明串> <声明>
 		break;
-	case 6:
+	case 6: //<声明> ::= $Int $ID <声明类型>
+		p_symbolTable->insert_variable({symbolType::Int, syntaxTree[rhs[1]].val});
 		break;
-	case 7:
+	case 7: //<声明> ::= $Void $ID <M> <A> <函数声明>
+		p_symbolTable->make_function(syntaxTree[rhs[4]].plist, syntaxTree[rhs[0]].val, symbolType::Void, syntaxTree[rhs[2]].quad);
 		break;
-	case 8:
+	case 8: //<声明> ::= $Int $ID <M> <A> <函数声明>
+		p_symbolTable->make_function(syntaxTree[rhs[4]].plist, syntaxTree[rhs[0]].val, symbolType::Int, syntaxTree[rhs[2]].quad);
 		break;
-	case 9:
+	case 9: //<声明类型> ::=  $Semi
 		break;
-	case 10:
+	case 10: //<函数声明> ::= $LeftBracket <形参> $RightBracket <语句块>
+		lhs.plist = syntaxTree[rhs[1]].plist;
 		break;
-	case 11:
+	case 11: //<形参> ::= <参数列表>
+		lhs.plist = syntaxTree[rhs[1]].plist;
 		break;
-	case 12:
+	case 12: //<形参> ::= $Void
+		lhs.plist = vector<symbolTableItem>();
 		break;
-	case 13:
+	case 13: //<参数列表> ::= <参数>
+		lhs.plist.push_back(syntaxTree[rhs[0]].plist[0]);
 		break;
-	case 14:
+	case 14: //<参数列表> ::= <参数> $Comma <参数列表>
+		lhs.plist.push_back(syntaxTree[rhs[0]].plist[0]);
+		lhs.plist.insert(lhs.plist.end(), syntaxTree[rhs[0]].plist.begin(), syntaxTree[rhs[0]].plist.end());
 		break;
-	case 15:
+	case 15: //<参数> ::= $Int $ID
+		lhs.plist.push_back({symbolType::Int, syntaxTree[rhs[1]].val});
 		break;
-	case 16:
+	case 16: //<语句块> ::= $LeftBrace <内部声明> <语句串> $RightBrace
+		lhs.nextlist = syntaxTree[rhs[2]].nextlist;
 		break;
-	case 17:
+	case 17: //<内部声明> ::= $Empty
 		break;
-	case 18:
+	case 18: //<内部声明> ::= <内部变量声明> <内部声明>
 		break;
-	case 19:
+	case 19: //<内部变量声明> ::= $Int $ID $Semi
+		p_symbolTable->insert_variable({symbolType::Int, syntaxTree[rhs[1]].val});
 		break;
-	case 20:
+	case 20: //<语句串> ::= <语句>
+		lhs.nextlist = syntaxTree[rhs[0]].nextlist;
 		break;
-	case 21:
+	case 21: //<语句串> ::= <语句> <M> <语句串>
+		lhs.nextlist = syntaxTree[rhs[2]].nextlist;
+		mid_code.back_patch(syntaxTree[rhs[0]].nextlist, syntaxTree[rhs[1]].quad);
 		break;
 	case 22: //<语句> ::= <if语句>
 		lhs.nextlist = syntaxTree[rhs[0]].nextlist;
@@ -602,15 +618,18 @@ void parsing::generate_midcode(syntaxTableIndex SyntaxIndex, syntaxTreeNode &lhs
 	case 23: //<语句> :: = <while语句>
 		lhs.nextlist = syntaxTree[rhs[0]].nextlist;
 		break;
-	case 24:
+	case 24: //<语句> ::= <return语句>
 		break;
-	case 25:
+	case 25: //<语句> ::= <assign语句>
 		break;
-	case 26:
+	case 26: //<assign语句> ::= $ID $Equal <表达式> $Semi
+		mid_code.emit_code(quadruple(Oper::Assign, syntaxTree[rhs[2]].place, string(""), syntaxTree[rhs[0]].val));
 		break;
-	case 27:
+	case 27: //<return语句> ::= $Return $Semi
+		mid_code.emit_code(quadruple(Oper::Return, string(""), string(""), string("")));
 		break;
-	case 28:
+	case 28: //<return语句> ::= $Return <表达式> $Semi
+		mid_code.emit_code(quadruple(Oper::Return, syntaxTree[rhs[1]].place, string(""), string("")));
 		break;
 	case 29: //<while语句> ::= $While <M> $LeftBracket <表达式> $RightBracket <A> <语句块>
 		int pos29m1, pos29e, pos29m2, pos29s1;
@@ -643,53 +662,50 @@ void parsing::generate_midcode(syntaxTableIndex SyntaxIndex, syntaxTreeNode &lhs
 		mid_code.back_patch(syntaxTree[rhs[pos31e]].falselist, syntaxTree[rhs[pos31m2]].quad);
 		lhs.nextlist = mergelist(syntaxTree[rhs[pos31s1]].nextlist, syntaxTree[rhs[pos31n]].nextlist, syntaxTree[rhs[pos31s2]].nextlist);
 		break;
-	case 32:
+	case 32: //<表达式> ::= <加法表达式>
+		//lhs.place = syntaxTree[rhs[0]].place;
 		break;
-	case 33:
+	case 33: //<表达式> ::= <表达式> <比较运算符> <加法表达式>
 		break;
-	case 34:
+	case 34: //<比较运算符> ::= $Smaller
 		break;
-	case 35:
+	case 35: //<比较运算符> ::= $SmallerEqual
 		break;
-	case 36:
+	case 36: //<比较运算符> ::= $Bigger
 		break;
-	case 37:
+	case 37: //<比较运算符> ::= $BiggerEqual
 		break;
-	case 38:
+	case 38: //<比较运算符> ::= $Equal2
 		break;
-	case 39:
+	case 39: //<比较运算符> ::= $NotEqual
 		break;
-	case 40:
+	case 40: //<加法表达式> ::= <项>
 		break;
-	case 41:
+	case 41: //<加法表达式> ::= <项> $Plus <加法表达式>
 		break;
-	case 42:
+	case 42: //<加法表达式> ::= <项> $Minus <加法表达式>
 		break;
-	case 43:
+	case 43: //<项> ::= <因子>
 		break;
-	case 44:
+	case 44: //<项> ::= <因子> $Multiply <项>
 		break;
-	case 45:
+	case 45: //<项> ::= <因子> $Divide <项>
 		break;
-	case 46:
+	case 46: //<因子> ::= $Number
 		break;
-	case 47:
+	case 47: //<因子> ::= $LeftBracket <表达式> $RightBracket
 		break;
-	case 48:
+	case 48: //<因子> ::= $ID $LeftBracket <实参列表> $RightBracket
 		break;
-	case 49:
+	case 49: //<因子> ::= $ID
+		break;
+	case 50: //<实参列表> ::= $Empty
+		break;
+	case 51: //<实参列表> ::= <表达式>
+		break;
+	case 52: //<实参列表> ::= <表达式> $Comma <实参列表>
 		break;
 	default:
-		break;
-	case 50:
-		break;
-	case 51:
-		break;
-	case 52:
-		break;
-	case 53:
-		break;
-	case 54:
 		break;
 	}
 	return;
