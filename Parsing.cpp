@@ -571,10 +571,10 @@ void parsing::generate_midcode(syntaxTableIndex SyntaxIndex, syntaxTreeNode &lhs
 		p_symbolTable->insert_variable({symbolType::Int, syntaxTree[rhs[1]].val});
 		break;
 	case 7: //<声明> ::= $Void $ID <M> <A> <函数声明>
-		p_symbolTable->make_function(syntaxTree[rhs[4]].plist, syntaxTree[rhs[0]].val, symbolType::Void, syntaxTree[rhs[2]].quad);
+		p_symbolTable->make_function(syntaxTree[rhs[4]].plist, syntaxTree[rhs[1]].val, symbolType::Void, syntaxTree[rhs[2]].quad);
 		break;
 	case 8: //<声明> ::= $Int $ID <M> <A> <函数声明>
-		p_symbolTable->make_function(syntaxTree[rhs[4]].plist, syntaxTree[rhs[0]].val, symbolType::Int, syntaxTree[rhs[2]].quad);
+		p_symbolTable->make_function(syntaxTree[rhs[4]].plist, syntaxTree[rhs[1]].val, symbolType::Int, syntaxTree[rhs[2]].quad);
 		break;
 	case 9: //<声明类型> ::=  $Semi
 		break;
@@ -589,10 +589,12 @@ void parsing::generate_midcode(syntaxTableIndex SyntaxIndex, syntaxTreeNode &lhs
 		break;
 	case 13: //<参数列表> ::= <参数>
 		lhs.plist.push_back(syntaxTree[rhs[0]].plist[0]);
+		p_symbolTable->insert_variable({ syntaxTree[rhs[0]].plist[0].type, syntaxTree[rhs[0]].plist[0].name });
 		break;
 	case 14: //<参数列表> ::= <参数> $Comma <参数列表>
 		lhs.plist.push_back(syntaxTree[rhs[0]].plist[0]);
-		lhs.plist.insert(lhs.plist.end(), syntaxTree[rhs[0]].plist.begin(), syntaxTree[rhs[0]].plist.end());
+		p_symbolTable->insert_variable({ syntaxTree[rhs[0]].plist[0].type, syntaxTree[rhs[0]].plist[0].name });
+		lhs.plist.insert(lhs.plist.end(), syntaxTree[rhs[2]].plist.begin(), syntaxTree[rhs[2]].plist.end());
 		break;
 	case 15: //<参数> ::= $Int $ID
 		lhs.plist.push_back({symbolType::Int, syntaxTree[rhs[1]].val});
@@ -710,34 +712,34 @@ void parsing::generate_midcode(syntaxTableIndex SyntaxIndex, syntaxTreeNode &lhs
 		break;
 	case 41: //<加法表达式> ::= <项> $Plus <加法表达式>
 		lhs.place = p_symbolTable->newtemp();
-		mid_code.emit_code(quadruple(Oper::Plus, syntaxTree[rhs[0]].place, syntaxTree[rhs[1]].place, lhs.place));
+		mid_code.emit_code(quadruple(Oper::Plus, syntaxTree[rhs[0]].place, syntaxTree[rhs[2]].place, lhs.place));
 		break;
 	case 42: //<加法表达式> ::= <项> $Minus <加法表达式>
 		lhs.place = p_symbolTable->newtemp();
-		mid_code.emit_code(quadruple(Oper::Minus, syntaxTree[rhs[0]].place, syntaxTree[rhs[1]].place, lhs.place));
+		mid_code.emit_code(quadruple(Oper::Minus, syntaxTree[rhs[0]].place, syntaxTree[rhs[2]].place, lhs.place));
 		break;
 	case 43: //<项> ::= <因子>
 		lhs.place = syntaxTree[rhs[0]].place;
 		break;
 	case 44: //<项> ::= <因子> $Multiply <项>
 		lhs.place = p_symbolTable->newtemp();
-		mid_code.emit_code(quadruple(Oper::Multiply, syntaxTree[rhs[0]].place, syntaxTree[rhs[1]].place, lhs.place));
+		mid_code.emit_code(quadruple(Oper::Multiply, syntaxTree[rhs[0]].place, syntaxTree[rhs[2]].place, lhs.place));
 		break;
 	case 45: //<项> ::= <因子> $Divide <项>
 		lhs.place = p_symbolTable->newtemp();
-		mid_code.emit_code(quadruple(Oper::Divide, syntaxTree[rhs[0]].place, syntaxTree[rhs[1]].place, lhs.place));
+		mid_code.emit_code(quadruple(Oper::Divide, syntaxTree[rhs[0]].place, syntaxTree[rhs[2]].place, lhs.place));
 		break;
 	case 46: //<因子> ::= $Number
 		lhs.place = syntaxTree[rhs[0]].val;
 		break;
 	case 47: //<因子> ::= $LeftBracket <表达式> $RightBracket
-		lhs.place = syntaxTree[rhs[0]].place;
+		lhs.place = syntaxTree[rhs[1]].place;
 		break;
 	case 48: //<因子> ::= $ID $LeftBracket <实参列表> $RightBracket
 		functmp = p_symbolTable->find_function(syntaxTree[rhs[0]].val);
 		if (functmp.return_type == symbolType::None)
 			cout << syntaxTree[rhs[0]].val << "不在函数表中" << endl;
-		else if (functmp.parm.size() == syntaxTree[rhs[2]].plist.size())
+		else if (functmp.parm.size() != syntaxTree[rhs[2]].plist.size())
 			cout << syntaxTree[rhs[0]].val << "函数实参列表不符" << endl;
 		else
 		{
@@ -757,7 +759,7 @@ void parsing::generate_midcode(syntaxTableIndex SyntaxIndex, syntaxTreeNode &lhs
 		if (p_symbolTable->find_variable(syntaxTree[rhs[0]].val).type == symbolType::None)
 			cout << syntaxTree[rhs[0]].val << "不在符号表中" << endl;
 		else
-			lhs.place = syntaxTree[rhs[0]].place;
+			lhs.place = p_symbolTable->find_variable(syntaxTree[rhs[0]].val).name;
 		break;
 	case 50: //<实参列表> ::= $Empty
 		break;
@@ -877,6 +879,11 @@ void parsing::output(ofstream &struction, ofstream &graph)
 		  << "}" << endl
 		  << endl;
 	graph << "#@enddot" << endl;
+}
+
+void parsing::outputMidcode(ofstream& midcode)
+{
+
 }
 
 vector<quadrupleIndex> parsing::mergelist(vector<quadrupleIndex> &list1, vector<quadrupleIndex> &list2)

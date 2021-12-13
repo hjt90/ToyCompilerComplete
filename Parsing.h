@@ -113,4 +113,5 @@ public:
 	void initSyntax(ifstream &);
 	void analyze(const vector<pair<Token, string>> &);
 	void output(ofstream &struction, ofstream &graph);
+	void outputMidcode(ofstream& midcode);
 };
