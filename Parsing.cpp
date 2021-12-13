@@ -516,6 +516,7 @@ void parsing::analyze(const vector<pair<Token, string>> &lexs)
 				}
 			}
 			syntaxTreeNode lhsTmp;
+			reverse(rhsTmp.begin(), rhsTmp.end());
 			lhsTmp.children = rhsTmp;
 			lhsTmp.productions = nextAction.second;
 			lhsTmp.type = useSyntax.lhs;
@@ -734,10 +735,10 @@ void parsing::generate_midcode(syntaxTableIndex SyntaxIndex, syntaxTreeNode &lhs
 		break;
 	case 48: //<因子> ::= $ID $LeftBracket <实参列表> $RightBracket
 		functmp = p_symbolTable->find_function(syntaxTree[rhs[0]].val);
-		if (functmp.return_type != symbolType::None)
-			printf("%s不在函数表中\n", syntaxTree[rhs[0]].val);
-		else if (functmp.parm.size() != syntaxTree[rhs[2]].plist.size())
-			printf("%s函数实参列表不符\n", syntaxTree[rhs[0]].val);
+		if (functmp.return_type == symbolType::None)
+			cout << syntaxTree[rhs[0]].val << "不在函数表中" << endl;
+		else if (functmp.parm.size() == syntaxTree[rhs[2]].plist.size())
+			cout << syntaxTree[rhs[0]].val << "函数实参列表不符" << endl;
 		else
 		{
 			for (auto i : functmp.parm)
@@ -753,8 +754,8 @@ void parsing::generate_midcode(syntaxTableIndex SyntaxIndex, syntaxTreeNode &lhs
 		}
 		break;
 	case 49: //<因子> ::= $ID
-		if (p_symbolTable->find_variable(syntaxTree[rhs[0]].val).type != symbolType::None)
-			printf("%s不在符号表中\n", syntaxTree[rhs[0]].val);
+		if (p_symbolTable->find_variable(syntaxTree[rhs[0]].val).type == symbolType::None)
+			cout << syntaxTree[rhs[0]].val << "不在符号表中" << endl;
 		else
 			lhs.place = syntaxTree[rhs[0]].place;
 		break;
@@ -834,11 +835,11 @@ void parsing::outputDot(ofstream &graph, syntaxTreeNodeIndex Node)
 				  << "		"
 				  << "rank = same;" << endl
 				  << "		";
-			for (int i = this->syntaxTree[Node].children.size() - 1; i >= 0; i--)
+			for (int i = 0; i < this->syntaxTree[Node].children.size(); i++)
 			{
 				graph
 					<< "Node" << this->syntaxTree[Node].children[i];
-				if (i != 0)
+				if (i < this->syntaxTree[Node].children.size() - 1)
 					graph << "->";
 			}
 			graph << "[color=white];" << endl
