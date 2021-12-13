@@ -156,7 +156,8 @@ Status Lexer::dealalpha(char* templine, int& cr, int len)
 	else //是标识符
 	{
 		int index = search_identifier(tempstr);                //查有没有登记，如果没有自动创建
-		this->result.push_back({ Token::Id, to_string(index) }); //这里我返回的值是它的索引而不是名字，可以再改
+		//this->result.push_back({ Token::Id, to_string(index) }); //这里我返回的值是它的索引而不是名字，可以再改
+		this->result.push_back({ Token::Id, tempstr });
 	}
 	return Status::Success;
 }
