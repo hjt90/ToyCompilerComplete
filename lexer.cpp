@@ -7,7 +7,7 @@ void Lexer::printresult()
 	int len = this->result.size();
 	for (int i = 0; i < len; i++)
 	{
-		cout << translatetoken(this->result[i].first) << ' ' << (this->result[i].first == Token::Id ? this->idtlist[stoi(this->result[i].second)] : this->result[i].second) << endl;
+		cout << translatetoken(this->result[i].first) << ' ' <<  this->result[i].second<< endl;
 	}
 }
 
