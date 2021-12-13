@@ -581,7 +581,7 @@ void parsing::generate_midcode(syntaxTableIndex SyntaxIndex, syntaxTreeNode &lhs
 		lhs.plist = syntaxTree[rhs[1]].plist;
 		break;
 	case 11: //<形参> ::= <参数列表>
-		lhs.plist = syntaxTree[rhs[1]].plist;
+		lhs.plist = syntaxTree[rhs[0]].plist;
 		break;
 	case 12: //<形参> ::= $Void
 		lhs.plist = vector<symbolTableItem>();
