@@ -2,15 +2,155 @@
 
 # ToyCompiler
 
+
+
 ## 项目简介
 
 本项目是由[pamnso(JackyWu)](https://github.com/pamnso)和[hjt90](https://github.com/hjt90)共同合作完成的同济大学编译原理程的大作业，实现一个语法分析器，包括词法分析、语法分析。
 
-程序可以生成词法分析部分或以json格式给出抽象语法树（AST）同时也支持输出 `dot` 格式的语法树结构文件。
+程序可以生成词法分析部分或以json格式给出抽象语法树（AST）同时也支持输出 `dot` 格式的语法树结构文件。同时实现一个中间代码生成接口，支持根据指定的文法进行语法分析并输出中间代码。
+
+## 中间代码生成演示
+
+**使用大作业的示例题目 `test.c` :**
+
+```c++
+int a;
+int b;
+int program(int a, int b, int c)
+{
+	int i;
+	int j;
+	i = 0;
+	if (a > (b + c))
+	{
+		j = a + (b * c + 1);
+	}
+	else
+	{
+		j = a;
+	}
+	while (i <= 100)
+	{
+		i = j * 2;
+	}
+	return i;
+}
+
+int demo(int a)
+{
+	a = a + 2;
+	return a * 2;
+}
+
+void main(void)
+{
+	int a;
+	int b;
+	int c;
+	a = 3;
+	b = 4;
+	c = 2;
+	a = program(a, b, demo(c));
+	return;
+}
+```
+
+**使用经过修改的指定文法**
+
+```
+$Start ::= <N> <声明串>
+
+<A> ::= $Empty
+<N> ::= $Empty
+<M> ::= $Empty
+
+<声明串> ::= <声明>
+<声明串> ::= <声明串> <声明>
+
+<声明> ::= $Int $ID <声明类型>
+<声明> ::= $Void $ID <M> <A> <函数声明>
+<声明> ::= $Int $ID <M> <A> <函数声明>
+
+<声明类型> ::=  $Semi
+
+<函数声明> ::= $LeftBracket <形参> $RightBracket <语句块>
+
+<形参> ::= <参数列表>
+<形参> ::= $Void
+
+<参数列表> ::= <参数>
+<参数列表> ::= <参数> $Comma <参数列表>
+
+<参数> ::= $Int $ID
+
+<语句块> ::= $LeftBrace <内部声明> <语句串> $RightBrace
+
+<内部声明> ::= $Empty
+<内部声明> ::= <内部变量声明> <内部声明>
+
+<内部变量声明> ::= $Int $ID $Semi
+
+<语句串> ::= <语句>
+<语句串> ::= <语句> <M> <语句串>
+
+<语句> ::= <if语句>
+<语句> ::= <while语句>
+<语句> ::= <return语句>
+<语句> ::= <assign语句>
+
+<assign语句> ::= $ID $Equal <表达式> $Semi
+
+<return语句> ::= $Return $Semi
+<return语句> ::= $Return <表达式> $Semi
+
+<while语句> ::= $While <M> $LeftBracket <表达式> $RightBracket <A> <语句块>
+
+<if语句> ::= $If $LeftBracket <表达式> $RightBracket <A> <语句块>
+<if语句> ::= $If $LeftBracket <表达式> $RightBracket <A> <语句块> <N> $Else <M> <A> <语句块>
+
+<表达式> ::= <加法表达式>
+<表达式> ::= <表达式> <比较运算符> <加法表达式>
+
+<比较运算符> ::= $Smaller
+<比较运算符> ::= $SmallerEqual
+<比较运算符> ::= $Bigger
+<比较运算符> ::= $BiggerEqual
+<比较运算符> ::= $Equal2
+<比较运算符> ::= $NotEqual
+
+<加法表达式> ::= <项>
+<加法表达式> ::= <项> $Plus <加法表达式>
+<加法表达式> ::= <项> $Minus <加法表达式>
+
+<项> ::= <因子>
+<项> ::= <因子> $Multiply <项>
+<项> ::= <因子> $Divide <项>
+
+<因子> ::= $Number
+<因子> ::= $LeftBracket <表达式> $RightBracket
+<因子> ::= $ID $LeftBracket <实参列表> $RightBracket
+<因子> ::= $ID
+
+<实参列表> ::= $Empty
+<实参列表> ::= <表达式>
+<实参列表> ::= <表达式> $Comma <实参列表>
+
+```
+
+**编译并运行代码**
+
+添加参数 `-omidcode test.csv` 便可以输出 `csv` 文件
+
+![image-20211107162040750](D:\workspace\GitHub\ToyCompiler\README.assets\image-20211107162040750.png)
+
+**中间代码输出**
+
+![img](D:\workspace\GitHub\ToyCompiler\README.assets\J$X2]S1EMAOA$8OES7DMF82.png)
 
 
 
-## 演示
+## 语法分析器演示
 
 使用大作业的示例题目 `test.c` :
 

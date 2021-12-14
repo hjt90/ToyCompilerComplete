@@ -3,83 +3,347 @@
 	"type": "<N> <声明串> ",
 	"inner": [
 		{
+			"kind": "<N>",
+			"type": "$Empty "
+		},
+		{
 			"kind": "<声明串>",
 			"type": "<声明串> <声明> ",
 			"inner": [
 				{
-					"kind": "<声明>",
-					"type": "$Void $ID <M> <A> <函数声明> ",
+					"kind": "<声明串>",
+					"type": "<声明串> <声明> ",
 					"inner": [
 						{
-							"kind": "<函数声明>",
-							"type": "$LeftBracket <形参> $RightBracket <语句块> ",
+							"kind": "<声明串>",
+							"type": "<声明串> <声明> ",
 							"inner": [
 								{
-									"kind": "<语句块>",
-									"type": "$LeftBrace <内部声明> <语句串> $RightBrace ",
+									"kind": "<声明串>",
+									"type": "<声明串> <声明> ",
 									"inner": [
 										{
-											"kind": "$RightBrace"
-										},
-										{
-											"kind": "<语句串>",
-											"type": "<语句> <M> <语句串> ",
+											"kind": "<声明串>",
+											"type": "<声明> ",
 											"inner": [
 												{
-													"kind": "<语句串>",
-													"type": "<语句> <M> <语句串> ",
+													"kind": "<声明>",
+													"type": "$Int $ID <声明类型> ",
 													"inner": [
+														{
+															"kind": "$Int"
+														},
+														{
+															"kind": "$ID",
+															"val": "a"
+														},
+														{
+															"kind": "<声明类型>",
+															"type": "$Semi ",
+															"inner": [
+																{
+																	"kind": "$Semi"
+																}
+															]
+														}
+													]
+												}
+											]
+										},
+										{
+											"kind": "<声明>",
+											"type": "$Int $ID <声明类型> ",
+											"inner": [
+												{
+													"kind": "$Int"
+												},
+												{
+													"kind": "$ID",
+													"val": "b"
+												},
+												{
+													"kind": "<声明类型>",
+													"type": "$Semi ",
+													"inner": [
+														{
+															"kind": "$Semi"
+														}
+													]
+												}
+											]
+										}
+									]
+								},
+								{
+									"kind": "<声明>",
+									"type": "$Int $ID <M> <A> <函数声明> ",
+									"inner": [
+										{
+											"kind": "$Int"
+										},
+										{
+											"kind": "$ID",
+											"val": "program"
+										},
+										{
+											"kind": "<M>",
+											"type": "$Empty "
+										},
+										{
+											"kind": "<A>",
+											"type": "$Empty "
+										},
+										{
+											"kind": "<函数声明>",
+											"type": "$LeftBracket <形参> $RightBracket <语句块> ",
+											"inner": [
+												{
+													"kind": "$LeftBracket"
+												},
+												{
+													"kind": "<形参>",
+													"type": "<参数列表> ",
+													"inner": [
+														{
+															"kind": "<参数列表>",
+															"type": "<参数> $Comma <参数列表> ",
+															"inner": [
+																{
+																	"kind": "<参数>",
+																	"type": "$Int $ID ",
+																	"inner": [
+																		{
+																			"kind": "$Int"
+																		},
+																		{
+																			"kind": "$ID",
+																			"val": "a"
+																		}
+																	]
+																},
+																{
+																	"kind": "$Comma"
+																},
+																{
+																	"kind": "<参数列表>",
+																	"type": "<参数> $Comma <参数列表> ",
+																	"inner": [
+																		{
+																			"kind": "<参数>",
+																			"type": "$Int $ID ",
+																			"inner": [
+																				{
+																					"kind": "$Int"
+																				},
+																				{
+																					"kind": "$ID",
+																					"val": "b"
+																				}
+																			]
+																		},
+																		{
+																			"kind": "$Comma"
+																		},
+																		{
+																			"kind": "<参数列表>",
+																			"type": "<参数> ",
+																			"inner": [
+																				{
+																					"kind": "<参数>",
+																					"type": "$Int $ID ",
+																					"inner": [
+																						{
+																							"kind": "$Int"
+																						},
+																						{
+																							"kind": "$ID",
+																							"val": "c"
+																						}
+																					]
+																				}
+																			]
+																		}
+																	]
+																}
+															]
+														}
+													]
+												},
+												{
+													"kind": "$RightBracket"
+												},
+												{
+													"kind": "<语句块>",
+													"type": "$LeftBrace <内部声明> <语句串> $RightBrace ",
+													"inner": [
+														{
+															"kind": "$LeftBrace"
+														},
+														{
+															"kind": "<内部声明>",
+															"type": "<内部变量声明> <内部声明> ",
+															"inner": [
+																{
+																	"kind": "<内部变量声明>",
+																	"type": "$Int $ID $Semi ",
+																	"inner": [
+																		{
+																			"kind": "$Int"
+																		},
+																		{
+																			"kind": "$ID",
+																			"val": "i"
+																		},
+																		{
+																			"kind": "$Semi"
+																		}
+																	]
+																},
+																{
+																	"kind": "<内部声明>",
+																	"type": "<内部变量声明> <内部声明> ",
+																	"inner": [
+																		{
+																			"kind": "<内部变量声明>",
+																			"type": "$Int $ID $Semi ",
+																			"inner": [
+																				{
+																					"kind": "$Int"
+																				},
+																				{
+																					"kind": "$ID",
+																					"val": "j"
+																				},
+																				{
+																					"kind": "$Semi"
+																				}
+																			]
+																		},
+																		{
+																			"kind": "<内部声明>",
+																			"type": "$Empty "
+																		}
+																	]
+																}
+															]
+														},
 														{
 															"kind": "<语句串>",
 															"type": "<语句> <M> <语句串> ",
 															"inner": [
 																{
-																	"kind": "<语句串>",
-																	"type": "<语句> <M> <语句串> ",
+																	"kind": "<语句>",
+																	"type": "<assign语句> ",
 																	"inner": [
 																		{
-																			"kind": "<语句串>",
-																			"type": "<语句> ",
+																			"kind": "<assign语句>",
+																			"type": "$ID $Equal <表达式> $Semi ",
 																			"inner": [
 																				{
-																					"kind": "<语句>",
-																					"type": "<return语句> ",
+																					"kind": "$ID",
+																					"val": "i"
+																				},
+																				{
+																					"kind": "$Equal"
+																				},
+																				{
+																					"kind": "<表达式>",
+																					"type": "<加法表达式> ",
 																					"inner": [
 																						{
-																							"kind": "<return语句>",
-																							"type": "$Return $Semi ",
+																							"kind": "<加法表达式>",
+																							"type": "<项> ",
 																							"inner": [
 																								{
-																									"kind": "$Semi"
-																								},
-																								{
-																									"kind": "$Return"
+																									"kind": "<项>",
+																									"type": "<因子> ",
+																									"inner": [
+																										{
+																											"kind": "<因子>",
+																											"type": "$Number ",
+																											"inner": [
+																												{
+																													"kind": "$Number",
+																													"val": "0"
+																												}
+																											]
+																										}
+																									]
 																								}
 																							]
 																						}
 																					]
+																				},
+																				{
+																					"kind": "$Semi"
 																				}
 																			]
-																		},
-																		{
-																			"kind": "<M>",
-																			"type": "$Empty "
-																		},
+																		}
+																	]
+																},
+																{
+																	"kind": "<M>",
+																	"type": "$Empty "
+																},
+																{
+																	"kind": "<语句串>",
+																	"type": "<语句> <M> <语句串> ",
+																	"inner": [
 																		{
 																			"kind": "<语句>",
-																			"type": "<assign语句> ",
+																			"type": "<if语句> ",
 																			"inner": [
 																				{
-																					"kind": "<assign语句>",
-																					"type": "$ID $Equal <表达式> $Semi ",
+																					"kind": "<if语句>",
+																					"type": "$If $LeftBracket <表达式> $RightBracket <A> <语句块> <N> $Else <M> <A> <语句块> ",
 																					"inner": [
 																						{
-																							"kind": "$Semi"
+																							"kind": "$If"
+																						},
+																						{
+																							"kind": "$LeftBracket"
 																						},
 																						{
 																							"kind": "<表达式>",
-																							"type": "<加法表达式> ",
+																							"type": "<表达式> <比较运算符> <加法表达式> ",
 																							"inner": [
+																								{
+																									"kind": "<表达式>",
+																									"type": "<加法表达式> ",
+																									"inner": [
+																										{
+																											"kind": "<加法表达式>",
+																											"type": "<项> ",
+																											"inner": [
+																												{
+																													"kind": "<项>",
+																													"type": "<因子> ",
+																													"inner": [
+																														{
+																															"kind": "<因子>",
+																															"type": "$ID ",
+																															"inner": [
+																																{
+																																	"kind": "$ID",
+																																	"val": "a"
+																																}
+																															]
+																														}
+																													]
+																												}
+																											]
+																										}
+																									]
+																								},
+																								{
+																									"kind": "<比较运算符>",
+																									"type": "$Bigger ",
+																									"inner": [
+																										{
+																											"kind": "$Bigger"
+																										}
+																									]
+																								},
 																								{
 																									"kind": "<加法表达式>",
 																									"type": "<项> ",
@@ -90,133 +354,38 @@
 																											"inner": [
 																												{
 																													"kind": "<因子>",
-																													"type": "$ID $LeftBracket <实参列表> $RightBracket ",
+																													"type": "$LeftBracket <表达式> $RightBracket ",
 																													"inner": [
 																														{
-																															"kind": "$RightBracket"
+																															"kind": "$LeftBracket"
 																														},
 																														{
-																															"kind": "<实参列表>",
-																															"type": "<表达式> $Comma <实参列表> ",
+																															"kind": "<表达式>",
+																															"type": "<加法表达式> ",
 																															"inner": [
 																																{
-																																	"kind": "<实参列表>",
-																																	"type": "<表达式> $Comma <实参列表> ",
+																																	"kind": "<加法表达式>",
+																																	"type": "<项> $Plus <加法表达式> ",
 																																	"inner": [
 																																		{
-																																			"kind": "<实参列表>",
-																																			"type": "<表达式> ",
+																																			"kind": "<项>",
+																																			"type": "<因子> ",
 																																			"inner": [
 																																				{
-																																					"kind": "<表达式>",
-																																					"type": "<加法表达式> ",
+																																					"kind": "<因子>",
+																																					"type": "$ID ",
 																																					"inner": [
 																																						{
-																																							"kind": "<加法表达式>",
-																																							"type": "<项> ",
-																																							"inner": [
-																																								{
-																																									"kind": "<项>",
-																																									"type": "<因子> ",
-																																									"inner": [
-																																										{
-																																											"kind": "<因子>",
-																																											"type": "$ID $LeftBracket <实参列表> $RightBracket ",
-																																											"inner": [
-																																												{
-																																													"kind": "$RightBracket"
-																																												},
-																																												{
-																																													"kind": "<实参列表>",
-																																													"type": "<表达式> ",
-																																													"inner": [
-																																														{
-																																															"kind": "<表达式>",
-																																															"type": "<加法表达式> ",
-																																															"inner": [
-																																																{
-																																																	"kind": "<加法表达式>",
-																																																	"type": "<项> ",
-																																																	"inner": [
-																																																		{
-																																																			"kind": "<项>",
-																																																			"type": "<因子> ",
-																																																			"inner": [
-																																																				{
-																																																					"kind": "<因子>",
-																																																					"type": "$ID ",
-																																																					"inner": [
-																																																						{
-																																																							"kind": "$ID",
-																																																							"val": "3"
-																																																						}
-																																																					]
-																																																				}
-																																																			]
-																																																		}
-																																																	]
-																																																}
-																																															]
-																																														}
-																																													]
-																																												},
-																																												{
-																																													"kind": "$LeftBracket"
-																																												},
-																																												{
-																																													"kind": "$ID",
-																																													"val": "6"
-																																												}
-																																											]
-																																										}
-																																									]
-																																								}
-																																							]
+																																							"kind": "$ID",
+																																							"val": "b"
 																																						}
 																																					]
 																																				}
 																																			]
 																																		},
 																																		{
-																																			"kind": "$Comma"
+																																			"kind": "$Plus"
 																																		},
-																																		{
-																																			"kind": "<表达式>",
-																																			"type": "<加法表达式> ",
-																																			"inner": [
-																																				{
-																																					"kind": "<加法表达式>",
-																																					"type": "<项> ",
-																																					"inner": [
-																																						{
-																																							"kind": "<项>",
-																																							"type": "<因子> ",
-																																							"inner": [
-																																								{
-																																									"kind": "<因子>",
-																																									"type": "$ID ",
-																																									"inner": [
-																																										{
-																																											"kind": "$ID",
-																																											"val": "1"
-																																										}
-																																									]
-																																								}
-																																							]
-																																						}
-																																					]
-																																				}
-																																			]
-																																		}
-																																	]
-																																},
-																																{
-																																	"kind": "$Comma"
-																																},
-																																{
-																																	"kind": "<表达式>",
-																																	"type": "<加法表达式> ",
-																																	"inner": [
 																																		{
 																																			"kind": "<加法表达式>",
 																																			"type": "<项> ",
@@ -231,7 +400,7 @@
 																																							"inner": [
 																																								{
 																																									"kind": "$ID",
-																																									"val": "0"
+																																									"val": "c"
 																																								}
 																																							]
 																																						}
@@ -244,11 +413,7 @@
 																															]
 																														},
 																														{
-																															"kind": "$LeftBracket"
-																														},
-																														{
-																															"kind": "$ID",
-																															"val": "2"
+																															"kind": "$RightBracket"
 																														}
 																													]
 																												}
@@ -259,37 +424,651 @@
 																							]
 																						},
 																						{
-																							"kind": "$Equal"
+																							"kind": "$RightBracket"
 																						},
 																						{
-																							"kind": "$ID",
-																							"val": "0"
+																							"kind": "<A>",
+																							"type": "$Empty "
+																						},
+																						{
+																							"kind": "<语句块>",
+																							"type": "$LeftBrace <内部声明> <语句串> $RightBrace ",
+																							"inner": [
+																								{
+																									"kind": "$LeftBrace"
+																								},
+																								{
+																									"kind": "<内部声明>",
+																									"type": "$Empty "
+																								},
+																								{
+																									"kind": "<语句串>",
+																									"type": "<语句> ",
+																									"inner": [
+																										{
+																											"kind": "<语句>",
+																											"type": "<assign语句> ",
+																											"inner": [
+																												{
+																													"kind": "<assign语句>",
+																													"type": "$ID $Equal <表达式> $Semi ",
+																													"inner": [
+																														{
+																															"kind": "$ID",
+																															"val": "j"
+																														},
+																														{
+																															"kind": "$Equal"
+																														},
+																														{
+																															"kind": "<表达式>",
+																															"type": "<加法表达式> ",
+																															"inner": [
+																																{
+																																	"kind": "<加法表达式>",
+																																	"type": "<项> $Plus <加法表达式> ",
+																																	"inner": [
+																																		{
+																																			"kind": "<项>",
+																																			"type": "<因子> ",
+																																			"inner": [
+																																				{
+																																					"kind": "<因子>",
+																																					"type": "$ID ",
+																																					"inner": [
+																																						{
+																																							"kind": "$ID",
+																																							"val": "a"
+																																						}
+																																					]
+																																				}
+																																			]
+																																		},
+																																		{
+																																			"kind": "$Plus"
+																																		},
+																																		{
+																																			"kind": "<加法表达式>",
+																																			"type": "<项> ",
+																																			"inner": [
+																																				{
+																																					"kind": "<项>",
+																																					"type": "<因子> ",
+																																					"inner": [
+																																						{
+																																							"kind": "<因子>",
+																																							"type": "$LeftBracket <表达式> $RightBracket ",
+																																							"inner": [
+																																								{
+																																									"kind": "$LeftBracket"
+																																								},
+																																								{
+																																									"kind": "<表达式>",
+																																									"type": "<加法表达式> ",
+																																									"inner": [
+																																										{
+																																											"kind": "<加法表达式>",
+																																											"type": "<项> $Plus <加法表达式> ",
+																																											"inner": [
+																																												{
+																																													"kind": "<项>",
+																																													"type": "<因子> $Multiply <项> ",
+																																													"inner": [
+																																														{
+																																															"kind": "<因子>",
+																																															"type": "$ID ",
+																																															"inner": [
+																																																{
+																																																	"kind": "$ID",
+																																																	"val": "b"
+																																																}
+																																															]
+																																														},
+																																														{
+																																															"kind": "$Multiply"
+																																														},
+																																														{
+																																															"kind": "<项>",
+																																															"type": "<因子> ",
+																																															"inner": [
+																																																{
+																																																	"kind": "<因子>",
+																																																	"type": "$ID ",
+																																																	"inner": [
+																																																		{
+																																																			"kind": "$ID",
+																																																			"val": "c"
+																																																		}
+																																																	]
+																																																}
+																																															]
+																																														}
+																																													]
+																																												},
+																																												{
+																																													"kind": "$Plus"
+																																												},
+																																												{
+																																													"kind": "<加法表达式>",
+																																													"type": "<项> ",
+																																													"inner": [
+																																														{
+																																															"kind": "<项>",
+																																															"type": "<因子> ",
+																																															"inner": [
+																																																{
+																																																	"kind": "<因子>",
+																																																	"type": "$Number ",
+																																																	"inner": [
+																																																		{
+																																																			"kind": "$Number",
+																																																			"val": "1"
+																																																		}
+																																																	]
+																																																}
+																																															]
+																																														}
+																																													]
+																																												}
+																																											]
+																																										}
+																																									]
+																																								},
+																																								{
+																																									"kind": "$RightBracket"
+																																								}
+																																							]
+																																						}
+																																					]
+																																				}
+																																			]
+																																		}
+																																	]
+																																}
+																															]
+																														},
+																														{
+																															"kind": "$Semi"
+																														}
+																													]
+																												}
+																											]
+																										}
+																									]
+																								},
+																								{
+																									"kind": "$RightBrace"
+																								}
+																							]
+																						},
+																						{
+																							"kind": "<N>",
+																							"type": "$Empty "
+																						},
+																						{
+																							"kind": "$Else"
+																						},
+																						{
+																							"kind": "<M>",
+																							"type": "$Empty "
+																						},
+																						{
+																							"kind": "<A>",
+																							"type": "$Empty "
+																						},
+																						{
+																							"kind": "<语句块>",
+																							"type": "$LeftBrace <内部声明> <语句串> $RightBrace ",
+																							"inner": [
+																								{
+																									"kind": "$LeftBrace"
+																								},
+																								{
+																									"kind": "<内部声明>",
+																									"type": "$Empty "
+																								},
+																								{
+																									"kind": "<语句串>",
+																									"type": "<语句> ",
+																									"inner": [
+																										{
+																											"kind": "<语句>",
+																											"type": "<assign语句> ",
+																											"inner": [
+																												{
+																													"kind": "<assign语句>",
+																													"type": "$ID $Equal <表达式> $Semi ",
+																													"inner": [
+																														{
+																															"kind": "$ID",
+																															"val": "j"
+																														},
+																														{
+																															"kind": "$Equal"
+																														},
+																														{
+																															"kind": "<表达式>",
+																															"type": "<加法表达式> ",
+																															"inner": [
+																																{
+																																	"kind": "<加法表达式>",
+																																	"type": "<项> ",
+																																	"inner": [
+																																		{
+																																			"kind": "<项>",
+																																			"type": "<因子> ",
+																																			"inner": [
+																																				{
+																																					"kind": "<因子>",
+																																					"type": "$ID ",
+																																					"inner": [
+																																						{
+																																							"kind": "$ID",
+																																							"val": "a"
+																																						}
+																																					]
+																																				}
+																																			]
+																																		}
+																																	]
+																																}
+																															]
+																														},
+																														{
+																															"kind": "$Semi"
+																														}
+																													]
+																												}
+																											]
+																										}
+																									]
+																								},
+																								{
+																									"kind": "$RightBrace"
+																								}
+																							]
+																						}
+																					]
+																				}
+																			]
+																		},
+																		{
+																			"kind": "<M>",
+																			"type": "$Empty "
+																		},
+																		{
+																			"kind": "<语句串>",
+																			"type": "<语句> <M> <语句串> ",
+																			"inner": [
+																				{
+																					"kind": "<语句>",
+																					"type": "<while语句> ",
+																					"inner": [
+																						{
+																							"kind": "<while语句>",
+																							"type": "$While <M> $LeftBracket <表达式> $RightBracket <A> <语句块> ",
+																							"inner": [
+																								{
+																									"kind": "$While"
+																								},
+																								{
+																									"kind": "<M>",
+																									"type": "$Empty "
+																								},
+																								{
+																									"kind": "$LeftBracket"
+																								},
+																								{
+																									"kind": "<表达式>",
+																									"type": "<表达式> <比较运算符> <加法表达式> ",
+																									"inner": [
+																										{
+																											"kind": "<表达式>",
+																											"type": "<加法表达式> ",
+																											"inner": [
+																												{
+																													"kind": "<加法表达式>",
+																													"type": "<项> ",
+																													"inner": [
+																														{
+																															"kind": "<项>",
+																															"type": "<因子> ",
+																															"inner": [
+																																{
+																																	"kind": "<因子>",
+																																	"type": "$ID ",
+																																	"inner": [
+																																		{
+																																			"kind": "$ID",
+																																			"val": "i"
+																																		}
+																																	]
+																																}
+																															]
+																														}
+																													]
+																												}
+																											]
+																										},
+																										{
+																											"kind": "<比较运算符>",
+																											"type": "$SmallerEqual ",
+																											"inner": [
+																												{
+																													"kind": "$SmallerEqual"
+																												}
+																											]
+																										},
+																										{
+																											"kind": "<加法表达式>",
+																											"type": "<项> ",
+																											"inner": [
+																												{
+																													"kind": "<项>",
+																													"type": "<因子> ",
+																													"inner": [
+																														{
+																															"kind": "<因子>",
+																															"type": "$Number ",
+																															"inner": [
+																																{
+																																	"kind": "$Number",
+																																	"val": "100"
+																																}
+																															]
+																														}
+																													]
+																												}
+																											]
+																										}
+																									]
+																								},
+																								{
+																									"kind": "$RightBracket"
+																								},
+																								{
+																									"kind": "<A>",
+																									"type": "$Empty "
+																								},
+																								{
+																									"kind": "<语句块>",
+																									"type": "$LeftBrace <内部声明> <语句串> $RightBrace ",
+																									"inner": [
+																										{
+																											"kind": "$LeftBrace"
+																										},
+																										{
+																											"kind": "<内部声明>",
+																											"type": "$Empty "
+																										},
+																										{
+																											"kind": "<语句串>",
+																											"type": "<语句> ",
+																											"inner": [
+																												{
+																													"kind": "<语句>",
+																													"type": "<assign语句> ",
+																													"inner": [
+																														{
+																															"kind": "<assign语句>",
+																															"type": "$ID $Equal <表达式> $Semi ",
+																															"inner": [
+																																{
+																																	"kind": "$ID",
+																																	"val": "i"
+																																},
+																																{
+																																	"kind": "$Equal"
+																																},
+																																{
+																																	"kind": "<表达式>",
+																																	"type": "<加法表达式> ",
+																																	"inner": [
+																																		{
+																																			"kind": "<加法表达式>",
+																																			"type": "<项> ",
+																																			"inner": [
+																																				{
+																																					"kind": "<项>",
+																																					"type": "<因子> $Multiply <项> ",
+																																					"inner": [
+																																						{
+																																							"kind": "<因子>",
+																																							"type": "$ID ",
+																																							"inner": [
+																																								{
+																																									"kind": "$ID",
+																																									"val": "j"
+																																								}
+																																							]
+																																						},
+																																						{
+																																							"kind": "$Multiply"
+																																						},
+																																						{
+																																							"kind": "<项>",
+																																							"type": "<因子> ",
+																																							"inner": [
+																																								{
+																																									"kind": "<因子>",
+																																									"type": "$Number ",
+																																									"inner": [
+																																										{
+																																											"kind": "$Number",
+																																											"val": "2"
+																																										}
+																																									]
+																																								}
+																																							]
+																																						}
+																																					]
+																																				}
+																																			]
+																																		}
+																																	]
+																																},
+																																{
+																																	"kind": "$Semi"
+																																}
+																															]
+																														}
+																													]
+																												}
+																											]
+																										},
+																										{
+																											"kind": "$RightBrace"
+																										}
+																									]
+																								}
+																							]
+																						}
+																					]
+																				},
+																				{
+																					"kind": "<M>",
+																					"type": "$Empty "
+																				},
+																				{
+																					"kind": "<语句串>",
+																					"type": "<语句> ",
+																					"inner": [
+																						{
+																							"kind": "<语句>",
+																							"type": "<return语句> ",
+																							"inner": [
+																								{
+																									"kind": "<return语句>",
+																									"type": "$Return <表达式> $Semi ",
+																									"inner": [
+																										{
+																											"kind": "$Return"
+																										},
+																										{
+																											"kind": "<表达式>",
+																											"type": "<加法表达式> ",
+																											"inner": [
+																												{
+																													"kind": "<加法表达式>",
+																													"type": "<项> ",
+																													"inner": [
+																														{
+																															"kind": "<项>",
+																															"type": "<因子> ",
+																															"inner": [
+																																{
+																																	"kind": "<因子>",
+																																	"type": "$ID ",
+																																	"inner": [
+																																		{
+																																			"kind": "$ID",
+																																			"val": "i"
+																																		}
+																																	]
+																																}
+																															]
+																														}
+																													]
+																												}
+																											]
+																										},
+																										{
+																											"kind": "$Semi"
+																										}
+																									]
+																								}
+																							]
 																						}
 																					]
 																				}
 																			]
 																		}
 																	]
+																}
+															]
+														},
+														{
+															"kind": "$RightBrace"
+														}
+													]
+												}
+											]
+										}
+									]
+								}
+							]
+						},
+						{
+							"kind": "<声明>",
+							"type": "$Int $ID <M> <A> <函数声明> ",
+							"inner": [
+								{
+									"kind": "$Int"
+								},
+								{
+									"kind": "$ID",
+									"val": "demo"
+								},
+								{
+									"kind": "<M>",
+									"type": "$Empty "
+								},
+								{
+									"kind": "<A>",
+									"type": "$Empty "
+								},
+								{
+									"kind": "<函数声明>",
+									"type": "$LeftBracket <形参> $RightBracket <语句块> ",
+									"inner": [
+										{
+											"kind": "$LeftBracket"
+										},
+										{
+											"kind": "<形参>",
+											"type": "<参数列表> ",
+											"inner": [
+												{
+													"kind": "<参数列表>",
+													"type": "<参数> ",
+													"inner": [
+														{
+															"kind": "<参数>",
+															"type": "$Int $ID ",
+															"inner": [
+																{
+																	"kind": "$Int"
 																},
 																{
-																	"kind": "<M>",
-																	"type": "$Empty "
-																},
+																	"kind": "$ID",
+																	"val": "a"
+																}
+															]
+														}
+													]
+												}
+											]
+										},
+										{
+											"kind": "$RightBracket"
+										},
+										{
+											"kind": "<语句块>",
+											"type": "$LeftBrace <内部声明> <语句串> $RightBrace ",
+											"inner": [
+												{
+													"kind": "$LeftBrace"
+												},
+												{
+													"kind": "<内部声明>",
+													"type": "$Empty "
+												},
+												{
+													"kind": "<语句串>",
+													"type": "<语句> <M> <语句串> ",
+													"inner": [
+														{
+															"kind": "<语句>",
+															"type": "<assign语句> ",
+															"inner": [
 																{
-																	"kind": "<语句>",
-																	"type": "<assign语句> ",
+																	"kind": "<assign语句>",
+																	"type": "$ID $Equal <表达式> $Semi ",
 																	"inner": [
 																		{
-																			"kind": "<assign语句>",
-																			"type": "$ID $Equal <表达式> $Semi ",
+																			"kind": "$ID",
+																			"val": "a"
+																		},
+																		{
+																			"kind": "$Equal"
+																		},
+																		{
+																			"kind": "<表达式>",
+																			"type": "<加法表达式> ",
 																			"inner": [
 																				{
-																					"kind": "$Semi"
-																				},
-																				{
-																					"kind": "<表达式>",
-																					"type": "<加法表达式> ",
+																					"kind": "<加法表达式>",
+																					"type": "<项> $Plus <加法表达式> ",
 																					"inner": [
+																						{
+																							"kind": "<项>",
+																							"type": "<因子> ",
+																							"inner": [
+																								{
+																									"kind": "<因子>",
+																									"type": "$ID ",
+																									"inner": [
+																										{
+																											"kind": "$ID",
+																											"val": "a"
+																										}
+																									]
+																								}
+																							]
+																						},
+																						{
+																							"kind": "$Plus"
+																						},
 																						{
 																							"kind": "<加法表达式>",
 																							"type": "<项> ",
@@ -313,15 +1092,11 @@
 																							]
 																						}
 																					]
-																				},
-																				{
-																					"kind": "$Equal"
-																				},
-																				{
-																					"kind": "$ID",
-																					"val": "3"
 																				}
 																			]
+																		},
+																		{
+																			"kind": "$Semi"
 																		}
 																	]
 																}
@@ -332,50 +1107,71 @@
 															"type": "$Empty "
 														},
 														{
-															"kind": "<语句>",
-															"type": "<assign语句> ",
+															"kind": "<语句串>",
+															"type": "<语句> ",
 															"inner": [
 																{
-																	"kind": "<assign语句>",
-																	"type": "$ID $Equal <表达式> $Semi ",
+																	"kind": "<语句>",
+																	"type": "<return语句> ",
 																	"inner": [
 																		{
-																			"kind": "$Semi"
-																		},
-																		{
-																			"kind": "<表达式>",
-																			"type": "<加法表达式> ",
+																			"kind": "<return语句>",
+																			"type": "$Return <表达式> $Semi ",
 																			"inner": [
 																				{
-																					"kind": "<加法表达式>",
-																					"type": "<项> ",
+																					"kind": "$Return"
+																				},
+																				{
+																					"kind": "<表达式>",
+																					"type": "<加法表达式> ",
 																					"inner": [
 																						{
-																							"kind": "<项>",
-																							"type": "<因子> ",
+																							"kind": "<加法表达式>",
+																							"type": "<项> ",
 																							"inner": [
 																								{
-																									"kind": "<因子>",
-																									"type": "$Number ",
+																									"kind": "<项>",
+																									"type": "<因子> $Multiply <项> ",
 																									"inner": [
 																										{
-																											"kind": "$Number",
-																											"val": "4"
+																											"kind": "<因子>",
+																											"type": "$ID ",
+																											"inner": [
+																												{
+																													"kind": "$ID",
+																													"val": "a"
+																												}
+																											]
+																										},
+																										{
+																											"kind": "$Multiply"
+																										},
+																										{
+																											"kind": "<项>",
+																											"type": "<因子> ",
+																											"inner": [
+																												{
+																													"kind": "<因子>",
+																													"type": "$Number ",
+																													"inner": [
+																														{
+																															"kind": "$Number",
+																															"val": "2"
+																														}
+																													]
+																												}
+																											]
 																										}
 																									]
 																								}
 																							]
 																						}
 																					]
+																				},
+																				{
+																					"kind": "$Semi"
 																				}
 																			]
-																		},
-																		{
-																			"kind": "$Equal"
-																		},
-																		{
-																			"kind": "$ID",
-																			"val": "1"
 																		}
 																	]
 																}
@@ -384,9 +1180,135 @@
 													]
 												},
 												{
-													"kind": "<M>",
-													"type": "$Empty "
+													"kind": "$RightBrace"
+												}
+											]
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				{
+					"kind": "<声明>",
+					"type": "$Void $ID <M> <A> <函数声明> ",
+					"inner": [
+						{
+							"kind": "$Void"
+						},
+						{
+							"kind": "$ID",
+							"val": "main"
+						},
+						{
+							"kind": "<M>",
+							"type": "$Empty "
+						},
+						{
+							"kind": "<A>",
+							"type": "$Empty "
+						},
+						{
+							"kind": "<函数声明>",
+							"type": "$LeftBracket <形参> $RightBracket <语句块> ",
+							"inner": [
+								{
+									"kind": "$LeftBracket"
+								},
+								{
+									"kind": "<形参>",
+									"type": "$Void ",
+									"inner": [
+										{
+											"kind": "$Void"
+										}
+									]
+								},
+								{
+									"kind": "$RightBracket"
+								},
+								{
+									"kind": "<语句块>",
+									"type": "$LeftBrace <内部声明> <语句串> $RightBrace ",
+									"inner": [
+										{
+											"kind": "$LeftBrace"
+										},
+										{
+											"kind": "<内部声明>",
+											"type": "<内部变量声明> <内部声明> ",
+											"inner": [
+												{
+													"kind": "<内部变量声明>",
+													"type": "$Int $ID $Semi ",
+													"inner": [
+														{
+															"kind": "$Int"
+														},
+														{
+															"kind": "$ID",
+															"val": "a"
+														},
+														{
+															"kind": "$Semi"
+														}
+													]
 												},
+												{
+													"kind": "<内部声明>",
+													"type": "<内部变量声明> <内部声明> ",
+													"inner": [
+														{
+															"kind": "<内部变量声明>",
+															"type": "$Int $ID $Semi ",
+															"inner": [
+																{
+																	"kind": "$Int"
+																},
+																{
+																	"kind": "$ID",
+																	"val": "b"
+																},
+																{
+																	"kind": "$Semi"
+																}
+															]
+														},
+														{
+															"kind": "<内部声明>",
+															"type": "<内部变量声明> <内部声明> ",
+															"inner": [
+																{
+																	"kind": "<内部变量声明>",
+																	"type": "$Int $ID $Semi ",
+																	"inner": [
+																		{
+																			"kind": "$Int"
+																		},
+																		{
+																			"kind": "$ID",
+																			"val": "c"
+																		},
+																		{
+																			"kind": "$Semi"
+																		}
+																	]
+																},
+																{
+																	"kind": "<内部声明>",
+																	"type": "$Empty "
+																}
+															]
+														}
+													]
+												}
+											]
+										},
+										{
+											"kind": "<语句串>",
+											"type": "<语句> <M> <语句串> ",
+											"inner": [
 												{
 													"kind": "<语句>",
 													"type": "<assign语句> ",
@@ -396,7 +1318,11 @@
 															"type": "$ID $Equal <表达式> $Semi ",
 															"inner": [
 																{
-																	"kind": "$Semi"
+																	"kind": "$ID",
+																	"val": "a"
+																},
+																{
+																	"kind": "$Equal"
 																},
 																{
 																	"kind": "<表达式>",
@@ -427,216 +1353,65 @@
 																	]
 																},
 																{
-																	"kind": "$Equal"
-																},
-																{
-																	"kind": "$ID",
-																	"val": "0"
-																}
-															]
-														}
-													]
-												}
-											]
-										},
-										{
-											"kind": "<内部声明>",
-											"type": "<内部变量声明> <内部声明> ",
-											"inner": [
-												{
-													"kind": "<内部声明>",
-													"type": "<内部变量声明> <内部声明> ",
-													"inner": [
-														{
-															"kind": "<内部声明>",
-															"type": "<内部变量声明> <内部声明> ",
-															"inner": [
-																{
-																	"kind": "<内部声明>",
-																	"type": "$Empty "
-																},
-																{
-																	"kind": "<内部变量声明>",
-																	"type": "$Int $ID $Semi ",
-																	"inner": [
-																		{
-																			"kind": "$Semi"
-																		},
-																		{
-																			"kind": "$ID",
-																			"val": "3"
-																		},
-																		{
-																			"kind": "$Int"
-																		}
-																	]
-																}
-															]
-														},
-														{
-															"kind": "<内部变量声明>",
-															"type": "$Int $ID $Semi ",
-															"inner": [
-																{
 																	"kind": "$Semi"
-																},
-																{
-																	"kind": "$ID",
-																	"val": "1"
-																},
-																{
-																	"kind": "$Int"
 																}
 															]
 														}
 													]
 												},
 												{
-													"kind": "<内部变量声明>",
-													"type": "$Int $ID $Semi ",
-													"inner": [
-														{
-															"kind": "$Semi"
-														},
-														{
-															"kind": "$ID",
-															"val": "0"
-														},
-														{
-															"kind": "$Int"
-														}
-													]
-												}
-											]
-										},
-										{
-											"kind": "$LeftBrace"
-										}
-									]
-								},
-								{
-									"kind": "$RightBracket"
-								},
-								{
-									"kind": "<形参>",
-									"type": "$Void ",
-									"inner": [
-										{
-											"kind": "$Void"
-										}
-									]
-								},
-								{
-									"kind": "$LeftBracket"
-								}
-							]
-						},
-						{
-							"kind": "<A>",
-							"type": "$Empty "
-						},
-						{
-							"kind": "<M>",
-							"type": "$Empty "
-						},
-						{
-							"kind": "$ID",
-							"val": "7"
-						},
-						{
-							"kind": "$Void"
-						}
-					]
-				},
-				{
-					"kind": "<声明串>",
-					"type": "<声明串> <声明> ",
-					"inner": [
-						{
-							"kind": "<声明>",
-							"type": "$Int $ID <M> <A> <函数声明> ",
-							"inner": [
-								{
-									"kind": "<函数声明>",
-									"type": "$LeftBracket <形参> $RightBracket <语句块> ",
-									"inner": [
-										{
-											"kind": "<语句块>",
-											"type": "$LeftBrace <内部声明> <语句串> $RightBrace ",
-											"inner": [
-												{
-													"kind": "$RightBrace"
+													"kind": "<M>",
+													"type": "$Empty "
 												},
 												{
 													"kind": "<语句串>",
 													"type": "<语句> <M> <语句串> ",
 													"inner": [
 														{
-															"kind": "<语句串>",
-															"type": "<语句> ",
+															"kind": "<语句>",
+															"type": "<assign语句> ",
 															"inner": [
 																{
-																	"kind": "<语句>",
-																	"type": "<return语句> ",
+																	"kind": "<assign语句>",
+																	"type": "$ID $Equal <表达式> $Semi ",
 																	"inner": [
 																		{
-																			"kind": "<return语句>",
-																			"type": "$Return <表达式> $Semi ",
+																			"kind": "$ID",
+																			"val": "b"
+																		},
+																		{
+																			"kind": "$Equal"
+																		},
+																		{
+																			"kind": "<表达式>",
+																			"type": "<加法表达式> ",
 																			"inner": [
 																				{
-																					"kind": "$Semi"
-																				},
-																				{
-																					"kind": "<表达式>",
-																					"type": "<加法表达式> ",
+																					"kind": "<加法表达式>",
+																					"type": "<项> ",
 																					"inner": [
 																						{
-																							"kind": "<加法表达式>",
-																							"type": "<项> ",
+																							"kind": "<项>",
+																							"type": "<因子> ",
 																							"inner": [
 																								{
-																									"kind": "<项>",
-																									"type": "<因子> $Multiply <项> ",
+																									"kind": "<因子>",
+																									"type": "$Number ",
 																									"inner": [
 																										{
-																											"kind": "<项>",
-																											"type": "<因子> ",
-																											"inner": [
-																												{
-																													"kind": "<因子>",
-																													"type": "$Number ",
-																													"inner": [
-																														{
-																															"kind": "$Number",
-																															"val": "2"
-																														}
-																													]
-																												}
-																											]
-																										},
-																										{
-																											"kind": "$Multiply"
-																										},
-																										{
-																											"kind": "<因子>",
-																											"type": "$ID ",
-																											"inner": [
-																												{
-																													"kind": "$ID",
-																													"val": "0"
-																												}
-																											]
+																											"kind": "$Number",
+																											"val": "4"
 																										}
 																									]
 																								}
 																							]
 																						}
 																					]
-																				},
-																				{
-																					"kind": "$Return"
 																				}
 																			]
+																		},
+																		{
+																			"kind": "$Semi"
 																		}
 																	]
 																}
@@ -647,23 +1422,27 @@
 															"type": "$Empty "
 														},
 														{
-															"kind": "<语句>",
-															"type": "<assign语句> ",
+															"kind": "<语句串>",
+															"type": "<语句> <M> <语句串> ",
 															"inner": [
 																{
-																	"kind": "<assign语句>",
-																	"type": "$ID $Equal <表达式> $Semi ",
+																	"kind": "<语句>",
+																	"type": "<assign语句> ",
 																	"inner": [
 																		{
-																			"kind": "$Semi"
-																		},
-																		{
-																			"kind": "<表达式>",
-																			"type": "<加法表达式> ",
+																			"kind": "<assign语句>",
+																			"type": "$ID $Equal <表达式> $Semi ",
 																			"inner": [
 																				{
-																					"kind": "<加法表达式>",
-																					"type": "<项> $Plus <加法表达式> ",
+																					"kind": "$ID",
+																					"val": "c"
+																				},
+																				{
+																					"kind": "$Equal"
+																				},
+																				{
+																					"kind": "<表达式>",
+																					"type": "<加法表达式> ",
 																					"inner": [
 																						{
 																							"kind": "<加法表达式>",
@@ -686,656 +1465,42 @@
 																									]
 																								}
 																							]
-																						},
-																						{
-																							"kind": "$Plus"
-																						},
-																						{
-																							"kind": "<项>",
-																							"type": "<因子> ",
-																							"inner": [
-																								{
-																									"kind": "<因子>",
-																									"type": "$ID ",
-																									"inner": [
-																										{
-																											"kind": "$ID",
-																											"val": "0"
-																										}
-																									]
-																								}
-																							]
 																						}
 																					]
+																				},
+																				{
+																					"kind": "$Semi"
 																				}
 																			]
-																		},
-																		{
-																			"kind": "$Equal"
-																		},
-																		{
-																			"kind": "$ID",
-																			"val": "0"
 																		}
 																	]
-																}
-															]
-														}
-													]
-												},
-												{
-													"kind": "<内部声明>",
-													"type": "$Empty "
-												},
-												{
-													"kind": "$LeftBrace"
-												}
-											]
-										},
-										{
-											"kind": "$RightBracket"
-										},
-										{
-											"kind": "<形参>",
-											"type": "<参数列表> ",
-											"inner": [
-												{
-													"kind": "<参数列表>",
-													"type": "<参数> ",
-													"inner": [
-														{
-															"kind": "<参数>",
-															"type": "$Int $ID ",
-															"inner": [
-																{
-																	"kind": "$ID",
-																	"val": "0"
 																},
 																{
-																	"kind": "$Int"
-																}
-															]
-														}
-													]
-												}
-											]
-										},
-										{
-											"kind": "$LeftBracket"
-										}
-									]
-								},
-								{
-									"kind": "<A>",
-									"type": "$Empty "
-								},
-								{
-									"kind": "<M>",
-									"type": "$Empty "
-								},
-								{
-									"kind": "$ID",
-									"val": "6"
-								},
-								{
-									"kind": "$Int"
-								}
-							]
-						},
-						{
-							"kind": "<声明串>",
-							"type": "<声明串> <声明> ",
-							"inner": [
-								{
-									"kind": "<声明>",
-									"type": "$Int $ID <M> <A> <函数声明> ",
-									"inner": [
-										{
-											"kind": "<函数声明>",
-											"type": "$LeftBracket <形参> $RightBracket <语句块> ",
-											"inner": [
-												{
-													"kind": "<语句块>",
-													"type": "$LeftBrace <内部声明> <语句串> $RightBrace ",
-													"inner": [
-														{
-															"kind": "$RightBrace"
-														},
-														{
-															"kind": "<语句串>",
-															"type": "<语句> <M> <语句串> ",
-															"inner": [
+																	"kind": "<M>",
+																	"type": "$Empty "
+																},
 																{
 																	"kind": "<语句串>",
 																	"type": "<语句> <M> <语句串> ",
 																	"inner": [
 																		{
-																			"kind": "<语句串>",
-																			"type": "<语句> <M> <语句串> ",
-																			"inner": [
-																				{
-																					"kind": "<语句串>",
-																					"type": "<语句> ",
-																					"inner": [
-																						{
-																							"kind": "<语句>",
-																							"type": "<return语句> ",
-																							"inner": [
-																								{
-																									"kind": "<return语句>",
-																									"type": "$Return <表达式> $Semi ",
-																									"inner": [
-																										{
-																											"kind": "$Semi"
-																										},
-																										{
-																											"kind": "<表达式>",
-																											"type": "<加法表达式> ",
-																											"inner": [
-																												{
-																													"kind": "<加法表达式>",
-																													"type": "<项> ",
-																													"inner": [
-																														{
-																															"kind": "<项>",
-																															"type": "<因子> ",
-																															"inner": [
-																																{
-																																	"kind": "<因子>",
-																																	"type": "$ID ",
-																																	"inner": [
-																																		{
-																																			"kind": "$ID",
-																																			"val": "4"
-																																		}
-																																	]
-																																}
-																															]
-																														}
-																													]
-																												}
-																											]
-																										},
-																										{
-																											"kind": "$Return"
-																										}
-																									]
-																								}
-																							]
-																						}
-																					]
-																				},
-																				{
-																					"kind": "<M>",
-																					"type": "$Empty "
-																				},
-																				{
-																					"kind": "<语句>",
-																					"type": "<while语句> ",
-																					"inner": [
-																						{
-																							"kind": "<while语句>",
-																							"type": "$While <M> $LeftBracket <表达式> $RightBracket <A> <语句块> ",
-																							"inner": [
-																								{
-																									"kind": "<语句块>",
-																									"type": "$LeftBrace <内部声明> <语句串> $RightBrace ",
-																									"inner": [
-																										{
-																											"kind": "$RightBrace"
-																										},
-																										{
-																											"kind": "<语句串>",
-																											"type": "<语句> ",
-																											"inner": [
-																												{
-																													"kind": "<语句>",
-																													"type": "<assign语句> ",
-																													"inner": [
-																														{
-																															"kind": "<assign语句>",
-																															"type": "$ID $Equal <表达式> $Semi ",
-																															"inner": [
-																																{
-																																	"kind": "$Semi"
-																																},
-																																{
-																																	"kind": "<表达式>",
-																																	"type": "<加法表达式> ",
-																																	"inner": [
-																																		{
-																																			"kind": "<加法表达式>",
-																																			"type": "<项> ",
-																																			"inner": [
-																																				{
-																																					"kind": "<项>",
-																																					"type": "<因子> $Multiply <项> ",
-																																					"inner": [
-																																						{
-																																							"kind": "<项>",
-																																							"type": "<因子> ",
-																																							"inner": [
-																																								{
-																																									"kind": "<因子>",
-																																									"type": "$Number ",
-																																									"inner": [
-																																										{
-																																											"kind": "$Number",
-																																											"val": "2"
-																																										}
-																																									]
-																																								}
-																																							]
-																																						},
-																																						{
-																																							"kind": "$Multiply"
-																																						},
-																																						{
-																																							"kind": "<因子>",
-																																							"type": "$ID ",
-																																							"inner": [
-																																								{
-																																									"kind": "$ID",
-																																									"val": "5"
-																																								}
-																																							]
-																																						}
-																																					]
-																																				}
-																																			]
-																																		}
-																																	]
-																																},
-																																{
-																																	"kind": "$Equal"
-																																},
-																																{
-																																	"kind": "$ID",
-																																	"val": "4"
-																																}
-																															]
-																														}
-																													]
-																												}
-																											]
-																										},
-																										{
-																											"kind": "<内部声明>",
-																											"type": "$Empty "
-																										},
-																										{
-																											"kind": "$LeftBrace"
-																										}
-																									]
-																								},
-																								{
-																									"kind": "<A>",
-																									"type": "$Empty "
-																								},
-																								{
-																									"kind": "$RightBracket"
-																								},
-																								{
-																									"kind": "<表达式>",
-																									"type": "<表达式> <比较运算符> <加法表达式> ",
-																									"inner": [
-																										{
-																											"kind": "<加法表达式>",
-																											"type": "<项> ",
-																											"inner": [
-																												{
-																													"kind": "<项>",
-																													"type": "<因子> ",
-																													"inner": [
-																														{
-																															"kind": "<因子>",
-																															"type": "$Number ",
-																															"inner": [
-																																{
-																																	"kind": "$Number",
-																																	"val": "100"
-																																}
-																															]
-																														}
-																													]
-																												}
-																											]
-																										},
-																										{
-																											"kind": "<比较运算符>",
-																											"type": "$SmallerEqual ",
-																											"inner": [
-																												{
-																													"kind": "$SmallerEqual"
-																												}
-																											]
-																										},
-																										{
-																											"kind": "<表达式>",
-																											"type": "<加法表达式> ",
-																											"inner": [
-																												{
-																													"kind": "<加法表达式>",
-																													"type": "<项> ",
-																													"inner": [
-																														{
-																															"kind": "<项>",
-																															"type": "<因子> ",
-																															"inner": [
-																																{
-																																	"kind": "<因子>",
-																																	"type": "$ID ",
-																																	"inner": [
-																																		{
-																																			"kind": "$ID",
-																																			"val": "4"
-																																		}
-																																	]
-																																}
-																															]
-																														}
-																													]
-																												}
-																											]
-																										}
-																									]
-																								},
-																								{
-																									"kind": "$LeftBracket"
-																								},
-																								{
-																									"kind": "<M>",
-																									"type": "$Empty "
-																								},
-																								{
-																									"kind": "$While"
-																								}
-																							]
-																						}
-																					]
-																				}
-																			]
-																		},
-																		{
-																			"kind": "<M>",
-																			"type": "$Empty "
-																		},
-																		{
 																			"kind": "<语句>",
-																			"type": "<if语句> ",
+																			"type": "<assign语句> ",
 																			"inner": [
 																				{
-																					"kind": "<if语句>",
-																					"type": "$If $LeftBracket <表达式> <A> $RightBracket <语句块> <N> $Else <M> <A> <语句块> ",
+																					"kind": "<assign语句>",
+																					"type": "$ID $Equal <表达式> $Semi ",
 																					"inner": [
 																						{
-																							"kind": "<语句块>",
-																							"type": "$LeftBrace <内部声明> <语句串> $RightBrace ",
-																							"inner": [
-																								{
-																									"kind": "$RightBrace"
-																								},
-																								{
-																									"kind": "<语句串>",
-																									"type": "<语句> ",
-																									"inner": [
-																										{
-																											"kind": "<语句>",
-																											"type": "<assign语句> ",
-																											"inner": [
-																												{
-																													"kind": "<assign语句>",
-																													"type": "$ID $Equal <表达式> $Semi ",
-																													"inner": [
-																														{
-																															"kind": "$Semi"
-																														},
-																														{
-																															"kind": "<表达式>",
-																															"type": "<加法表达式> ",
-																															"inner": [
-																																{
-																																	"kind": "<加法表达式>",
-																																	"type": "<项> ",
-																																	"inner": [
-																																		{
-																																			"kind": "<项>",
-																																			"type": "<因子> ",
-																																			"inner": [
-																																				{
-																																					"kind": "<因子>",
-																																					"type": "$ID ",
-																																					"inner": [
-																																						{
-																																							"kind": "$ID",
-																																							"val": "0"
-																																						}
-																																					]
-																																				}
-																																			]
-																																		}
-																																	]
-																																}
-																															]
-																														},
-																														{
-																															"kind": "$Equal"
-																														},
-																														{
-																															"kind": "$ID",
-																															"val": "5"
-																														}
-																													]
-																												}
-																											]
-																										}
-																									]
-																								},
-																								{
-																									"kind": "<内部声明>",
-																									"type": "$Empty "
-																								},
-																								{
-																									"kind": "$LeftBrace"
-																								}
-																							]
+																							"kind": "$ID",
+																							"val": "a"
 																						},
 																						{
-																							"kind": "<A>",
-																							"type": "$Empty "
-																						},
-																						{
-																							"kind": "<M>",
-																							"type": "$Empty "
-																						},
-																						{
-																							"kind": "$Else"
-																						},
-																						{
-																							"kind": "<N>",
-																							"type": "$Empty "
-																						},
-																						{
-																							"kind": "<语句块>",
-																							"type": "$LeftBrace <内部声明> <语句串> $RightBrace ",
-																							"inner": [
-																								{
-																									"kind": "$RightBrace"
-																								},
-																								{
-																									"kind": "<语句串>",
-																									"type": "<语句> ",
-																									"inner": [
-																										{
-																											"kind": "<语句>",
-																											"type": "<assign语句> ",
-																											"inner": [
-																												{
-																													"kind": "<assign语句>",
-																													"type": "$ID $Equal <表达式> $Semi ",
-																													"inner": [
-																														{
-																															"kind": "$Semi"
-																														},
-																														{
-																															"kind": "<表达式>",
-																															"type": "<加法表达式> ",
-																															"inner": [
-																																{
-																																	"kind": "<加法表达式>",
-																																	"type": "<项> $Plus <加法表达式> ",
-																																	"inner": [
-																																		{
-																																			"kind": "<加法表达式>",
-																																			"type": "<项> ",
-																																			"inner": [
-																																				{
-																																					"kind": "<项>",
-																																					"type": "<因子> ",
-																																					"inner": [
-																																						{
-																																							"kind": "<因子>",
-																																							"type": "$LeftBracket <表达式> $RightBracket ",
-																																							"inner": [
-																																								{
-																																									"kind": "$RightBracket"
-																																								},
-																																								{
-																																									"kind": "<表达式>",
-																																									"type": "<加法表达式> ",
-																																									"inner": [
-																																										{
-																																											"kind": "<加法表达式>",
-																																											"type": "<项> $Plus <加法表达式> ",
-																																											"inner": [
-																																												{
-																																													"kind": "<加法表达式>",
-																																													"type": "<项> ",
-																																													"inner": [
-																																														{
-																																															"kind": "<项>",
-																																															"type": "<因子> ",
-																																															"inner": [
-																																																{
-																																																	"kind": "<因子>",
-																																																	"type": "$Number ",
-																																																	"inner": [
-																																																		{
-																																																			"kind": "$Number",
-																																																			"val": "1"
-																																																		}
-																																																	]
-																																																}
-																																															]
-																																														}
-																																													]
-																																												},
-																																												{
-																																													"kind": "$Plus"
-																																												},
-																																												{
-																																													"kind": "<项>",
-																																													"type": "<因子> $Multiply <项> ",
-																																													"inner": [
-																																														{
-																																															"kind": "<项>",
-																																															"type": "<因子> ",
-																																															"inner": [
-																																																{
-																																																	"kind": "<因子>",
-																																																	"type": "$ID ",
-																																																	"inner": [
-																																																		{
-																																																			"kind": "$ID",
-																																																			"val": "3"
-																																																		}
-																																																	]
-																																																}
-																																															]
-																																														},
-																																														{
-																																															"kind": "$Multiply"
-																																														},
-																																														{
-																																															"kind": "<因子>",
-																																															"type": "$ID ",
-																																															"inner": [
-																																																{
-																																																	"kind": "$ID",
-																																																	"val": "1"
-																																																}
-																																															]
-																																														}
-																																													]
-																																												}
-																																											]
-																																										}
-																																									]
-																																								},
-																																								{
-																																									"kind": "$LeftBracket"
-																																								}
-																																							]
-																																						}
-																																					]
-																																				}
-																																			]
-																																		},
-																																		{
-																																			"kind": "$Plus"
-																																		},
-																																		{
-																																			"kind": "<项>",
-																																			"type": "<因子> ",
-																																			"inner": [
-																																				{
-																																					"kind": "<因子>",
-																																					"type": "$ID ",
-																																					"inner": [
-																																						{
-																																							"kind": "$ID",
-																																							"val": "0"
-																																						}
-																																					]
-																																				}
-																																			]
-																																		}
-																																	]
-																																}
-																															]
-																														},
-																														{
-																															"kind": "$Equal"
-																														},
-																														{
-																															"kind": "$ID",
-																															"val": "5"
-																														}
-																													]
-																												}
-																											]
-																										}
-																									]
-																								},
-																								{
-																									"kind": "<内部声明>",
-																									"type": "$Empty "
-																								},
-																								{
-																									"kind": "$LeftBrace"
-																								}
-																							]
-																						},
-																						{
-																							"kind": "$RightBracket"
-																						},
-																						{
-																							"kind": "<A>",
-																							"type": "$Empty "
+																							"kind": "$Equal"
 																						},
 																						{
 																							"kind": "<表达式>",
-																							"type": "<表达式> <比较运算符> <加法表达式> ",
+																							"type": "<加法表达式> ",
 																							"inner": [
 																								{
 																									"kind": "<加法表达式>",
@@ -1347,18 +1512,22 @@
 																											"inner": [
 																												{
 																													"kind": "<因子>",
-																													"type": "$LeftBracket <表达式> $RightBracket ",
+																													"type": "$ID $LeftBracket <实参列表> $RightBracket ",
 																													"inner": [
 																														{
-																															"kind": "$RightBracket"
+																															"kind": "$ID",
+																															"val": "program"
 																														},
 																														{
-																															"kind": "<表达式>",
-																															"type": "<加法表达式> ",
+																															"kind": "$LeftBracket"
+																														},
+																														{
+																															"kind": "<实参列表>",
+																															"type": "<表达式> $Comma <实参列表> ",
 																															"inner": [
 																																{
-																																	"kind": "<加法表达式>",
-																																	"type": "<项> $Plus <加法表达式> ",
+																																	"kind": "<表达式>",
+																																	"type": "<加法表达式> ",
 																																	"inner": [
 																																		{
 																																			"kind": "<加法表达式>",
@@ -1374,7 +1543,44 @@
 																																							"inner": [
 																																								{
 																																									"kind": "$ID",
-																																									"val": "3"
+																																									"val": "a"
+																																								}
+																																							]
+																																						}
+																																					]
+																																				}
+																																			]
+																																		}
+																																	]
+																																},
+																																{
+																																	"kind": "$Comma"
+																																},
+																																{
+																																	"kind": "<实参列表>",
+																																	"type": "<表达式> $Comma <实参列表> ",
+																																	"inner": [
+																																		{
+																																			"kind": "<表达式>",
+																																			"type": "<加法表达式> ",
+																																			"inner": [
+																																				{
+																																					"kind": "<加法表达式>",
+																																					"type": "<项> ",
+																																					"inner": [
+																																						{
+																																							"kind": "<项>",
+																																							"type": "<因子> ",
+																																							"inner": [
+																																								{
+																																									"kind": "<因子>",
+																																									"type": "$ID ",
+																																									"inner": [
+																																										{
+																																											"kind": "$ID",
+																																											"val": "b"
+																																										}
+																																									]
 																																								}
 																																							]
 																																						}
@@ -1383,19 +1589,77 @@
 																																			]
 																																		},
 																																		{
-																																			"kind": "$Plus"
+																																			"kind": "$Comma"
 																																		},
 																																		{
-																																			"kind": "<项>",
-																																			"type": "<因子> ",
+																																			"kind": "<实参列表>",
+																																			"type": "<表达式> ",
 																																			"inner": [
 																																				{
-																																					"kind": "<因子>",
-																																					"type": "$ID ",
+																																					"kind": "<表达式>",
+																																					"type": "<加法表达式> ",
 																																					"inner": [
 																																						{
-																																							"kind": "$ID",
-																																							"val": "1"
+																																							"kind": "<加法表达式>",
+																																							"type": "<项> ",
+																																							"inner": [
+																																								{
+																																									"kind": "<项>",
+																																									"type": "<因子> ",
+																																									"inner": [
+																																										{
+																																											"kind": "<因子>",
+																																											"type": "$ID $LeftBracket <实参列表> $RightBracket ",
+																																											"inner": [
+																																												{
+																																													"kind": "$ID",
+																																													"val": "demo"
+																																												},
+																																												{
+																																													"kind": "$LeftBracket"
+																																												},
+																																												{
+																																													"kind": "<实参列表>",
+																																													"type": "<表达式> ",
+																																													"inner": [
+																																														{
+																																															"kind": "<表达式>",
+																																															"type": "<加法表达式> ",
+																																															"inner": [
+																																																{
+																																																	"kind": "<加法表达式>",
+																																																	"type": "<项> ",
+																																																	"inner": [
+																																																		{
+																																																			"kind": "<项>",
+																																																			"type": "<因子> ",
+																																																			"inner": [
+																																																				{
+																																																					"kind": "<因子>",
+																																																					"type": "$ID ",
+																																																					"inner": [
+																																																						{
+																																																							"kind": "$ID",
+																																																							"val": "c"
+																																																						}
+																																																					]
+																																																				}
+																																																			]
+																																																		}
+																																																	]
+																																																}
+																																															]
+																																														}
+																																													]
+																																												},
+																																												{
+																																													"kind": "$RightBracket"
+																																												}
+																																											]
+																																										}
+																																									]
+																																								}
+																																							]
 																																						}
 																																					]
 																																				}
@@ -1406,44 +1670,7 @@
 																															]
 																														},
 																														{
-																															"kind": "$LeftBracket"
-																														}
-																													]
-																												}
-																											]
-																										}
-																									]
-																								},
-																								{
-																									"kind": "<比较运算符>",
-																									"type": "$Bigger ",
-																									"inner": [
-																										{
-																											"kind": "$Bigger"
-																										}
-																									]
-																								},
-																								{
-																									"kind": "<表达式>",
-																									"type": "<加法表达式> ",
-																									"inner": [
-																										{
-																											"kind": "<加法表达式>",
-																											"type": "<项> ",
-																											"inner": [
-																												{
-																													"kind": "<项>",
-																													"type": "<因子> ",
-																													"inner": [
-																														{
-																															"kind": "<因子>",
-																															"type": "$ID ",
-																															"inner": [
-																																{
-																																	"kind": "$ID",
-																																	"val": "0"
-																																}
-																															]
+																															"kind": "$RightBracket"
 																														}
 																													]
 																												}
@@ -1454,273 +1681,50 @@
 																							]
 																						},
 																						{
-																							"kind": "$LeftBracket"
-																						},
-																						{
-																							"kind": "$If"
+																							"kind": "$Semi"
 																						}
 																					]
 																				}
 																			]
-																		}
-																	]
-																},
-																{
-																	"kind": "<M>",
-																	"type": "$Empty "
-																},
-																{
-																	"kind": "<语句>",
-																	"type": "<assign语句> ",
-																	"inner": [
+																		},
 																		{
-																			"kind": "<assign语句>",
-																			"type": "$ID $Equal <表达式> $Semi ",
-																			"inner": [
-																				{
-																					"kind": "$Semi"
-																				},
-																				{
-																					"kind": "<表达式>",
-																					"type": "<加法表达式> ",
-																					"inner": [
-																						{
-																							"kind": "<加法表达式>",
-																							"type": "<项> ",
-																							"inner": [
-																								{
-																									"kind": "<项>",
-																									"type": "<因子> ",
-																									"inner": [
-																										{
-																											"kind": "<因子>",
-																											"type": "$Number ",
-																											"inner": [
-																												{
-																													"kind": "$Number",
-																													"val": "0"
-																												}
-																											]
-																										}
-																									]
-																								}
-																							]
-																						}
-																					]
-																				},
-																				{
-																					"kind": "$Equal"
-																				},
-																				{
-																					"kind": "$ID",
-																					"val": "4"
-																				}
-																			]
-																		}
-																	]
-																}
-															]
-														},
-														{
-															"kind": "<内部声明>",
-															"type": "<内部变量声明> <内部声明> ",
-															"inner": [
-																{
-																	"kind": "<内部声明>",
-																	"type": "<内部变量声明> <内部声明> ",
-																	"inner": [
-																		{
-																			"kind": "<内部声明>",
+																			"kind": "<M>",
 																			"type": "$Empty "
 																		},
 																		{
-																			"kind": "<内部变量声明>",
-																			"type": "$Int $ID $Semi ",
+																			"kind": "<语句串>",
+																			"type": "<语句> ",
 																			"inner": [
 																				{
-																					"kind": "$Semi"
-																				},
-																				{
-																					"kind": "$ID",
-																					"val": "5"
-																				},
-																				{
-																					"kind": "$Int"
-																				}
-																			]
-																		}
-																	]
-																},
-																{
-																	"kind": "<内部变量声明>",
-																	"type": "$Int $ID $Semi ",
-																	"inner": [
-																		{
-																			"kind": "$Semi"
-																		},
-																		{
-																			"kind": "$ID",
-																			"val": "4"
-																		},
-																		{
-																			"kind": "$Int"
-																		}
-																	]
-																}
-															]
-														},
-														{
-															"kind": "$LeftBrace"
-														}
-													]
-												},
-												{
-													"kind": "$RightBracket"
-												},
-												{
-													"kind": "<形参>",
-													"type": "<参数列表> ",
-													"inner": [
-														{
-															"kind": "<参数列表>",
-															"type": "<参数> $Comma <参数列表> ",
-															"inner": [
-																{
-																	"kind": "<参数列表>",
-																	"type": "<参数> $Comma <参数列表> ",
-																	"inner": [
-																		{
-																			"kind": "<参数列表>",
-																			"type": "<参数> ",
-																			"inner": [
-																				{
-																					"kind": "<参数>",
-																					"type": "$Int $ID ",
+																					"kind": "<语句>",
+																					"type": "<return语句> ",
 																					"inner": [
 																						{
-																							"kind": "$ID",
-																							"val": "3"
-																						},
-																						{
-																							"kind": "$Int"
+																							"kind": "<return语句>",
+																							"type": "$Return $Semi ",
+																							"inner": [
+																								{
+																									"kind": "$Return"
+																								},
+																								{
+																									"kind": "$Semi"
+																								}
+																							]
 																						}
 																					]
 																				}
 																			]
-																		},
-																		{
-																			"kind": "$Comma"
-																		},
-																		{
-																			"kind": "<参数>",
-																			"type": "$Int $ID ",
-																			"inner": [
-																				{
-																					"kind": "$ID",
-																					"val": "1"
-																				},
-																				{
-																					"kind": "$Int"
-																				}
-																			]
-																		}
-																	]
-																},
-																{
-																	"kind": "$Comma"
-																},
-																{
-																	"kind": "<参数>",
-																	"type": "$Int $ID ",
-																	"inner": [
-																		{
-																			"kind": "$ID",
-																			"val": "0"
-																		},
-																		{
-																			"kind": "$Int"
 																		}
 																	]
 																}
 															]
 														}
 													]
-												},
-												{
-													"kind": "$LeftBracket"
 												}
 											]
 										},
 										{
-											"kind": "<A>",
-											"type": "$Empty "
-										},
-										{
-											"kind": "<M>",
-											"type": "$Empty "
-										},
-										{
-											"kind": "$ID",
-											"val": "2"
-										},
-										{
-											"kind": "$Int"
-										}
-									]
-								},
-								{
-									"kind": "<声明串>",
-									"type": "<声明串> <声明> ",
-									"inner": [
-										{
-											"kind": "<声明>",
-											"type": "$Int $ID <声明类型> ",
-											"inner": [
-												{
-													"kind": "<声明类型>",
-													"type": "$Semi ",
-													"inner": [
-														{
-															"kind": "$Semi"
-														}
-													]
-												},
-												{
-													"kind": "$ID",
-													"val": "1"
-												},
-												{
-													"kind": "$Int"
-												}
-											]
-										},
-										{
-											"kind": "<声明串>",
-											"type": "<声明> ",
-											"inner": [
-												{
-													"kind": "<声明>",
-													"type": "$Int $ID <声明类型> ",
-													"inner": [
-														{
-															"kind": "<声明类型>",
-															"type": "$Semi ",
-															"inner": [
-																{
-																	"kind": "$Semi"
-																}
-															]
-														},
-														{
-															"kind": "$ID",
-															"val": "0"
-														},
-														{
-															"kind": "$Int"
-														}
-													]
-												}
-											]
+											"kind": "$RightBrace"
 										}
 									]
 								}
@@ -1729,10 +1733,6 @@
 					]
 				}
 			]
-		},
-		{
-			"kind": "<N>",
-			"type": "$Empty "
 		}
 	]
 }
