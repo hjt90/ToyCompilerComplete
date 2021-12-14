@@ -636,35 +636,19 @@ void parsing::generate_midcode(syntaxTableIndex SyntaxIndex, syntaxTreeNode &lhs
 		mid_code.emit_code(quadruple(Oper::Return, syntaxTree[rhs[1]].place, string(""), string("")));
 		break;
 	case 29: //<while语句> ::= $While <M> $LeftBracket <表达式> $RightBracket <A> <语句块>
-		int pos29m1, pos29e, pos29m2, pos29s1;
-		pos29m1 = 1;
-		pos29e = 3;
-		pos29m2 = 5;
-		pos29s1 = 6;
-		mid_code.back_patch(syntaxTree[rhs[pos29s1]].nextlist, syntaxTree[rhs[pos29m1]].quad);
-		mid_code.back_patch(syntaxTree[rhs[pos29e]].truelist, syntaxTree[rhs[pos29m2]].quad);
-		lhs.nextlist = syntaxTree[rhs[pos29e]].falselist;
-		mid_code.emit_code(quadruple(Oper::J, string(""), string(""), to_string(syntaxTree[rhs[pos29m1]].quad)));
+		mid_code.back_patch(syntaxTree[rhs[6]].nextlist, syntaxTree[rhs[1]].quad);
+		mid_code.back_patch(syntaxTree[rhs[3]].truelist, syntaxTree[rhs[5]].quad);
+		lhs.nextlist = syntaxTree[rhs[3]].falselist;
+		mid_code.emit_code(quadruple(Oper::J, string(""), string(""), to_string(syntaxTree[rhs[1]].quad)));
 		break;
 	case 30: //<if语句> ::= $If $LeftBracket <表达式> $RightBracket <A> <语句块>
-		int pos30e, pos30m, pos30s1;
-		pos30e = 2;
-		pos30m = 4;
-		pos30s1 = 5;
-		mid_code.back_patch(syntaxTree[rhs[pos30e]].truelist, syntaxTree[rhs[pos30m]].quad);
-		lhs.nextlist = mergelist(syntaxTree[rhs[pos30e]].falselist, syntaxTree[rhs[pos30s1]].nextlist);
+		mid_code.back_patch(syntaxTree[rhs[2]].truelist, syntaxTree[rhs[4]].quad);
+		lhs.nextlist = mergelist(syntaxTree[rhs[2]].falselist, syntaxTree[rhs[4]].nextlist);
 		break;
 	case 31: //<if语句> ::= $If $LeftBracket <表达式> $RightBracket <A> <语句块> <N> $Else <M> <A> <语句块>
-		int pos31e, pos31m1, pos31s1, pos31n, pos31m2, pos31s2;
-		pos31e = 2;
-		pos31m1 = 4;
-		pos31s1 = 5;
-		pos31n = 6;
-		pos31m2 = 8;
-		pos31s2 = 10;
-		mid_code.back_patch(syntaxTree[rhs[pos31e]].truelist, syntaxTree[rhs[pos31m1]].quad);
-		mid_code.back_patch(syntaxTree[rhs[pos31e]].falselist, syntaxTree[rhs[pos31m2]].quad);
-		lhs.nextlist = mergelist(syntaxTree[rhs[pos31s1]].nextlist, syntaxTree[rhs[pos31n]].nextlist, syntaxTree[rhs[pos31s2]].nextlist);
+		mid_code.back_patch(syntaxTree[rhs[2]].truelist, syntaxTree[rhs[4]].quad);
+		mid_code.back_patch(syntaxTree[rhs[2]].falselist, syntaxTree[rhs[8]].quad);
+		lhs.nextlist = mergelist(syntaxTree[rhs[5]].nextlist, syntaxTree[rhs[6]].nextlist, syntaxTree[rhs[10]].nextlist);
 		break;
 	case 32: //<表达式> ::= <加法表达式>
 		lhs.place = syntaxTree[rhs[0]].place;
@@ -751,7 +735,7 @@ void parsing::generate_midcode(syntaxTableIndex SyntaxIndex, syntaxTreeNode &lhs
 			if (functmp.return_type == symbolType::Int)
 			{
 				lhs.place = p_symbolTable->newtemp();
-				mid_code.emit_code(quadruple(Oper::Assign, lhs.place, string(""), "EAX"));
+				mid_code.emit_code(quadruple(Oper::Assign, "EAX", string(""), lhs.place));
 			}
 		}
 		break;
@@ -883,7 +867,7 @@ void parsing::output(ofstream &struction, ofstream &graph)
 
 void parsing::outputMidcode(ofstream& midcode)
 {
-
+	this->mid_code.output(midcode);
 }
 
 vector<quadrupleIndex> parsing::mergelist(vector<quadrupleIndex> &list1, vector<quadrupleIndex> &list2)

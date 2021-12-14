@@ -3,7 +3,7 @@ CFLAGS=
 SOURCE=main.cpp
 OBJ=$(SOURCE:.cpp=.o)
 
-COMMON_SOURCE=lexer.cpp Parsing.cpp
+COMMON_SOURCE=lexer.cpp Parsing.cpp quadruple.cpp symbolTable.cpp
 COMMON_OBJECT=$(COMMON_SOURCE:.cpp=.o)
 
 EXE=toycc
