@@ -1,4 +1,5 @@
 #include "symbolTable.h"
+#include <algorithm>
 using namespace std;
 
 int proc_symbolTable::nexttmpname = 0;
@@ -100,4 +101,15 @@ int proc_symbolTable::get_enterquad() const
 int proc_symbolTable::get_offset() const
 {
 	return this->itemTable_offset;
+}
+
+vector<pair<int, string>> proc_symbolTable::getFuncEnter() const
+{
+	vector<pair<int, string> >ret;
+	for (auto iter : this->functionTable)
+	{
+		ret.push_back(pair<int, string>(iter.second->enter_quad, iter.first));
+	}
+	sort(ret.begin(), ret.end());
+	return ret;
 }

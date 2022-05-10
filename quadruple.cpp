@@ -1,7 +1,9 @@
 #include "quadruple.h"
-int IntermediateLanguage::nextquad = CODE_START_POS;
 
-int IntermediateLanguage::emit_code(const quadruple &newqr)
+IntermediateLanguage::IntermediateLanguage() :nextquad(CODE_START_POS)
+{}
+
+int IntermediateLanguage::emit_code(const quadruple& newqr)
 {
 	code.push_back(newqr);
 	int quadnow = nextquad;
@@ -22,57 +24,57 @@ string Oper2string(Oper op)
 {
 	switch (op)
 	{
-	case Oper::J:
-		return "J";
-		break;
-	case Oper::Jeq:
-		return "Jeq";
-		break;
-	case Oper::Jgt:
-		return "Jgt";
-		break;
-	case Oper::Jge:
-		return "Jge";
-		break;
-	case Oper::Jlt:
-		return "Jlt";
-		break;
-	case Oper::Jle:
-		return "Jle";
-		break;
-	case Oper::Jne:
-		return "Jne";
-		break;
-	case Oper::Plus:
-		return "Plus";
-		break;
-	case Oper::Minus:
-		return "Minus";
-		break;
-	case Oper::Multiply:
-		return "Multiply";
-		break;
-	case Oper::Divide:
-		return "Divide";
-		break;
-	case Oper::Assign:
-		return "Assign";
-		break;
-	case Oper::Parm:
-		return "Parm";
-		break;
-	case Oper::Call:
-		return "Call";
-		break;
-	case Oper::Return:
-		return "Return";
-		break;
-	default:
-		return "-1";
+		case Oper::J:
+			return "J";
+			break;
+		case Oper::Jeq:
+			return "Jeq";
+			break;
+		case Oper::Jgt:
+			return "Jgt";
+			break;
+		case Oper::Jge:
+			return "Jge";
+			break;
+		case Oper::Jlt:
+			return "Jlt";
+			break;
+		case Oper::Jle:
+			return "Jle";
+			break;
+		case Oper::Jne:
+			return "Jne";
+			break;
+		case Oper::Plus:
+			return "Plus";
+			break;
+		case Oper::Minus:
+			return "Minus";
+			break;
+		case Oper::Multiply:
+			return "Multiply";
+			break;
+		case Oper::Divide:
+			return "Divide";
+			break;
+		case Oper::Assign:
+			return "Assign";
+			break;
+		case Oper::Parm:
+			return "Parm";
+			break;
+		case Oper::Call:
+			return "Call";
+			break;
+		case Oper::Return:
+			return "Return";
+			break;
+		default:
+			return "-1";
 	}
 }
 
-void IntermediateLanguage::output(ofstream &midcode)
+void IntermediateLanguage::output(ofstream& midcode)
 {
 	int pos = CODE_START_POS;
 	for (auto i : code)

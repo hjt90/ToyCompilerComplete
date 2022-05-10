@@ -68,4 +68,5 @@ public:
 public:
 	int get_enterquad() const;
 	int get_offset() const;
+	vector<pair<int, string> >getFuncEnter() const;
 };

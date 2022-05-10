@@ -62,9 +62,10 @@ public:
 	bool inTree;
 
 	syntaxTreeNode();
-	syntaxTreeNode(const pair<Token, string> &);
+	syntaxTreeNode(const pair<Token, string>&);
 };
 
+class Optimizer;
 //文法分析器
 class parsing
 {
@@ -90,28 +91,29 @@ class parsing
 	stack<syntaxTreeNodeIndex> inputSymbolvector;  //输入符号栈
 	syntaxTreeNodeIndex topNode;
 	//中间代码生成部分
-	proc_symbolTable *p_symbolTable;
+	proc_symbolTable* p_symbolTable;
 	IntermediateLanguage mid_code;
 
-	void initSymbolTable(ifstream &);
+	void initSymbolTable(ifstream&);
 	void initFirstTable();
 	void initAnalyseTable();
 	void initTerminalSymbol();
-	void generate_midcode(syntaxTableIndex SyntaxIndex, syntaxTreeNode &lhs, vector<syntaxTreeNodeIndex> &rhs);
+	void generate_midcode(syntaxTableIndex SyntaxIndex, syntaxTreeNode& lhs, vector<syntaxTreeNodeIndex>& rhs);
 	symbolTableIndex insertSymbol(symbolItem);
 	set<symbolTableIndex> firstForPhrase(vector<symbolTableIndex> p);
-	pair<int, bool> createClosure(DFA_status &sta);
-	void outputStruction(ofstream &, syntaxTreeNodeIndex, int);
-	void outputDot(ofstream &, syntaxTreeNodeIndex);
+	pair<int, bool> createClosure(DFA_status& sta);
+	void outputStruction(ofstream&, syntaxTreeNodeIndex, int);
+	void outputDot(ofstream&, syntaxTreeNodeIndex);
 	void debugdfa(); //用来调试dfa
-	vector<quadrupleIndex> mergelist(vector<quadrupleIndex> &list1, vector<quadrupleIndex> &list2);
-	vector<quadrupleIndex> mergelist(vector<quadrupleIndex> &list1, vector<quadrupleIndex> &list2, vector<quadrupleIndex> &list3);
+	vector<quadrupleIndex> mergelist(vector<quadrupleIndex>& list1, vector<quadrupleIndex>& list2);
+	vector<quadrupleIndex> mergelist(vector<quadrupleIndex>& list1, vector<quadrupleIndex>& list2, vector<quadrupleIndex>& list3);
 
 public:
 	parsing() = default;
 	void clear();
-	void initSyntax(ifstream &);
-	void analyze(const vector<pair<Token, string>> &);
-	void output(ofstream &struction, ofstream &graph);
+	void initSyntax(ifstream&);
+	void analyze(const vector<pair<Token, string>>&);
+	void output(ofstream& struction, ofstream& graph);
 	void outputMidcode(ofstream& midcode);
+	friend class Optimizer;
 };
