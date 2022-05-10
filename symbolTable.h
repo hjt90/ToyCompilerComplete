@@ -2,47 +2,70 @@
 #include <string>
 #include <vector>
 #include <map>
+using namespace std;
 
 enum class symbolType : char
 {
-    Int,
-    Real,
-    Void,
-    None,
-    Unknown
+	Int,
+	Real,
+	Void,
+	None,
+	Unknown
+};
+
+enum class procSymbolTableType : char
+{
+	function,
+	block,
+	unknow
+};
+
+const map< symbolType, int> symbolTypeOffset =
+{
+	{map< symbolType, int>::value_type(symbolType::Int, 4)},
+	{map< symbolType, int>::value_type(symbolType::Real,4)},
+	{map< symbolType, int>::value_type(symbolType::Void,0)},
+	{map< symbolType, int>::value_type(symbolType::None,0)},
+	{map< symbolType, int>::value_type(symbolType::Unknown,0)}
 };
 
 struct symbolTableItem
 {
-    symbolType type;
-    std::string name;
-};
-
-class proc_symbolTable;
-struct symbolTableFunction
-{
-    int enter_quad;
-    std::string name;
-    symbolType return_type;
-    proc_symbolTable *addr;
-    std::vector<symbolTableItem> parm;
+	symbolType type;
+	std::string name;
+	std::string gobalname;
+	int offset; //偏移量
+	symbolTableItem() = default;
 };
 
 class proc_symbolTable
 {
-    proc_symbolTable *returnAddr;
-    std::map<std::string, symbolTableItem> itemTable;
-    std::map<std::string, symbolTableFunction> functionTable;
+	procSymbolTableType type; //种类
+	int enter_quad; //入口地址
+	std::string name;
+	proc_symbolTable* returnAddr;      //返回地址
+	std::map<std::string, proc_symbolTable*> functionTable;
+	std::map<std::string, symbolTableItem> itemTable;
+	int itemTable_offset; //当前符号表的offset
 
 public:
-    static int nextname;
-    static int nexttmpname;
-    proc_symbolTable() = default;
-    const symbolTableItem &find_variable(std::string name);
-    const symbolTableFunction &find_function(std::string name);
-    void make_function(const std::vector<symbolTableItem> &parms, std::string name, symbolType return_type, int enter_quad);
-    void insert_variable(const symbolTableItem &);
-    proc_symbolTable *into_function(std::string);
-    proc_symbolTable *return_function();
-    std::string newtemp();
+	static int nexttmpname;
+	static std::string newtemp();
+
+	std::vector<symbolTableItem> parm; //参数列表
+	symbolType return_type;
+
+	proc_symbolTable();
+	proc_symbolTable* create_function();
+	proc_symbolTable* return_block(int enter_quad);
+	void init_function(const std::vector<symbolTableItem>& parms, std::string name, symbolType return_type, int enter_quad);
+	void insert_variable(const symbolTableItem&);
+
+	const symbolTableItem& find_variable(std::string name);
+	proc_symbolTable* find_function(const std::string& name) const;
+	const proc_symbolTable* find_gobal() const;
+
+public:
+	int get_enterquad() const;
+	int get_offset() const;
 };
