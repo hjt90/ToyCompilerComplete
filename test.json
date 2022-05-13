@@ -1241,7 +1241,7 @@
 											"inner": [
 												{
 													"kind": "<内部变量声明>",
-													"type": "$Int $ID $Semi ",
+													"type": "$Int $ID <数组声明> $Semi ",
 													"inner": [
 														{
 															"kind": "$Int"
@@ -1251,57 +1251,45 @@
 															"val": "a"
 														},
 														{
+															"kind": "<数组声明>",
+															"type": "<数组声明> $LeftArray $Number $RightArray ",
+															"inner": [
+																{
+																	"kind": "<数组声明>",
+																	"type": "$LeftArray $Number $RightArray ",
+																	"inner": [
+																		{
+																			"kind": "$LeftArray"
+																		},
+																		{
+																			"kind": "$Number",
+																			"val": "2"
+																		},
+																		{
+																			"kind": "$RightArray"
+																		}
+																	]
+																},
+																{
+																	"kind": "$LeftArray"
+																},
+																{
+																	"kind": "$Number",
+																	"val": "2"
+																},
+																{
+																	"kind": "$RightArray"
+																}
+															]
+														},
+														{
 															"kind": "$Semi"
 														}
 													]
 												},
 												{
 													"kind": "<内部声明>",
-													"type": "<内部变量声明> <内部声明> ",
-													"inner": [
-														{
-															"kind": "<内部变量声明>",
-															"type": "$Int $ID $Semi ",
-															"inner": [
-																{
-																	"kind": "$Int"
-																},
-																{
-																	"kind": "$ID",
-																	"val": "b"
-																},
-																{
-																	"kind": "$Semi"
-																}
-															]
-														},
-														{
-															"kind": "<内部声明>",
-															"type": "<内部变量声明> <内部声明> ",
-															"inner": [
-																{
-																	"kind": "<内部变量声明>",
-																	"type": "$Int $ID $Semi ",
-																	"inner": [
-																		{
-																			"kind": "$Int"
-																		},
-																		{
-																			"kind": "$ID",
-																			"val": "c"
-																		},
-																		{
-																			"kind": "$Semi"
-																		}
-																	]
-																},
-																{
-																	"kind": "<内部声明>",
-																	"type": "$Empty "
-																}
-															]
-														}
-													]
+													"type": "$Empty "
 												}
 											]
 										},
@@ -1315,11 +1303,91 @@
 													"inner": [
 														{
 															"kind": "<assign语句>",
-															"type": "$ID $Equal <表达式> $Semi ",
+															"type": "<数组> $Equal <表达式> $Semi ",
 															"inner": [
 																{
-																	"kind": "$ID",
-																	"val": "a"
+																	"kind": "<数组>",
+																	"type": "<数组> $LeftArray <表达式> $RightArray ",
+																	"inner": [
+																		{
+																			"kind": "<数组>",
+																			"type": "$ID $LeftArray <表达式> $RightArray ",
+																			"inner": [
+																				{
+																					"kind": "$ID",
+																					"val": "a"
+																				},
+																				{
+																					"kind": "$LeftArray"
+																				},
+																				{
+																					"kind": "<表达式>",
+																					"type": "<加法表达式> ",
+																					"inner": [
+																						{
+																							"kind": "<加法表达式>",
+																							"type": "<项> ",
+																							"inner": [
+																								{
+																									"kind": "<项>",
+																									"type": "<因子> ",
+																									"inner": [
+																										{
+																											"kind": "<因子>",
+																											"type": "$Number ",
+																											"inner": [
+																												{
+																													"kind": "$Number",
+																													"val": "0"
+																												}
+																											]
+																										}
+																									]
+																								}
+																							]
+																						}
+																					]
+																				},
+																				{
+																					"kind": "$RightArray"
+																				}
+																			]
+																		},
+																		{
+																			"kind": "$LeftArray"
+																		},
+																		{
+																			"kind": "<表达式>",
+																			"type": "<加法表达式> ",
+																			"inner": [
+																				{
+																					"kind": "<加法表达式>",
+																					"type": "<项> ",
+																					"inner": [
+																						{
+																							"kind": "<项>",
+																							"type": "<因子> ",
+																							"inner": [
+																								{
+																									"kind": "<因子>",
+																									"type": "$Number ",
+																									"inner": [
+																										{
+																											"kind": "$Number",
+																											"val": "0"
+																										}
+																									]
+																								}
+																							]
+																						}
+																					]
+																				}
+																			]
+																		},
+																		{
+																			"kind": "$RightArray"
+																		}
+																	]
 																},
 																{
 																	"kind": "$Equal"
@@ -1373,11 +1441,91 @@
 															"inner": [
 																{
 																	"kind": "<assign语句>",
-																	"type": "$ID $Equal <表达式> $Semi ",
+																	"type": "<数组> $Equal <表达式> $Semi ",
 																	"inner": [
 																		{
-																			"kind": "$ID",
-																			"val": "b"
+																			"kind": "<数组>",
+																			"type": "<数组> $LeftArray <表达式> $RightArray ",
+																			"inner": [
+																				{
+																					"kind": "<数组>",
+																					"type": "$ID $LeftArray <表达式> $RightArray ",
+																					"inner": [
+																						{
+																							"kind": "$ID",
+																							"val": "a"
+																						},
+																						{
+																							"kind": "$LeftArray"
+																						},
+																						{
+																							"kind": "<表达式>",
+																							"type": "<加法表达式> ",
+																							"inner": [
+																								{
+																									"kind": "<加法表达式>",
+																									"type": "<项> ",
+																									"inner": [
+																										{
+																											"kind": "<项>",
+																											"type": "<因子> ",
+																											"inner": [
+																												{
+																													"kind": "<因子>",
+																													"type": "$Number ",
+																													"inner": [
+																														{
+																															"kind": "$Number",
+																															"val": "0"
+																														}
+																													]
+																												}
+																											]
+																										}
+																									]
+																								}
+																							]
+																						},
+																						{
+																							"kind": "$RightArray"
+																						}
+																					]
+																				},
+																				{
+																					"kind": "$LeftArray"
+																				},
+																				{
+																					"kind": "<表达式>",
+																					"type": "<加法表达式> ",
+																					"inner": [
+																						{
+																							"kind": "<加法表达式>",
+																							"type": "<项> ",
+																							"inner": [
+																								{
+																									"kind": "<项>",
+																									"type": "<因子> ",
+																									"inner": [
+																										{
+																											"kind": "<因子>",
+																											"type": "$Number ",
+																											"inner": [
+																												{
+																													"kind": "$Number",
+																													"val": "1"
+																												}
+																											]
+																										}
+																									]
+																								}
+																							]
+																						}
+																					]
+																				},
+																				{
+																					"kind": "$RightArray"
+																				}
+																			]
 																		},
 																		{
 																			"kind": "$Equal"
@@ -1388,7 +1536,7 @@
 																			"inner": [
 																				{
 																					"kind": "<加法表达式>",
-																					"type": "<项> ",
+																					"type": "<项> $Plus <加法表达式> ",
 																					"inner": [
 																						{
 																							"kind": "<项>",
@@ -1396,11 +1544,116 @@
 																							"inner": [
 																								{
 																									"kind": "<因子>",
-																									"type": "$Number ",
+																									"type": "<数组> ",
 																									"inner": [
 																										{
-																											"kind": "$Number",
-																											"val": "4"
+																											"kind": "<数组>",
+																											"type": "<数组> $LeftArray <表达式> $RightArray ",
+																											"inner": [
+																												{
+																													"kind": "<数组>",
+																													"type": "$ID $LeftArray <表达式> $RightArray ",
+																													"inner": [
+																														{
+																															"kind": "$ID",
+																															"val": "a"
+																														},
+																														{
+																															"kind": "$LeftArray"
+																														},
+																														{
+																															"kind": "<表达式>",
+																															"type": "<加法表达式> ",
+																															"inner": [
+																																{
+																																	"kind": "<加法表达式>",
+																																	"type": "<项> ",
+																																	"inner": [
+																																		{
+																																			"kind": "<项>",
+																																			"type": "<因子> ",
+																																			"inner": [
+																																				{
+																																					"kind": "<因子>",
+																																					"type": "$Number ",
+																																					"inner": [
+																																						{
+																																							"kind": "$Number",
+																																							"val": "0"
+																																						}
+																																					]
+																																				}
+																																			]
+																																		}
+																																	]
+																																}
+																															]
+																														},
+																														{
+																															"kind": "$RightArray"
+																														}
+																													]
+																												},
+																												{
+																													"kind": "$LeftArray"
+																												},
+																												{
+																													"kind": "<表达式>",
+																													"type": "<加法表达式> ",
+																													"inner": [
+																														{
+																															"kind": "<加法表达式>",
+																															"type": "<项> ",
+																															"inner": [
+																																{
+																																	"kind": "<项>",
+																																	"type": "<因子> ",
+																																	"inner": [
+																																		{
+																																			"kind": "<因子>",
+																																			"type": "$Number ",
+																																			"inner": [
+																																				{
+																																					"kind": "$Number",
+																																					"val": "0"
+																																				}
+																																			]
+																																		}
+																																	]
+																																}
+																															]
+																														}
+																													]
+																												},
+																												{
+																													"kind": "$RightArray"
+																												}
+																											]
+																										}
+																									]
+																								}
+																							]
+																						},
+																						{
+																							"kind": "$Plus"
+																						},
+																						{
+																							"kind": "<加法表达式>",
+																							"type": "<项> ",
+																							"inner": [
+																								{
+																									"kind": "<项>",
+																									"type": "<因子> ",
+																									"inner": [
+																										{
+																											"kind": "<因子>",
+																											"type": "$Number ",
+																											"inner": [
+																												{
+																													"kind": "$Number",
+																													"val": "1"
+																												}
+																											]
 																										}
 																									]
 																								}
@@ -1431,11 +1684,91 @@
 																	"inner": [
 																		{
 																			"kind": "<assign语句>",
-																			"type": "$ID $Equal <表达式> $Semi ",
+																			"type": "<数组> $Equal <表达式> $Semi ",
 																			"inner": [
 																				{
-																					"kind": "$ID",
-																					"val": "c"
+																					"kind": "<数组>",
+																					"type": "<数组> $LeftArray <表达式> $RightArray ",
+																					"inner": [
+																						{
+																							"kind": "<数组>",
+																							"type": "$ID $LeftArray <表达式> $RightArray ",
+																							"inner": [
+																								{
+																									"kind": "$ID",
+																									"val": "a"
+																								},
+																								{
+																									"kind": "$LeftArray"
+																								},
+																								{
+																									"kind": "<表达式>",
+																									"type": "<加法表达式> ",
+																									"inner": [
+																										{
+																											"kind": "<加法表达式>",
+																											"type": "<项> ",
+																											"inner": [
+																												{
+																													"kind": "<项>",
+																													"type": "<因子> ",
+																													"inner": [
+																														{
+																															"kind": "<因子>",
+																															"type": "$Number ",
+																															"inner": [
+																																{
+																																	"kind": "$Number",
+																																	"val": "1"
+																																}
+																															]
+																														}
+																													]
+																												}
+																											]
+																										}
+																									]
+																								},
+																								{
+																									"kind": "$RightArray"
+																								}
+																							]
+																						},
+																						{
+																							"kind": "$LeftArray"
+																						},
+																						{
+																							"kind": "<表达式>",
+																							"type": "<加法表达式> ",
+																							"inner": [
+																								{
+																									"kind": "<加法表达式>",
+																									"type": "<项> ",
+																									"inner": [
+																										{
+																											"kind": "<项>",
+																											"type": "<因子> ",
+																											"inner": [
+																												{
+																													"kind": "<因子>",
+																													"type": "$Number ",
+																													"inner": [
+																														{
+																															"kind": "$Number",
+																															"val": "0"
+																														}
+																													]
+																												}
+																											]
+																										}
+																									]
+																								}
+																							]
+																						},
+																						{
+																							"kind": "$RightArray"
+																						}
+																					]
 																				},
 																				{
 																					"kind": "$Equal"
@@ -1446,7 +1779,7 @@
 																					"inner": [
 																						{
 																							"kind": "<加法表达式>",
-																							"type": "<项> ",
+																							"type": "<项> $Plus <加法表达式> ",
 																							"inner": [
 																								{
 																									"kind": "<项>",
@@ -1454,11 +1787,196 @@
 																									"inner": [
 																										{
 																											"kind": "<因子>",
-																											"type": "$Number ",
+																											"type": "<数组> ",
 																											"inner": [
 																												{
-																													"kind": "$Number",
-																													"val": "2"
+																													"kind": "<数组>",
+																													"type": "<数组> $LeftArray <表达式> $RightArray ",
+																													"inner": [
+																														{
+																															"kind": "<数组>",
+																															"type": "$ID $LeftArray <表达式> $RightArray ",
+																															"inner": [
+																																{
+																																	"kind": "$ID",
+																																	"val": "a"
+																																},
+																																{
+																																	"kind": "$LeftArray"
+																																},
+																																{
+																																	"kind": "<表达式>",
+																																	"type": "<加法表达式> ",
+																																	"inner": [
+																																		{
+																																			"kind": "<加法表达式>",
+																																			"type": "<项> ",
+																																			"inner": [
+																																				{
+																																					"kind": "<项>",
+																																					"type": "<因子> ",
+																																					"inner": [
+																																						{
+																																							"kind": "<因子>",
+																																							"type": "$Number ",
+																																							"inner": [
+																																								{
+																																									"kind": "$Number",
+																																									"val": "0"
+																																								}
+																																							]
+																																						}
+																																					]
+																																				}
+																																			]
+																																		}
+																																	]
+																																},
+																																{
+																																	"kind": "$RightArray"
+																																}
+																															]
+																														},
+																														{
+																															"kind": "$LeftArray"
+																														},
+																														{
+																															"kind": "<表达式>",
+																															"type": "<加法表达式> ",
+																															"inner": [
+																																{
+																																	"kind": "<加法表达式>",
+																																	"type": "<项> ",
+																																	"inner": [
+																																		{
+																																			"kind": "<项>",
+																																			"type": "<因子> ",
+																																			"inner": [
+																																				{
+																																					"kind": "<因子>",
+																																					"type": "$Number ",
+																																					"inner": [
+																																						{
+																																							"kind": "$Number",
+																																							"val": "0"
+																																						}
+																																					]
+																																				}
+																																			]
+																																		}
+																																	]
+																																}
+																															]
+																														},
+																														{
+																															"kind": "$RightArray"
+																														}
+																													]
+																												}
+																											]
+																										}
+																									]
+																								},
+																								{
+																									"kind": "$Plus"
+																								},
+																								{
+																									"kind": "<加法表达式>",
+																									"type": "<项> ",
+																									"inner": [
+																										{
+																											"kind": "<项>",
+																											"type": "<因子> ",
+																											"inner": [
+																												{
+																													"kind": "<因子>",
+																													"type": "<数组> ",
+																													"inner": [
+																														{
+																															"kind": "<数组>",
+																															"type": "<数组> $LeftArray <表达式> $RightArray ",
+																															"inner": [
+																																{
+																																	"kind": "<数组>",
+																																	"type": "$ID $LeftArray <表达式> $RightArray ",
+																																	"inner": [
+																																		{
+																																			"kind": "$ID",
+																																			"val": "a"
+																																		},
+																																		{
+																																			"kind": "$LeftArray"
+																																		},
+																																		{
+																																			"kind": "<表达式>",
+																																			"type": "<加法表达式> ",
+																																			"inner": [
+																																				{
+																																					"kind": "<加法表达式>",
+																																					"type": "<项> ",
+																																					"inner": [
+																																						{
+																																							"kind": "<项>",
+																																							"type": "<因子> ",
+																																							"inner": [
+																																								{
+																																									"kind": "<因子>",
+																																									"type": "$Number ",
+																																									"inner": [
+																																										{
+																																											"kind": "$Number",
+																																											"val": "0"
+																																										}
+																																									]
+																																								}
+																																							]
+																																						}
+																																					]
+																																				}
+																																			]
+																																		},
+																																		{
+																																			"kind": "$RightArray"
+																																		}
+																																	]
+																																},
+																																{
+																																	"kind": "$LeftArray"
+																																},
+																																{
+																																	"kind": "<表达式>",
+																																	"type": "<加法表达式> ",
+																																	"inner": [
+																																		{
+																																			"kind": "<加法表达式>",
+																																			"type": "<项> ",
+																																			"inner": [
+																																				{
+																																					"kind": "<项>",
+																																					"type": "<因子> ",
+																																					"inner": [
+																																						{
+																																							"kind": "<因子>",
+																																							"type": "$Number ",
+																																							"inner": [
+																																								{
+																																									"kind": "$Number",
+																																									"val": "1"
+																																								}
+																																							]
+																																						}
+																																					]
+																																				}
+																																			]
+																																		}
+																																	]
+																																},
+																																{
+																																	"kind": "$RightArray"
+																																}
+																															]
+																														}
+																													]
 																												}
 																											]
 																										}
@@ -1489,11 +2007,91 @@
 																			"inner": [
 																				{
 																					"kind": "<assign语句>",
-																					"type": "$ID $Equal <表达式> $Semi ",
+																					"type": "<数组> $Equal <表达式> $Semi ",
 																					"inner": [
 																						{
-																							"kind": "$ID",
-																							"val": "a"
+																							"kind": "<数组>",
+																							"type": "<数组> $LeftArray <表达式> $RightArray ",
+																							"inner": [
+																								{
+																									"kind": "<数组>",
+																									"type": "$ID $LeftArray <表达式> $RightArray ",
+																									"inner": [
+																										{
+																											"kind": "$ID",
+																											"val": "a"
+																										},
+																										{
+																											"kind": "$LeftArray"
+																										},
+																										{
+																											"kind": "<表达式>",
+																											"type": "<加法表达式> ",
+																											"inner": [
+																												{
+																													"kind": "<加法表达式>",
+																													"type": "<项> ",
+																													"inner": [
+																														{
+																															"kind": "<项>",
+																															"type": "<因子> ",
+																															"inner": [
+																																{
+																																	"kind": "<因子>",
+																																	"type": "$Number ",
+																																	"inner": [
+																																		{
+																																			"kind": "$Number",
+																																			"val": "1"
+																																		}
+																																	]
+																																}
+																															]
+																														}
+																													]
+																												}
+																											]
+																										},
+																										{
+																											"kind": "$RightArray"
+																										}
+																									]
+																								},
+																								{
+																									"kind": "$LeftArray"
+																								},
+																								{
+																									"kind": "<表达式>",
+																									"type": "<加法表达式> ",
+																									"inner": [
+																										{
+																											"kind": "<加法表达式>",
+																											"type": "<项> ",
+																											"inner": [
+																												{
+																													"kind": "<项>",
+																													"type": "<因子> ",
+																													"inner": [
+																														{
+																															"kind": "<因子>",
+																															"type": "$Number ",
+																															"inner": [
+																																{
+																																	"kind": "$Number",
+																																	"val": "1"
+																																}
+																															]
+																														}
+																													]
+																												}
+																											]
+																										}
+																									]
+																								},
+																								{
+																									"kind": "$RightArray"
+																								}
+																							]
 																						},
 																						{
 																							"kind": "$Equal"
@@ -1539,11 +2137,91 @@
 																																					"inner": [
 																																						{
 																																							"kind": "<因子>",
-																																							"type": "$ID ",
+																																							"type": "<数组> ",
 																																							"inner": [
 																																								{
-																																									"kind": "$ID",
-																																									"val": "a"
+																																									"kind": "<数组>",
+																																									"type": "<数组> $LeftArray <表达式> $RightArray ",
+																																									"inner": [
+																																										{
+																																											"kind": "<数组>",
+																																											"type": "$ID $LeftArray <表达式> $RightArray ",
+																																											"inner": [
+																																												{
+																																													"kind": "$ID",
+																																													"val": "a"
+																																												},
+																																												{
+																																													"kind": "$LeftArray"
+																																												},
+																																												{
+																																													"kind": "<表达式>",
+																																													"type": "<加法表达式> ",
+																																													"inner": [
+																																														{
+																																															"kind": "<加法表达式>",
+																																															"type": "<项> ",
+																																															"inner": [
+																																																{
+																																																	"kind": "<项>",
+																																																	"type": "<因子> ",
+																																																	"inner": [
+																																																		{
+																																																			"kind": "<因子>",
+																																																			"type": "$Number ",
+																																																			"inner": [
+																																																				{
+																																																					"kind": "$Number",
+																																																					"val": "0"
+																																																				}
+																																																			]
+																																																		}
+																																																	]
+																																																}
+																																															]
+																																														}
+																																													]
+																																												},
+																																												{
+																																													"kind": "$RightArray"
+																																												}
+																																											]
+																																										},
+																																										{
+																																											"kind": "$LeftArray"
+																																										},
+																																										{
+																																											"kind": "<表达式>",
+																																											"type": "<加法表达式> ",
+																																											"inner": [
+																																												{
+																																													"kind": "<加法表达式>",
+																																													"type": "<项> ",
+																																													"inner": [
+																																														{
+																																															"kind": "<项>",
+																																															"type": "<因子> ",
+																																															"inner": [
+																																																{
+																																																	"kind": "<因子>",
+																																																	"type": "$Number ",
+																																																	"inner": [
+																																																		{
+																																																			"kind": "$Number",
+																																																			"val": "0"
+																																																		}
+																																																	]
+																																																}
+																																															]
+																																														}
+																																													]
+																																												}
+																																											]
+																																										},
+																																										{
+																																											"kind": "$RightArray"
+																																										}
+																																									]
 																																								}
 																																							]
 																																						}
@@ -1574,11 +2252,91 @@
 																																							"inner": [
 																																								{
 																																									"kind": "<因子>",
-																																									"type": "$ID ",
+																																									"type": "<数组> ",
 																																									"inner": [
 																																										{
-																																											"kind": "$ID",
-																																											"val": "b"
+																																											"kind": "<数组>",
+																																											"type": "<数组> $LeftArray <表达式> $RightArray ",
+																																											"inner": [
+																																												{
+																																													"kind": "<数组>",
+																																													"type": "$ID $LeftArray <表达式> $RightArray ",
+																																													"inner": [
+																																														{
+																																															"kind": "$ID",
+																																															"val": "a"
+																																														},
+																																														{
+																																															"kind": "$LeftArray"
+																																														},
+																																														{
+																																															"kind": "<表达式>",
+																																															"type": "<加法表达式> ",
+																																															"inner": [
+																																																{
+																																																	"kind": "<加法表达式>",
+																																																	"type": "<项> ",
+																																																	"inner": [
+																																																		{
+																																																			"kind": "<项>",
+																																																			"type": "<因子> ",
+																																																			"inner": [
+																																																				{
+																																																					"kind": "<因子>",
+																																																					"type": "$Number ",
+																																																					"inner": [
+																																																						{
+																																																							"kind": "$Number",
+																																																							"val": "0"
+																																																						}
+																																																					]
+																																																				}
+																																																			]
+																																																		}
+																																																	]
+																																																}
+																																															]
+																																														},
+																																														{
+																																															"kind": "$RightArray"
+																																														}
+																																													]
+																																												},
+																																												{
+																																													"kind": "$LeftArray"
+																																												},
+																																												{
+																																													"kind": "<表达式>",
+																																													"type": "<加法表达式> ",
+																																													"inner": [
+																																														{
+																																															"kind": "<加法表达式>",
+																																															"type": "<项> ",
+																																															"inner": [
+																																																{
+																																																	"kind": "<项>",
+																																																	"type": "<因子> ",
+																																																	"inner": [
+																																																		{
+																																																			"kind": "<因子>",
+																																																			"type": "$Number ",
+																																																			"inner": [
+																																																				{
+																																																					"kind": "$Number",
+																																																					"val": "1"
+																																																				}
+																																																			]
+																																																		}
+																																																	]
+																																																}
+																																															]
+																																														}
+																																													]
+																																												},
+																																												{
+																																													"kind": "$RightArray"
+																																												}
+																																											]
 																																										}
 																																									]
 																																								}
@@ -1636,11 +2394,91 @@
 																																																			"inner": [
 																																																				{
 																																																					"kind": "<因子>",
-																																																					"type": "$ID ",
+																																																					"type": "<数组> ",
 																																																					"inner": [
 																																																						{
-																																																							"kind": "$ID",
-																																																							"val": "c"
+																																																							"kind": "<数组>",
+																																																							"type": "<数组> $LeftArray <表达式> $RightArray ",
+																																																							"inner": [
+																																																								{
+																																																									"kind": "<数组>",
+																																																									"type": "$ID $LeftArray <表达式> $RightArray ",
+																																																									"inner": [
+																																																										{
+																																																											"kind": "$ID",
+																																																											"val": "a"
+																																																										},
+																																																										{
+																																																											"kind": "$LeftArray"
+																																																										},
+																																																										{
+																																																											"kind": "<表达式>",
+																																																											"type": "<加法表达式> ",
+																																																											"inner": [
+																																																												{
+																																																													"kind": "<加法表达式>",
+																																																													"type": "<项> ",
+																																																													"inner": [
+																																																														{
+																																																															"kind": "<项>",
+																																																															"type": "<因子> ",
+																																																															"inner": [
+																																																																{
+																																																																	"kind": "<因子>",
+																																																																	"type": "$Number ",
+																																																																	"inner": [
+																																																																		{
+																																																																			"kind": "$Number",
+																																																																			"val": "1"
+																																																																		}
+																																																																	]
+																																																																}
+																																																															]
+																																																														}
+																																																													]
+																																																												}
+																																																											]
+																																																										},
+																																																										{
+																																																											"kind": "$RightArray"
+																																																										}
+																																																									]
+																																																								},
+																																																								{
+																																																									"kind": "$LeftArray"
+																																																								},
+																																																								{
+																																																									"kind": "<表达式>",
+																																																									"type": "<加法表达式> ",
+																																																									"inner": [
+																																																										{
+																																																											"kind": "<加法表达式>",
+																																																											"type": "<项> ",
+																																																											"inner": [
+																																																												{
+																																																													"kind": "<项>",
+																																																													"type": "<因子> ",
+																																																													"inner": [
+																																																														{
+																																																															"kind": "<因子>",
+																																																															"type": "$Number ",
+																																																															"inner": [
+																																																																{
+																																																																	"kind": "$Number",
+																																																																	"val": "0"
+																																																																}
+																																																															]
+																																																														}
+																																																													]
+																																																												}
+																																																											]
+																																																										}
+																																																									]
+																																																								},
+																																																								{
+																																																									"kind": "$RightArray"
+																																																								}
+																																																							]
 																																																						}
 																																																					]
 																																																				}
@@ -1720,11 +2558,91 @@
 																													"inner": [
 																														{
 																															"kind": "<因子>",
-																															"type": "$ID ",
+																															"type": "<数组> ",
 																															"inner": [
 																																{
-																																	"kind": "$ID",
-																																	"val": "a"
+																																	"kind": "<数组>",
+																																	"type": "<数组> $LeftArray <表达式> $RightArray ",
+																																	"inner": [
+																																		{
+																																			"kind": "<数组>",
+																																			"type": "$ID $LeftArray <表达式> $RightArray ",
+																																			"inner": [
+																																				{
+																																					"kind": "$ID",
+																																					"val": "a"
+																																				},
+																																				{
+																																					"kind": "$LeftArray"
+																																				},
+																																				{
+																																					"kind": "<表达式>",
+																																					"type": "<加法表达式> ",
+																																					"inner": [
+																																						{
+																																							"kind": "<加法表达式>",
+																																							"type": "<项> ",
+																																							"inner": [
+																																								{
+																																									"kind": "<项>",
+																																									"type": "<因子> ",
+																																									"inner": [
+																																										{
+																																											"kind": "<因子>",
+																																											"type": "$Number ",
+																																											"inner": [
+																																												{
+																																													"kind": "$Number",
+																																													"val": "1"
+																																												}
+																																											]
+																																										}
+																																									]
+																																								}
+																																							]
+																																						}
+																																					]
+																																				},
+																																				{
+																																					"kind": "$RightArray"
+																																				}
+																																			]
+																																		},
+																																		{
+																																			"kind": "$LeftArray"
+																																		},
+																																		{
+																																			"kind": "<表达式>",
+																																			"type": "<加法表达式> ",
+																																			"inner": [
+																																				{
+																																					"kind": "<加法表达式>",
+																																					"type": "<项> ",
+																																					"inner": [
+																																						{
+																																							"kind": "<项>",
+																																							"type": "<因子> ",
+																																							"inner": [
+																																								{
+																																									"kind": "<因子>",
+																																									"type": "$Number ",
+																																									"inner": [
+																																										{
+																																											"kind": "$Number",
+																																											"val": "1"
+																																										}
+																																									]
+																																								}
+																																							]
+																																						}
+																																					]
+																																				}
+																																			]
+																																		},
+																																		{
+																																			"kind": "$RightArray"
+																																		}
+																																	]
 																																}
 																															]
 																														}

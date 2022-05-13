@@ -59,6 +59,9 @@ public:
 	vector<quadrupleIndex> nextlist;
 	std::vector<symbolTableItem> plist;
 
+	vector<string> array_vec;
+	string array_place;
+
 	bool inTree;
 
 	syntaxTreeNode();

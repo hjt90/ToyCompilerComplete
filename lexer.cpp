@@ -73,6 +73,10 @@ string Lexer::translatetoken(Token i)//·­ÒëtokenÒÔ±ãÊä³ö
 			return "Number";
 		case (int)Token::End:
 			return "End";
+		case (int)Token::LeftArray:
+			return "LeftArray";
+		case (int)Token::RightArray:
+			return "RightArray";
 		default:
 			return "Unknown";
 	}
@@ -185,6 +189,18 @@ Status Lexer::dealsymbol(char* templine, int& cr, int len)
 	else if (templine[cr] == '/')
 	{
 		this->result.push_back({ Token::Divide, "" });
+		cr++;
+		return Status::Success;
+	}
+	else if (templine[cr] == '[')
+	{
+		this->result.push_back({ Token::LeftArray, "" });
+		cr++;
+		return Status::Success;
+	}
+	else if (templine[cr] == ']')
+	{
+		this->result.push_back({ Token::RightArray, "" });
 		cr++;
 		return Status::Success;
 	}

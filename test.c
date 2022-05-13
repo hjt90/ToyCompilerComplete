@@ -1,5 +1,6 @@
 int a;
 int b;
+
 int program(int a, int b, int c)
 {
 	int i;
@@ -28,12 +29,10 @@ int demo(int a)
 
 int main(void)
 {
-	int a;
-	int b;
-	int c;
-	a = 3;
-	b = 4;
-	c = 2;
-	a = program(a, b, demo(c));
-	return a;
+	int a[2][2];
+	a[0][0] = 3;
+	a[0][1] = a[0][0] + 1;
+	a[1][0] = a[0][0] + a[0][1];
+	a[1][1] = program(a[0][0], a[0][1], demo(a[1][0]));
+	return a[1][1];
 }

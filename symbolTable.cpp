@@ -4,6 +4,23 @@ using namespace std;
 
 int proc_symbolTable::nexttmpname = 0;
 
+symbolTableItem::symbolTableItem(symbolType type, std::string name, std::string gobalname, int offset)
+{
+	this->type = type;
+	this->name = name;
+	this->gobalname = gobalname;
+	this->offset = offset;
+}
+
+symbolTableItem::symbolTableItem(symbolType type, std::string name, std::string gobalname, int offset, vector<int> array)
+{
+	this->type = type;
+	this->name = name;
+	this->gobalname = gobalname;
+	this->offset = offset;
+	this->array = array;
+}
+
 proc_symbolTable::proc_symbolTable() : enter_quad(-1), return_type(symbolType::Unknown), returnAddr(NULL), itemTable_offset(0), type(procSymbolTableType::unknow)
 {
 }
@@ -19,8 +36,16 @@ void proc_symbolTable::insert_variable(const symbolTableItem& item)
 {
 	if (this->itemTable.find(item.name) == this->itemTable.end()) //Ã»ÓÐÖØ¸´
 	{
-		this->itemTable.insert({ item.name, item });
-		this->itemTable_offset += symbolTypeOffset.find(item.type)->second;
+		this->itemTable.insert({item.name, item});
+		if (item.type == symbolType::Array)
+		{
+			int offet = symbolTypeOffset.find(item.type)->second;
+			for (const auto &i : item.array)
+				offet *= i;
+			this->itemTable_offset += offet;
+		}
+		else
+			this->itemTable_offset += symbolTypeOffset.find(item.type)->second;
 	}
 	else
 	{

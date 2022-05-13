@@ -9,6 +9,7 @@ enum class symbolType : char
 	Int,
 	Real,
 	Void,
+	Array,
 	None,
 	Unknown
 };
@@ -25,6 +26,7 @@ const map< symbolType, int> symbolTypeOffset =
 	{map< symbolType, int>::value_type(symbolType::Int, 4)},
 	{map< symbolType, int>::value_type(symbolType::Real,4)},
 	{map< symbolType, int>::value_type(symbolType::Void,0)},
+	{map< symbolType, int>::value_type(symbolType::Array,4)},
 	{map< symbolType, int>::value_type(symbolType::None,0)},
 	{map< symbolType, int>::value_type(symbolType::Unknown,0)}
 };
@@ -35,7 +37,10 @@ struct symbolTableItem
 	std::string name;
 	std::string gobalname;
 	int offset; //Æ«ÒÆÁ¿
+	vector<int> array;
 	symbolTableItem() = default;
+	symbolTableItem(symbolType, std::string, std::string, int);
+	symbolTableItem(symbolType, std::string, std::string, int, vector<int>);
 };
 
 class proc_symbolTable

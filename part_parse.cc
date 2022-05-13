@@ -74,3 +74,12 @@ $Start ::= <N> <声明串>
 <实参列表> ::= $Empty
 <实参列表> ::= <表达式>
 <实参列表> ::= <表达式> $Comma <实参列表>
+
+<因子> ::= <数组>
+<数组> ::= $ID $LeftArray <表达式> $RightArray
+<数组> ::= <数组> $LeftArray <表达式> $RightArray
+<assign语句> ::= <数组> $Equal <表达式> $Semi
+<声明> ::= $Int $ID <数组声明> $Semi
+<数组声明> ::= $LeftArray $Number $RightArray 
+<数组声明> ::= <数组声明> $LeftArray $Number $RightArray
+<内部变量声明> ::= $Int $ID <数组声明> $Semi

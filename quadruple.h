@@ -23,6 +23,8 @@ enum class Oper : char
 	Multiply,
 	Divide,
 	Assign,
+	AssignArray,
+	ArrayAssign,
 	Parm,
 	Call,
 	Return
