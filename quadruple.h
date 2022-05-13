@@ -33,6 +33,7 @@ class quadruple
 {
 public:
 	quadruple(Oper Op, std::string arg1, std::string arg2, std::string result);
+	quadruple();
 	Oper Op;
 	std::string arg1;
 	std::string arg2;

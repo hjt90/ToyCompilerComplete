@@ -9,7 +9,7 @@ int main(int argc, char** argv)
 {
 	int option_index = 0;
 	ifstream fin, finSyntax;
-	ofstream struction, graph, midcode, midblock;
+	ofstream struction, graph, midcode, midblock, optimizer_block;
 
 	//fin.setstate(std::ios_base::badbit);
 	fin.open("D:/workspace/GitHub/ToyCompiler/test.c");
@@ -18,6 +18,7 @@ int main(int argc, char** argv)
 	graph.open("D:/workspace/GitHub/ToyCompiler/test.dot");
 	midcode.open("D:/workspace/GitHub/ToyCompiler/test.csv");
 	midblock.open("D:/workspace/GitHub/ToyCompiler/midblock.txt");
+	optimizer_block.open("D:/workspace/GitHub/ToyCompiler/optimizer_block.txt");
 
 	Lexer lex;
 	parsing parser;
@@ -33,12 +34,15 @@ int main(int argc, char** argv)
 
 	optimizer.divideBlocks(parser);
 	optimizer.outputBlocks(midblock);
+	midcode.close();
+	optimizer.optimizer();
+	optimizer.outputBlocks(optimizer_block);
 
 	fin.close();
 	finSyntax.close();
 	struction.close();
 	graph.close();
-	midcode.close();
+	
 	midblock.close();
 
 	return 0;

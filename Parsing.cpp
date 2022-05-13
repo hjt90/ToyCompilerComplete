@@ -641,7 +641,7 @@ void parsing::generate_midcode(syntaxTableIndex SyntaxIndex, syntaxTreeNode& lhs
 			mid_code.emit_code(quadruple(Oper::Return, string(""), string(""), string("")));
 			break;
 		case 28: //<return语句> ::= $Return <表达式> $Semi
-			mid_code.emit_code(quadruple(Oper::Return, syntaxTree[rhs[1]].place, string(""), string("")));
+			mid_code.emit_code(quadruple(Oper::Return, syntaxTree[rhs[1]].place, string(""), string("ReturnValue")));
 			break;
 		case 29: //<while语句> ::= $While <M> $LeftBracket <表达式> $RightBracket <A> <语句块>
 			mid_code.back_patch(syntaxTree[rhs[6]].nextlist, syntaxTree[rhs[1]].quad);
@@ -737,13 +737,15 @@ void parsing::generate_midcode(syntaxTableIndex SyntaxIndex, syntaxTreeNode& lhs
 			{
 				for (const auto& i : syntaxTree[rhs[2]].plist)
 				{
-					mid_code.emit_code(quadruple(Oper::Parm, string(""), string(""), i.gobalname));
+					mid_code.emit_code(quadruple(Oper::Parm, i.gobalname, string(""), syntaxTree[rhs[0]].val));
 				}
-				mid_code.emit_code(quadruple(Oper::Call, string(""), string(""), syntaxTree[rhs[0]].val));
 				if (functmp->return_type == symbolType::Int)
 				{
 					lhs.place = p_symbolTable->newtemp();
-					mid_code.emit_code(quadruple(Oper::Assign, "EAX", string(""), lhs.place));
+					mid_code.emit_code(quadruple(Oper::Call, syntaxTree[rhs[0]].val, string(""), lhs.place));
+				}
+				else {
+					mid_code.emit_code(quadruple(Oper::Call, syntaxTree[rhs[0]].val, string(""), string("")));
 				}
 			}
 			break;

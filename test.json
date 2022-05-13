@@ -1192,10 +1192,10 @@
 				},
 				{
 					"kind": "<声明>",
-					"type": "$Void $ID <M> <A> <函数声明> ",
+					"type": "$Int $ID <M> <A> <函数声明> ",
 					"inner": [
 						{
-							"kind": "$Void"
+							"kind": "$Int"
 						},
 						{
 							"kind": "$ID",
@@ -1701,10 +1701,38 @@
 																					"inner": [
 																						{
 																							"kind": "<return语句>",
-																							"type": "$Return $Semi ",
+																							"type": "$Return <表达式> $Semi ",
 																							"inner": [
 																								{
 																									"kind": "$Return"
+																								},
+																								{
+																									"kind": "<表达式>",
+																									"type": "<加法表达式> ",
+																									"inner": [
+																										{
+																											"kind": "<加法表达式>",
+																											"type": "<项> ",
+																											"inner": [
+																												{
+																													"kind": "<项>",
+																													"type": "<因子> ",
+																													"inner": [
+																														{
+																															"kind": "<因子>",
+																															"type": "$ID ",
+																															"inner": [
+																																{
+																																	"kind": "$ID",
+																																	"val": "a"
+																																}
+																															]
+																														}
+																													]
+																												}
+																											]
+																										}
+																									]
 																								},
 																								{
 																									"kind": "$Semi"

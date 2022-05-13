@@ -90,3 +90,6 @@ quadruple::quadruple(Oper Op, std::string arg1, std::string arg2, std::string re
 	this->arg2 = arg2;
 	this->result = result;
 }
+
+quadruple::quadruple() : Op(Oper::Assign)
+{}
