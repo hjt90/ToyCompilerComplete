@@ -1,0 +1,70 @@
+[demo]
+demo:
+    (Plus,T16,2,T16)(1,y)(^,^)(0,y)
+    (Multiply,T16,2,T18)(^,^)(^,^)(2,y)
+    (Return,T18,,ReturnValue)(^,y)(^,^)(^,^)
+    next1 = -1
+    next2 = -1
+
+[main]
+main:
+    (ArrayAssign,3,T19,0)(^,^)(^,^)(^,^)
+    (AssignArray,T19,0,T25)(^,^)(^,^)(2,y)
+    (Plus,T25,1,T26)(5,y)(^,^)(3,y)
+    (ArrayAssign,T26,T19,1)(^,^)(^,^)(^,^)
+    (AssignArray,T19,1,T35)(^,^)(^,^)(5,y)
+    (Plus,T25,T35,T36)(10,y)(11,y)(6,y)
+    (ArrayAssign,T36,T19,2)(^,^)(^,^)(^,^)
+    (AssignArray,T19,2,T48)(^,^)(^,^)(8,y)
+    (Parm,T48,,demo0)(^,^)(^,^)(^,^)
+    (Call,demo,,T49)(^,^)(^,^)(12,y)
+    (Parm,T25,,program1)(^,^)(^,^)(^,^)
+    (Parm,T35,,program2)(^,^)(^,^)(^,^)
+    (Parm,T49,,program3)(^,^)(^,^)(^,^)
+    (Call,program,,T50)(^,^)(^,^)(14,y)
+    (ArrayAssign,T50,T19,3)(^,^)(^,^)(^,^)
+    (AssignArray,T19,3,T56)(^,^)(^,^)(16,y)
+    (Return,T56,,ReturnValue)(^,y)(^,^)(^,^)
+    next1 = -1
+    next2 = -1
+
+[program]
+program:
+    (Assign,0,,T8)(^,^)(^,^)(^,y)
+    (Plus,T6,T5,T10)(^,y)(^,y)(2,y)
+    (Jgt,T7,T10,Label2)(^,y)(^,^)(^,^)
+    next1 = 1
+    next2 = 2
+Label1:
+    (J,,,Label3)(^,^)(^,^)(^,^)
+    next1 = 3
+    next2 = -1
+Label2:
+    (Multiply,T6,T5,T11)(^,^)(^,^)(1,y)
+    (Plus,T11,1,T12)(^,^)(^,^)(2,y)
+    (Plus,T7,T12,T9)(^,^)(^,^)(^,y)
+    (J,,,Label4)(^,^)(^,^)(^,^)
+    next1 = 4
+    next2 = -1
+Label3:
+    (Assign,T7,,T9)(^,^)(^,^)(^,y)
+    next1 = 4
+    next2 = -1
+Label4:
+    (Jle,T8,100,Label6)(^,y)(^,^)(^,^)
+    next1 = 5
+    next2 = 6
+Label5:
+    (J,,,Label7)(^,^)(^,^)(^,^)
+    next1 = 7
+    next2 = -1
+Label6:
+    (Multiply,T9,2,T8)(^,y)(^,^)(^,y)
+    (J,,,Label4)(^,^)(^,^)(^,^)
+    next1 = 4
+    next2 = -1
+Label7:
+    (Return,T8,,ReturnValue)(^,y)(^,^)(^,^)
+    next1 = -1
+    next2 = -1
+

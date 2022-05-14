@@ -2,11 +2,11 @@
 #include<queue>
 #include<iostream>
 
-bool isVar(string name) {
+static bool isVar(string name) {
 	return name.size() > 0 && isalpha(name[0]);
 }
 
-bool isNum(string name) {
+static bool isNum(string name) {
 	return name.size() > 0 && isdigit(name[0]);
 }
 

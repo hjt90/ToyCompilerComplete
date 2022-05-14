@@ -49,6 +49,7 @@ struct DAGitem
 
 typedef vector<DAGitem> Block_DAG;
 
+class ObjectCode;
 class Optimizer {
 private:
 	IntermediateLanguage code;
@@ -66,10 +67,10 @@ private:
 	vector<DAGitem> geneDAG(const Block&); //将基本块转为DAG图
 	Block DAG2block(vector<DAGitem>&, const Block&, const set<string>&); //将DAG图转为基本块
 
-
 public:
 	Optimizer() = default;
 	void outputBlocks(ostream& out);
 	void divideBlocks(const parsing&);
 	void optimizer();
+	friend class ObjectCode;
 };
