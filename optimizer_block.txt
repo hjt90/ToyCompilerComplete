@@ -8,13 +8,23 @@ demo:
 
 [main]
 main:
-    (Assign,2,,demo0)
-    (Call,demo,,T22)
-    (Assign,3,,program1)
-    (Assign,4,,program2)
-    (Parm,T22,,program3)
-    (Call,program,,T23)
-    (Return,T19,,ReturnValue)
+    (ArrayAssign,3,T19,0)
+    (AssignArray,T19,0,T25)
+    (Plus,T25,1,T26)
+    (ArrayAssign,T26,T19,1)
+    (AssignArray,T19,1,T35)
+    (Plus,T25,T35,T36)
+    (ArrayAssign,T36,T19,2)
+    (AssignArray,T19,2,T48)
+    (Parm,T48,,demo0)
+    (Call,demo,,T49)
+    (Parm,T25,,program1)
+    (Parm,T35,,program2)
+    (Parm,T49,,program3)
+    (Call,program,,T50)
+    (ArrayAssign,T50,T19,3)
+    (AssignArray,T19,3,T56)
+    (Return,T56,,ReturnValue)
     next1 = -1
     next2 = -1
 

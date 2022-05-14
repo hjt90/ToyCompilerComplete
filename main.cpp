@@ -25,7 +25,7 @@ int main(int argc, char** argv)
 	Optimizer optimizer;
 
 	lex.analyze(fin);
-	//lex.printresult();
+	// lex.printresult();
 
 	parser.initSyntax(finSyntax);
 	parser.analyze(lex.output());

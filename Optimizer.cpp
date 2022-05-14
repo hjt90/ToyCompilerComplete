@@ -169,7 +169,26 @@ void Optimizer::init_INOUTL()
 		for (vector<Block>::iterator biter = blocks.begin(); biter != blocks.end(); biter++) {
 			set<string>def, use;
 			for (vector<quadruple>::iterator citer = biter->codes.begin(); citer != biter->codes.end(); citer++) {
-				if (citer->Op == Oper::Call) {
+				if (citer->Op == Oper::ArrayAssign) {
+					if (isVar(citer->arg1) && def.count(citer->arg1) == 0) {//如果源操作数1还没有被定值
+						use.insert(citer->arg1);
+					}
+					if (isVar(citer->arg2) && def.count(citer->arg2) == 0) {//如果源操作数2还没有被定值
+						use.insert(citer->arg2);
+					}
+					if (isVar(citer->result) && use.count(citer->result) == 0) {//如果目的操作数还没有被引用
+						def.insert(citer->result);
+					}
+				}
+				else if (citer->Op == Oper::AssignArray) {
+					if (isVar(citer->arg2) && def.count(citer->arg2) == 0) {//如果源操作数2还没有被定值
+						use.insert(citer->arg2);
+					}
+					if (isVar(citer->result) && use.count(citer->result) == 0) {//如果目的操作数还没有被引用
+						def.insert(citer->result);
+					}
+				}
+				else if (citer->Op == Oper::Call) {
 					if (isVar(citer->result) && use.count(citer->result) == 0) {//如果目的操作数还没有被引用
 						def.insert(citer->result);
 					}
@@ -287,7 +306,7 @@ void Optimizer::preparing(Block& block)
 vector<DAGitem> Optimizer::geneDAG(const Block& block)
 {
 	vector<DAGitem> DAG;
-	int parmId;
+	int ArrayAss = 0;
 	for (const auto& code : block.codes)
 	{
 		int oper_type;
@@ -295,12 +314,14 @@ vector<DAGitem> Optimizer::geneDAG(const Block& block)
 			oper_type = -1;
 		else if (code.Op == Oper::Parm || code.Op == Oper::Call || code.Op == Oper::Return) //Call应该是一个多子节点的数组
 			oper_type = 1;
-		else if (code.Op == Oper::Jeq || code.Op == Oper::Jge || code.Op == Oper::Jgt
+		else if (code.Op == Oper::Jeq || code.Op == Oper::Jge || code.Op == Oper::Jgt || code.Op == Oper::AssignArray
 			|| code.Op == Oper::Jle || code.Op == Oper::Jlt || code.Op == Oper::Jne || code.Op == Oper::Plus ||
 			code.Op == Oper::Divide || code.Op == Oper::Multiply || code.Op == Oper::Minus)
 			oper_type = 2;
 		else if (code.Op == Oper::Assign)
 			oper_type = 0;
+		else if (code.Op == Oper::ArrayAssign)
+			oper_type = 3;
 		else
 			oper_type = 2;
 
@@ -391,6 +412,77 @@ vector<DAGitem> Optimizer::geneDAG(const Block& block)
 							DAG.push_back(newDAG);
 						}
 						state = 22;
+					}
+					else if (oper_type == 3)
+					{
+						//在已有DAG节点中寻找C
+						C_no = -1;
+						for (auto i = 0; i < DAG.size(); i++)
+						{
+							if ((DAG[i].isleaf && DAG[i].value == C) || find(DAG[i].label.begin(), DAG[i].label.end(), C) != DAG[i].label.end())
+							{
+								C_no = i;
+								new_C = false;
+								break;
+							}
+						}
+						//已有DAG中没有C则新建C的DAG节点
+						if (C_no == -1)
+						{
+							DAGitem newDAG;
+							newDAG.isleaf = true;
+							newDAG.value = C;
+							newDAG.code = code;
+							C_no = DAG.size();
+							new_C = true;
+							DAG.push_back(newDAG);
+						}
+						//在已有DAG节点中寻找A
+						A_no = -1;
+						for (auto i = 0; i < DAG.size(); i++)
+						{
+							if ((DAG[i].isleaf && DAG[i].value == A) || find(DAG[i].label.begin(), DAG[i].label.end(), A) != DAG[i].label.end())
+							{
+								A_no = i;
+								new_A = false;
+								break;
+							}
+						}
+						//已有DAG中没有A则新建A的DAG节点
+						if (A_no == -1)
+						{
+							DAGitem newDAG;
+							newDAG.isleaf = true;
+							newDAG.value = A;
+							newDAG.code = code;
+							A_no = DAG.size();
+							new_A = true;
+							DAG.push_back(newDAG);
+						}
+						DAGitem newDAG;
+						newDAG.isremain = true;
+						newDAG.isleaf = false;
+						newDAG.op = Oper2string(code.Op);
+						newDAG.left_child = B_no;
+						newDAG.right_child = C_no;
+						newDAG.tri_child = A_no;
+						newDAG.code = code;
+						newDAG.label.push_back(string("ArrayAssigned") + to_string(ArrayAss++));
+						n = DAG.size();
+						DAG.push_back(newDAG);
+						DAG[B_no].parent = n;
+						DAG[C_no].parent = n;
+						DAG[A_no].parent = n;
+						//其他值为该数组中任意元素的叶结点失效
+						for (auto i = 0; i < DAG.size(); i++)
+						{
+							if (DAG[i].isleaf && DAG[i].value == A)
+							{
+								DAG[i].value = "-" + A;
+								break;
+							}
+						}
+						state = -1;
 					}
 					else
 					{
@@ -528,6 +620,8 @@ vector<DAGitem> Optimizer::geneDAG(const Block& block)
 							break;
 						}
 					}
+					if (code.Op == Oper::Parm || code.Op == Oper::Call) //不许优化
+						n = -1;
 					//没有则新建根节点
 					if (n == -1)
 					{
@@ -619,6 +713,7 @@ Block Optimizer::DAG2block(vector<DAGitem>& DAGs, const Block& block, const set<
 		DAGs.back().isremain = true;
 	}
 
+	int ArrayAss = 0;
 	for (const auto& code : block.codes)
 	{
 		if (code.Op == Oper::Call)
@@ -632,6 +727,10 @@ Block Optimizer::DAG2block(vector<DAGitem>& DAGs, const Block& block, const set<
 		if (code.Op == Oper::Return)
 		{
 			activate_variable.insert("ReturnValue");
+		}
+		if (code.Op == Oper::ArrayAssign)
+		{
+			activate_variable.insert(string("ArrayAssigned") + to_string(ArrayAss++));
 		}
 	}
 
@@ -727,16 +826,35 @@ Block Optimizer::DAG2block(vector<DAGitem>& DAGs, const Block& block, const set<
 				}
 				else if (labels.size() == 1)
 				{
-					if (val != string(""))
+					if (isNum(val))
+					{
+						if (find(block_OutVariable.begin(), block_OutVariable.end(), labels[0]) != block_OutVariable.end())
+							res.codes.push_back({ Oper::Assign,val,string(""),labels[0] });
+					}
+					else if (isVar(val))
 						res.codes.push_back({ Oper::Assign,val,string(""),labels[0] });
 				}
 				else
 				{
-					if (val != string(""))
-						res.codes.push_back({ Oper::Assign,val,string(""),labels[0] });
-					for (int i = 1; i < labels.size(); i++)
-						res.codes.push_back({ Oper::Assign,labels[0],string(""),labels[i] });
+					if (isNum(val))
+					{
+						for (int i = 0; i < labels.size(); i++)
+							if (find(block_OutVariable.begin(), block_OutVariable.end(), labels[i]) != block_OutVariable.end())
+								res.codes.push_back({ Oper::Assign,val,string(""),labels[i] });
+					}
+					else if (isVar(val))
+					{
+						for (int i = 0; i < labels.size(); i++)
+							res.codes.push_back({ Oper::Assign,val,string(""),labels[i] });
+					}
+					else
+					{
+						for (int i = 1; i < labels.size(); i++)
+							res.codes.push_back({ Oper::Assign,labels[0],string(""),labels[i] });
+					}
 				}
+				if (isNum(val))
+					DAG.label.insert(DAG.label.begin(), val);
 			}
 			else
 			{
@@ -774,6 +892,14 @@ Block Optimizer::DAG2block(vector<DAGitem>& DAGs, const Block& block, const set<
 						for (int i = 1; i < labels.size(); i++)
 							res.codes.push_back({ Oper::Assign,labels[0],string(""),labels[i] });
 					}
+				}
+				else if (DAG.code.Op == Oper::ArrayAssign)
+				{
+					res.codes.push_back({ DAG.code.Op,DAG.code.arg1,DAGs[DAG.right_child].label[0] ,DAGs[DAG.tri_child].label[0] });
+				}
+				else if (DAG.code.Op == Oper::AssignArray)
+				{
+					res.codes.push_back({ DAG.code.Op,DAG.code.arg1,DAGs[DAG.right_child].label[0],labels[0] });
 				}
 			}
 		}

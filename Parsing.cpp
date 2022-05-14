@@ -781,9 +781,15 @@ void parsing::generate_midcode(syntaxTableIndex SyntaxIndex, syntaxTreeNode &lhs
 			for(int i = 0 ; i < len; i++)
 			{
 				this_place = proc_symbolTable::newtemp();
-				mid_code.emit_code(quadruple(Oper::Multiply, syntaxTree[rhs[0]].array_vec[i], to_string(variable.array[i]), this_place));
-				if(i != 0)
-					mid_code.emit_code(quadruple(Oper::Plus, this_place, before_place, this_place));
+				if (i == 0)
+				{
+					mid_code.emit_code(quadruple(Oper::Plus, syntaxTree[rhs[0]].array_vec[i], to_string(0), this_place));
+				}
+				else
+				{
+					mid_code.emit_code(quadruple(Oper::Multiply, before_place, to_string(variable.array[i]), this_place));
+					mid_code.emit_code(quadruple(Oper::Plus, this_place, syntaxTree[rhs[0]].array_vec[i], this_place));
+				}
 				before_place = this_place;
 			}
 			lhs.place = proc_symbolTable::newtemp();
@@ -823,13 +829,19 @@ void parsing::generate_midcode(syntaxTableIndex SyntaxIndex, syntaxTreeNode &lhs
 			for(int i = 0 ; i < len; i++)
 			{
 				this_place = proc_symbolTable::newtemp();
-				mid_code.emit_code(quadruple(Oper::Multiply, syntaxTree[rhs[0]].array_vec[i], to_string(variable.array[i]), this_place));
-				if(i != 0)
-					mid_code.emit_code(quadruple(Oper::Plus, this_place, before_place, this_place));
+				if (i == 0)
+				{
+					mid_code.emit_code(quadruple(Oper::Plus, syntaxTree[rhs[0]].array_vec[i], to_string(0), this_place));
+				}
+				else
+				{
+					mid_code.emit_code(quadruple(Oper::Multiply, before_place, to_string(variable.array[i]), this_place));
+					mid_code.emit_code(quadruple(Oper::Plus, this_place, syntaxTree[rhs[0]].array_vec[i], this_place));
+				}
 				before_place = this_place;
 			}
 			lhs.place = proc_symbolTable::newtemp();
-			mid_code.emit_code(quadruple(Oper::ArrayAssign, syntaxTree[rhs[2]].place, variable.gobalname, this_place));
+			mid_code.emit_code(quadruple(Oper::ArrayAssign, syntaxTree[rhs[2]].place, variable.gobalname,this_place ));
 			break;
 		}
 		break;
