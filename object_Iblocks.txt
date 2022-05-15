@@ -1,31 +1,31 @@
 [demo]
 demo:
-    (Get,,,T12)(^,^)(^,^)(^,^)
-    (Plus,T12,2,T12)(2,y)(^,^)(1,y)
-    (Multiply,T12,2,T14)(^,^)(^,^)(3,y)
-    (Return,T14,,ReturnValue)(^,y)(^,^)(^,^)
+    (Get,,,T13)(^,^)(^,^)(^,^)
+    (Plus,T13,2,T13)(2,y)(^,^)(1,y)
+    (Multiply,T13,2,T15)(^,^)(^,^)(3,y)
+    (Return,T15,,ReturnValue)(^,y)(^,^)(^,^)
     next1 = -1
     next2 = -1
 
 [main]
 main:
-    (ArrayAssign,3,T15,0)(^,^)(^,^)(^,^)
-    (AssignArray,T15,0,T21)(^,^)(^,^)(2,y)
-    (Plus,T21,1,T22)(5,y)(^,^)(3,y)
-    (ArrayAssign,T22,T15,1)(^,^)(^,^)(^,^)
-    (AssignArray,T15,1,T31)(^,^)(^,^)(5,y)
-    (Plus,T21,T31,T32)(10,y)(11,y)(6,y)
-    (ArrayAssign,T32,T15,2)(^,^)(^,^)(^,^)
-    (AssignArray,T15,2,T44)(^,^)(^,^)(8,y)
-    (Parm,T44,,demo0)(^,^)(^,^)(^,^)
-    (Call,demo,,T45)(^,^)(^,^)(12,y)
-    (Parm,T21,,program1)(^,^)(^,^)(^,^)
-    (Parm,T31,,program2)(^,^)(^,^)(^,^)
-    (Parm,T45,,program3)(^,^)(^,^)(^,^)
-    (Call,program,,T46)(^,^)(^,^)(14,y)
-    (ArrayAssign,T46,T15,3)(^,^)(^,^)(^,^)
-    (AssignArray,T15,3,T52)(^,^)(^,^)(16,y)
-    (Return,T52,,ReturnValue)(^,y)(^,^)(^,^)
+    (ArrayAssign,3,T16,0)(^,^)(^,^)(^,^)
+    (AssignArray,T16,0,T22)(^,^)(^,^)(2,y)
+    (Plus,T22,1,T23)(5,y)(^,^)(3,y)
+    (ArrayAssign,T23,T16,1)(^,^)(^,^)(^,^)
+    (AssignArray,T16,1,T32)(^,^)(^,^)(5,y)
+    (Plus,T22,T32,T33)(10,y)(11,y)(6,y)
+    (ArrayAssign,T33,T16,2)(^,^)(^,^)(^,^)
+    (AssignArray,T16,2,T45)(^,^)(^,^)(8,y)
+    (Parm,T45,,demo0)(^,^)(^,^)(^,^)
+    (Call,demo,,T46)(^,^)(^,^)(12,y)
+    (Parm,T22,,program1)(^,^)(^,^)(^,^)
+    (Parm,T32,,program2)(^,^)(^,^)(^,^)
+    (Parm,T46,,program3)(^,^)(^,^)(^,^)
+    (Call,program,,T47)(^,^)(^,^)(14,y)
+    (ArrayAssign,T47,T16,3)(^,^)(^,^)(^,^)
+    (AssignArray,T16,3,T53)(^,^)(^,^)(16,y)
+    (Return,T53,,ReturnValue)(^,y)(^,^)(^,^)
     next1 = -1
     next2 = -1
 
@@ -63,7 +63,8 @@ Label5:
     next1 = 7
     next2 = -1
 Label6:
-    (Multiply,T6,2,T5)(^,y)(^,^)(^,y)
+    (Multiply,T6,2,T5)(^,^)(^,^)(1,y)
+    (Assign,T5,,T6)(^,y)(^,^)(^,y)
     (J,,,Label4)(^,^)(^,^)(^,^)
     next1 = 4
     next2 = -1

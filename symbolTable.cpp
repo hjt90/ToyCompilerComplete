@@ -78,7 +78,7 @@ const symbolTableItem& proc_symbolTable::find_variable(std::string name)
 	{
 		return tmp->itemTable[name];
 	}
-	symbolTableItem tmpItem;
+	static symbolTableItem tmpItem;
 	tmpItem.type = symbolType::None;
 	return tmpItem;
 }

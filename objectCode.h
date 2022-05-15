@@ -50,6 +50,7 @@ private:
 	void storeOutLiveVar(set<string>& outl);
 	void releaseVar(string var);
 	string getReg();
+	string getArrayReg();
 	string allocateReg();
 	string allocateReg(string var);
 

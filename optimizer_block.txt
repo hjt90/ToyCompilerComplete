@@ -1,31 +1,31 @@
 [demo]
 demo:
-    (Get,,,T12)
-    (Plus,T12,2,T12)
-    (Multiply,T12,2,T14)
-    (Return,T14,,ReturnValue)
+    (Get,,,T13)
+    (Plus,T13,2,T13)
+    (Multiply,T13,2,T15)
+    (Return,T15,,ReturnValue)
     next1 = -1
     next2 = -1
 
 [main]
 main:
-    (ArrayAssign,3,T15,0)
-    (AssignArray,T15,0,T21)
-    (Plus,T21,1,T22)
-    (ArrayAssign,T22,T15,1)
-    (AssignArray,T15,1,T31)
-    (Plus,T21,T31,T32)
-    (ArrayAssign,T32,T15,2)
-    (AssignArray,T15,2,T44)
-    (Parm,T44,,demo0)
-    (Call,demo,,T45)
-    (Parm,T21,,program1)
-    (Parm,T31,,program2)
-    (Parm,T45,,program3)
-    (Call,program,,T46)
-    (ArrayAssign,T46,T15,3)
-    (AssignArray,T15,3,T52)
-    (Return,T52,,ReturnValue)
+    (ArrayAssign,3,T16,0)
+    (AssignArray,T16,0,T22)
+    (Plus,T22,1,T23)
+    (ArrayAssign,T23,T16,1)
+    (AssignArray,T16,1,T32)
+    (Plus,T22,T32,T33)
+    (ArrayAssign,T33,T16,2)
+    (AssignArray,T16,2,T45)
+    (Parm,T45,,demo0)
+    (Call,demo,,T46)
+    (Parm,T22,,program1)
+    (Parm,T32,,program2)
+    (Parm,T46,,program3)
+    (Call,program,,T47)
+    (ArrayAssign,T47,T16,3)
+    (AssignArray,T16,3,T53)
+    (Return,T53,,ReturnValue)
     next1 = -1
     next2 = -1
 
@@ -64,6 +64,7 @@ Label5:
     next2 = -1
 Label6:
     (Multiply,T6,2,T5)
+    (Assign,T5,,T6)
     (J,,,Label4)
     next1 = 4
     next2 = -1

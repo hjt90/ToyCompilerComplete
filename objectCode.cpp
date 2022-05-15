@@ -231,9 +231,43 @@ string ObjectCode::getReg() {
 	return ret;
 }
 
+//为数组赋值分配寄存器
+string ObjectCode::getArrayReg() {
+	//i: A:=B op C
+	//如果B的现行值在某个寄存器Ri中，RVALUE[Ri]中只包含B
+	//此外，或者B与A是同一个标识符或者B的现行值在执行四元式A:=B op C之后不会再引用
+	//则选取Ri为所需要的寄存器R
+
+	//如果src1不是数字
+	if (!isNum(nowQuatenary->q.arg2)) {
+		//遍历src1所在的寄存器
+		set<string>& src1pos = Avalue[nowQuatenary->q.arg2];
+		for (set<string>::iterator iter = src1pos.begin(); iter != src1pos.end(); iter++) {
+			if ((*iter)[0] == '$') {
+				if (Rvalue[*iter].size() == 1) {//如果该寄存器中值仅仅存有src1
+					if (nowQuatenary->q.result == nowQuatenary->q.arg2 || !nowQuatenary->info2.active) {//如果A,B是同一标识符或B以后不活跃
+						Avalue[nowQuatenary->q.result].insert(*iter);
+						Rvalue[*iter].insert(nowQuatenary->q.result);
+						return *iter;
+					}
+				}
+			}
+		}
+	}
+
+	//为目标变量分配可能不正确
+	//return allocateReg(nowQuatenary->q.des);
+	string ret = allocateReg();
+	Avalue[nowQuatenary->q.result].insert(ret);
+	Rvalue[ret].insert(nowQuatenary->q.result);
+	return ret;
+}
+
 void ObjectCode::analyseBlock(Optimizer& optim) {
 	map<string, vector<Block> >& funcBlocks = optim.funcBlocks;
 	const map<string, vector<set<string> > >& funcOUTL = optim.funcOUTL;
+	this->funcOUTL = optim.funcOUTL;
+	this->funcINL = optim.funcINL;
 
 	for (map<string, vector<Block> >::iterator fbiter = funcBlocks.begin(); fbiter != funcBlocks.end(); fbiter++) {
 		vector<IBlock> iBlocks;
@@ -443,6 +477,156 @@ void ObjectCode::storeOutLiveVar(set<string>& outl) {
 
 void ObjectCode::generateCodeForQuatenary(int nowBaseBlockIndex, int& arg_num, int& par_num, list<pair<string, bool> >& par_list)
 {
+	if (Oper2string(nowQuatenary->q.Op)[0] != 'J' && nowQuatenary->q.Op != Oper::Call) {
+		if (isVar(nowQuatenary->q.arg1) && Avalue[nowQuatenary->q.arg1].empty()) {
+			cout << string("变量") << nowQuatenary->q.arg1 << "在引用前未赋值" << endl;
+		}
+		if (isVar(nowQuatenary->q.arg2) && Avalue[nowQuatenary->q.arg2].empty()) {
+			cout << string("变量") << nowQuatenary->q.arg2 << "在引用前未赋值" << endl;
+		}
+	}
+
+
+	if (nowQuatenary->q.Op == Oper::J) {
+		objectCodes.push_back(Oper2string(nowQuatenary->q.Op) + " " + nowQuatenary->q.result);
+	}
+	else if (Oper2string(nowQuatenary->q.Op)[0] == 'J') 
+	{
+		string op;
+		if (nowQuatenary->q.Op == Oper::Jge)
+			op = "bge";
+		else if (nowQuatenary->q.Op == Oper::Jgt)
+			op = "bgt";
+		else if (nowQuatenary->q.Op == Oper::Jeq)
+			op = "beq";
+		else if (nowQuatenary->q.Op == Oper::Jne)
+			op = "bne";
+		else if (nowQuatenary->q.Op == Oper::Jlt)
+			op = "blt";
+		else if (nowQuatenary->q.Op == Oper::Jle)
+			op = "ble";
+		string pos1 = allocateReg(nowQuatenary->q.arg1);
+		string pos2 = allocateReg(nowQuatenary->q.arg2);
+		objectCodes.push_back(op + " " + pos1 + " " + pos2 + " " + nowQuatenary->q.result);
+		if (!nowQuatenary->info1.active) {
+			releaseVar(nowQuatenary->q.arg1);
+		}
+		if (!nowQuatenary->info2.active) {
+			releaseVar(nowQuatenary->q.arg2);
+		}
+	}
+	else if (nowQuatenary->q.Op == Oper::Parm) {
+		par_list.push_back(pair<string, bool>(nowQuatenary->q.arg1, nowQuatenary->info1.active));
+	}
+	else if (nowQuatenary->q.Op == Oper::Call) {
+		/*将参数压栈*/
+		for (list<pair<string, bool> >::iterator aiter = par_list.begin(); aiter != par_list.end(); aiter++) {
+			string pos = allocateReg(aiter->first);
+			objectCodes.push_back(string("sw ") + pos + " " + to_string(top + 4 * (++arg_num + 1)) + "($sp)");
+			if (!aiter->second) {
+				releaseVar(aiter->first);
+			}
+		}
+		/*更新$sp*/
+		objectCodes.push_back(string("sw $sp ") + to_string(top) + "($sp)");
+		objectCodes.push_back(string("addi $sp $sp ") + to_string(top));
+
+		/*跳转到对应函数*/
+		objectCodes.push_back(string("jal ") + nowQuatenary->q.arg1);
+
+		/*恢复现场*/
+		objectCodes.push_back(string("lw $sp 0($sp)"));
+
+		/*保存返回值*/
+		string src1Pos = "$v0";
+		Rvalue[src1Pos].insert(nowQuatenary->q.result);
+		Avalue[nowQuatenary->q.result].insert(src1Pos);
+		par_list.clear();
+		arg_num = 0;
+	}
+	else if (nowQuatenary->q.Op == Oper::Return) {
+		if (isNum(nowQuatenary->q.arg1)) {//返回值为数字
+			objectCodes.push_back("addi $v0 $zero " + nowQuatenary->q.arg1);
+		}
+		else if (isVar(nowQuatenary->q.arg1)) {//返回值为变量
+			set<string>::iterator piter = Avalue[nowQuatenary->q.arg1].begin();
+			if ((*piter)[0] == '$') {
+				objectCodes.push_back(string("add $v0 $zero ") + *piter);
+			}
+			else {
+				objectCodes.push_back(string("lw $v0 ") + to_string(varOffset[*piter]) + "($sp)");
+			}
+		}
+		if (nowFunc == "main") {
+			objectCodes.push_back("j end");
+		}
+		else {
+			objectCodes.push_back("lw $ra 4($sp)");
+			objectCodes.push_back("jr $ra");
+		}
+	}
+	else if (nowQuatenary->q.Op == Oper::Get) {
+		//varOffset[nowQuatenary->q.src1] = 4 * (par_num++ + 2);
+		varOffset[nowQuatenary->q.result] = top;
+		top += 4;
+		Avalue[nowQuatenary->q.result].insert(nowQuatenary->q.result);
+	}
+	else if (nowQuatenary->q.Op == Oper::Assign) {
+		string src1Pos;
+		src1Pos = allocateReg(nowQuatenary->q.arg1);
+		Rvalue[src1Pos].insert(nowQuatenary->q.result);
+		Avalue[nowQuatenary->q.result].insert(src1Pos);
+	}
+	else if (nowQuatenary->q.Op == Oper::ArrayAssign)
+	{
+		//sw $t1, n($t0)
+		string src1Pos = allocateReg(nowQuatenary->q.arg1);
+		string arrayIndex = allocateReg(nowQuatenary->q.result);
+		objectCodes.push_back(string("mul ") + arrayIndex + " " + arrayIndex + " " + to_string(4));
+		objectCodes.push_back(string("sw ") + src1Pos + string(" ") + nowQuatenary->q.arg2 + string("(") + arrayIndex + string(")"));
+		if (!nowQuatenary->info1.active && isVar(nowQuatenary->q.arg1)) {
+			releaseVar(nowQuatenary->q.arg1);
+		}
+		if (!nowQuatenary->info3.active && isVar(nowQuatenary->q.result)) {
+			releaseVar(nowQuatenary->q.result);
+		}
+	}
+	else if (nowQuatenary->q.Op == Oper::AssignArray)
+	{
+		//lw $t7, n($t0)
+		//AssignArray n $t0 t7
+		string arrayIndex = allocateReg(nowQuatenary->q.arg2);
+		objectCodes.push_back(string("mul ") + arrayIndex + " " + arrayIndex + " " + to_string(4));
+		string desPos = getArrayReg();
+		objectCodes.push_back(string("lw ") + desPos + string(" ") + nowQuatenary->q.arg1 + string("(") + arrayIndex + string(")"));
+		if (!nowQuatenary->info2.active && isVar(nowQuatenary->q.arg2)) {
+			releaseVar(nowQuatenary->q.arg2);
+		}
+	}
+	else {// + - * /
+		string src1Pos = allocateReg(nowQuatenary->q.arg1);
+		string src2Pos = allocateReg(nowQuatenary->q.arg2);
+		string desPos = getReg();
+		if (nowQuatenary->q.Op == Oper::Plus) {
+			objectCodes.push_back(string("add ") + desPos + " " + src1Pos + " " + src2Pos);
+		}
+		else if (nowQuatenary->q.Op == Oper::Minus) {
+			objectCodes.push_back(string("sub ") + desPos + " " + src1Pos + " " + src2Pos);
+		}
+		else if (nowQuatenary-> q.Op == Oper::Multiply) {
+			objectCodes.push_back(string("mul ") + desPos + " " + src1Pos + " " + src2Pos);
+		}
+		else if (nowQuatenary->q.Op == Oper::Divide) {
+			objectCodes.push_back(string("div ") + src1Pos + " " + src2Pos);
+			objectCodes.push_back(string("mflo ") + desPos);
+		}
+		if (!nowQuatenary->info1.active) {
+			releaseVar(nowQuatenary->q.arg1);
+		}
+		if (!nowQuatenary->info2.active) {
+			releaseVar(nowQuatenary->q.arg2);
+		}
+	}
 }
 
 void ObjectCode::generateCodeForBaseBlocks(int nowBaseBlockIndex)
@@ -450,10 +634,6 @@ void ObjectCode::generateCodeForBaseBlocks(int nowBaseBlockIndex)
 	int arg_num = 0;//par的实参个数
 	int par_num = 0;//get的形参个数
 	list<pair<string, bool> > par_list;//函数调用用到的实参集list<实参名,是否活跃>
-
-	if (nowFunc == "program") {
-		int a = 1;
-	}
 
 	Avalue.clear();
 	Rvalue.clear();
@@ -521,10 +701,10 @@ void ObjectCode::generateArrayData(const proc_symbolTable* ptr)
 		if (item.second.type == symbolType::Array)
 		{
 			objectCodes.push_back(item.second.gobalname + string(":"));
-			int len = 4;
+			int len = 1;
 			for (const auto& arr : item.second.array)
 				len *= arr;
-			objectCodes.push_back(string(".space ") + to_string(len));
+			objectCodes.push_back(string(".word ") + to_string(len));
 		}
 	}
 
@@ -535,10 +715,10 @@ void ObjectCode::generateArrayData(const proc_symbolTable* ptr)
 			if (item.second.type == symbolType::Array)
 			{
 				objectCodes.push_back(item.second.gobalname + string(":"));
-				int len = 4;
+				int len = 1;
 				for (const auto& arr : item.second.array)
 					len *= arr;
-				objectCodes.push_back(string(".space ") + to_string(len));
+				objectCodes.push_back(string(".word ") + to_string(len));
 			}
 		}
 	}
@@ -548,7 +728,7 @@ void ObjectCode::generateCode(const proc_symbolTable* ptr)
 {
 	this->generateArrayData(ptr);
 	objectCodes.push_back(".text");
-	objectCodes.push_back("lui $sp,0x1001");
+	objectCodes.push_back("lui $sp,0x1002");
 	objectCodes.push_back("j main");
 	for (map<string, vector<IBlock> >::iterator fiter = funcIBlocks.begin(); fiter != funcIBlocks.end(); fiter++) {//对每一个函数块
 		generateCodeForFuncBlocks(fiter);

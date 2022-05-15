@@ -803,7 +803,7 @@
 																										},
 																										{
 																											"kind": "<语句串>",
-																											"type": "<语句> ",
+																											"type": "<语句> <M> <语句串> ",
 																											"inner": [
 																												{
 																													"kind": "<语句>",
@@ -869,6 +869,85 @@
 																																},
 																																{
 																																	"kind": "$Semi"
+																																}
+																															]
+																														}
+																													]
+																												},
+																												{
+																													"kind": "<M>",
+																													"type": "$Empty "
+																												},
+																												{
+																													"kind": "<语句串>",
+																													"type": "<语句> ",
+																													"inner": [
+																														{
+																															"kind": "<语句>",
+																															"type": "<assign语句> ",
+																															"inner": [
+																																{
+																																	"kind": "<assign语句>",
+																																	"type": "$ID $Equal <表达式> $Semi ",
+																																	"inner": [
+																																		{
+																																			"kind": "$ID",
+																																			"val": "j"
+																																		},
+																																		{
+																																			"kind": "$Equal"
+																																		},
+																																		{
+																																			"kind": "<表达式>",
+																																			"type": "<加法表达式> ",
+																																			"inner": [
+																																				{
+																																					"kind": "<加法表达式>",
+																																					"type": "<项> ",
+																																					"inner": [
+																																						{
+																																							"kind": "<项>",
+																																							"type": "<因子> $Multiply <项> ",
+																																							"inner": [
+																																								{
+																																									"kind": "<因子>",
+																																									"type": "$ID ",
+																																									"inner": [
+																																										{
+																																											"kind": "$ID",
+																																											"val": "j"
+																																										}
+																																									]
+																																								},
+																																								{
+																																									"kind": "$Multiply"
+																																								},
+																																								{
+																																									"kind": "<项>",
+																																									"type": "<因子> ",
+																																									"inner": [
+																																										{
+																																											"kind": "<因子>",
+																																											"type": "$Number ",
+																																											"inner": [
+																																												{
+																																													"kind": "$Number",
+																																													"val": "2"
+																																												}
+																																											]
+																																										}
+																																									]
+																																								}
+																																							]
+																																						}
+																																					]
+																																				}
+																																			]
+																																		},
+																																		{
+																																			"kind": "$Semi"
+																																		}
+																																	]
 																																}
 																															]
 																														}

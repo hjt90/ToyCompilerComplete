@@ -21,7 +21,7 @@ int main(int argc, char** argv)
 	midblock.open("D:/workspace/GitHub/ToyCompiler/midblock.txt");
 	optimizer_block.open("D:/workspace/GitHub/ToyCompiler/optimizer_block.txt");
 	object_Iblocks.open("D:/workspace/GitHub/ToyCompiler/object_Iblocks.txt");
-	object_code.open("D:/workspace/GitHub/ToyCompiler/object_code.txt");
+	object_code.open("D:/workspace/GitHub/ToyCompiler/out.asm");
 
 	Lexer lex;
 	parsing parser;
@@ -43,8 +43,8 @@ int main(int argc, char** argv)
 
 	objectcode.analyseBlock(optimizer);
 	objectcode.outputIBlocks(object_Iblocks);
-	// objectcode.generateCode(parser.get_proc_symbolTable());
-	// objectcode.outputObjectCode(object_code);
+	objectcode.generateCode(parser.get_proc_symbolTable());
+	objectcode.outputObjectCode(object_code);
 
 	fin.close();
 	finSyntax.close();
