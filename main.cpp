@@ -36,13 +36,15 @@ int main(int argc, char** argv)
 	parser.output(struction, graph);
 	parser.outputMidcode(midcode);
 
-	optimizer.divideBlocks(parser);
+	optimizer.divideBlocks(parser, parser.get_proc_symbolTable());
 	optimizer.outputBlocks(midblock);
 	optimizer.optimizer();
 	optimizer.outputBlocks(optimizer_block);
 
 	objectcode.analyseBlock(optimizer);
 	objectcode.outputIBlocks(object_Iblocks);
+	// objectcode.generateCode(parser.get_proc_symbolTable());
+	// objectcode.outputObjectCode(object_code);
 
 	fin.close();
 	finSyntax.close();

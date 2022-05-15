@@ -75,6 +75,9 @@ string Oper2string(Oper op)
 		case Oper::ArrayAssign:
 			return "ArrayAssign";
 			break;
+		case Oper::Get:
+			return "Get";
+			break;
 		default:
 			return "-1";
 	}

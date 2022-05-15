@@ -9,6 +9,13 @@ static bool isNum(string name) {
 	return isdigit(name[0]);
 }
 
+static bool isControlOp(string op) {
+	if (op[0] == 'J' || op == "Call" || op == "Return" || op == "Get") {
+		return true;
+	}
+	return false;
+}
+
 VarInfomation::VarInfomation(int next, bool active) {
 	this->next = next;
 	this->active = active;
@@ -227,6 +234,7 @@ string ObjectCode::getReg() {
 void ObjectCode::analyseBlock(Optimizer& optim) {
 	map<string, vector<Block> >& funcBlocks = optim.funcBlocks;
 	const map<string, vector<set<string> > >& funcOUTL = optim.funcOUTL;
+
 	for (map<string, vector<Block> >::iterator fbiter = funcBlocks.begin(); fbiter != funcBlocks.end(); fbiter++) {
 		vector<IBlock> iBlocks;
 		vector<Block>& blocks = fbiter->second;
@@ -433,13 +441,68 @@ void ObjectCode::storeOutLiveVar(set<string>& outl) {
 	}
 }
 
-void ObjectCode::generateCodeForQuatenary(int nowBaseBlockIndex, int& arg_num, int& par_num, list<pair<string, bool> >& par_list) {
+void ObjectCode::generateCodeForQuatenary(int nowBaseBlockIndex, int& arg_num, int& par_num, list<pair<string, bool> >& par_list)
+{
 }
 
-void ObjectCode::generateCodeForBaseBlocks(int nowBaseBlockIndex) {
+void ObjectCode::generateCodeForBaseBlocks(int nowBaseBlockIndex)
+{
+	int arg_num = 0;//par的实参个数
+	int par_num = 0;//get的形参个数
+	list<pair<string, bool> > par_list;//函数调用用到的实参集list<实参名,是否活跃>
+
+	if (nowFunc == "program") {
+		int a = 1;
+	}
+
+	Avalue.clear();
+	Rvalue.clear();
+	set<string>& inl = funcINL[nowFunc][nowBaseBlockIndex];
+	for (set<string>::iterator iter = inl.begin(); iter != inl.end(); iter++) {
+		Avalue[*iter].insert(*iter);
+	}
+
+	//初始化空闲寄存器
+	freeReg.clear();
+	for (int i = 0; i <= 7; i++) {
+		freeReg.push_back(string("$s") + to_string(i));
+	}
+
+	objectCodes.push_back(nowIBlock->name + ":");
+	if (nowBaseBlockIndex == 0) {
+		if (nowFunc == "main") {
+			top = 8;
+		}
+		else {
+			objectCodes.push_back("sw $ra 4($sp)");//把返回地址压栈
+			top = 8;
+		}
+	}
+
+	for (vector<QuaternaryWithInfo>::iterator cIter = nowIBlock->codes.begin(); cIter != nowIBlock->codes.end(); cIter++) {//对基本块内的每一条语句
+		nowQuatenary = cIter;
+		//如果是基本块的最后一条语句
+		if (cIter + 1 == nowIBlock->codes.end()) {
+			//如果最后一条语句是控制语句，则先将出口活跃变量保存，再进行跳转(j,call,return)
+			if (isControlOp(Oper2string(cIter->q.Op))) {
+				storeOutLiveVar(funcOUTL[nowFunc][nowBaseBlockIndex]);
+				generateCodeForQuatenary(nowBaseBlockIndex, arg_num, par_num, par_list);
+			}
+			//如果最后一条语句不是控制语句（是赋值语句），则先计算，再将出口活跃变量保存
+			else {
+				generateCodeForQuatenary(nowBaseBlockIndex, arg_num, par_num, par_list);
+				storeOutLiveVar(funcOUTL[nowFunc][nowBaseBlockIndex]);
+			}
+		}
+		else {
+			generateCodeForQuatenary(nowBaseBlockIndex, arg_num, par_num, par_list);
+		}
+
+	}
 }
 
-void ObjectCode::generateCodeForFuncBlocks(map<string, vector<IBlock> >::iterator& fiter) {
+void ObjectCode::generateCodeForFuncBlocks(map<string, vector<IBlock> >::iterator& fiter)
+{
 	varOffset.clear();
 	nowFunc = fiter->first;
 	vector<IBlock>& iBlocks = fiter->second;
@@ -449,7 +512,42 @@ void ObjectCode::generateCodeForFuncBlocks(map<string, vector<IBlock> >::iterato
 	}
 }
 
-void ObjectCode::generateCode() {
+void ObjectCode::generateArrayData(const proc_symbolTable* ptr)
+{
+	objectCodes.push_back(".data");
+
+	for (const auto& item : ptr->itemTable)	//全局数组
+	{
+		if (item.second.type == symbolType::Array)
+		{
+			objectCodes.push_back(item.second.gobalname + string(":"));
+			int len = 4;
+			for (const auto& arr : item.second.array)
+				len *= arr;
+			objectCodes.push_back(string(".space ") + to_string(len));
+		}
+	}
+
+	for (const auto& func : ptr->functionTable)	//局部数组
+	{
+		for (const auto& item : func.second->itemTable)
+		{
+			if (item.second.type == symbolType::Array)
+			{
+				objectCodes.push_back(item.second.gobalname + string(":"));
+				int len = 4;
+				for (const auto& arr : item.second.array)
+					len *= arr;
+				objectCodes.push_back(string(".space ") + to_string(len));
+			}
+		}
+	}
+}
+
+void ObjectCode::generateCode(const proc_symbolTable* ptr)
+{
+	this->generateArrayData(ptr);
+	objectCodes.push_back(".text");
 	objectCodes.push_back("lui $sp,0x1001");
 	objectCodes.push_back("j main");
 	for (map<string, vector<IBlock> >::iterator fiter = funcIBlocks.begin(); fiter != funcIBlocks.end(); fiter++) {//对每一个函数块

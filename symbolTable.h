@@ -43,6 +43,8 @@ struct symbolTableItem
 	symbolTableItem(symbolType, std::string, std::string, int, vector<int>);
 };
 
+class Optimizer;
+class ObjectCode;
 class proc_symbolTable
 {
 	procSymbolTableType type; //ÖÖÀà
@@ -74,4 +76,6 @@ public:
 	int get_enterquad() const;
 	int get_offset() const;
 	vector<pair<int, string> >getFuncEnter() const;
+	friend class Optimizer;
+	friend class ObjectCode;
 };

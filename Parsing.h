@@ -118,5 +118,6 @@ public:
 	void analyze(const vector<pair<Token, string>>&);
 	void output(ofstream& struction, ofstream& graph);
 	void outputMidcode(ofstream& midcode);
+	proc_symbolTable* get_proc_symbolTable()const;
 	friend class Optimizer;
 };

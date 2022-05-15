@@ -53,13 +53,14 @@ private:
 	string allocateReg();
 	string allocateReg(string var);
 
+	void generateArrayData(const proc_symbolTable*);
 	void generateCodeForFuncBlocks(map<string, vector<IBlock> >::iterator& fiter);
 	void generateCodeForBaseBlocks(int nowBaseBlockIndex);
 	void generateCodeForQuatenary(int nowBaseBlockIndex, int& arg_num, int& par_num, list<pair<string, bool> >& par_list);
 public:
 	ObjectCode();
-	void generateCode();
-	void analyseBlock(Optimizer &);
+	void generateCode(const proc_symbolTable*);
+	void analyseBlock(Optimizer&);
 	void outputIBlocks(ostream& out);
 	void outputObjectCode(ostream& out);
 };

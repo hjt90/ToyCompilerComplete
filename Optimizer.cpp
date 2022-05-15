@@ -21,7 +21,7 @@ string NewLabeler::newTmp() {
 	return string("Tmp") + to_string(tmp++);
 }
 
-void Optimizer::divideBlocks(const parsing& pars) {
+void Optimizer::divideBlocks(const parsing& pars, const proc_symbolTable* ptr) {
 	vector<pair<int, string> > funcEnter = pars.p_symbolTable->getFuncEnter();
 	this->code = pars.mid_code;
 
@@ -137,6 +137,23 @@ void Optimizer::divideBlocks(const parsing& pars) {
 		}
 		funcBlocks[iter->second] = blocks;
 	}
+
+	for (map<string, vector<Block> >::iterator fbiter = funcBlocks.begin(); fbiter != funcBlocks.end(); fbiter++)
+	{
+		const std::vector<symbolTableItem>& parms = ptr->functionTable.at(fbiter->first)->parm;
+		Block& block = fbiter->second[0];
+		vector<quadruple> get_parm;
+
+		if (fbiter->first != string("main"))
+		{
+			for (const auto& parm : parms)
+			{
+				if (parm.type != symbolType::Array)
+					get_parm.push_back({ Oper::Get,string(""),string("") ,parm.gobalname });
+			}
+		}
+		block.codes.insert(block.codes.begin(), get_parm.begin(), get_parm.end());
+	}
 }
 
 void Optimizer::outputBlocks(ostream& out)
@@ -176,6 +193,11 @@ void Optimizer::init_INOUTL()
 					if (isVar(citer->arg2) && def.count(citer->arg2) == 0) {//如果源操作数2还没有被定值
 						use.insert(citer->arg2);
 					}
+					if (isVar(citer->result) && use.count(citer->result) == 0) {//如果目的操作数还没有被引用
+						def.insert(citer->result);
+					}
+				}
+				else if (citer->Op == Oper::Get) {
 					if (isVar(citer->result) && use.count(citer->result) == 0) {//如果目的操作数还没有被引用
 						def.insert(citer->result);
 					}
@@ -310,7 +332,7 @@ vector<DAGitem> Optimizer::geneDAG(const Block& block)
 	for (const auto& code : block.codes)
 	{
 		int oper_type;
-		if (code.Op == Oper::J)
+		if (code.Op == Oper::J || code.Op == Oper::Get)
 			oper_type = -1;
 		else if (code.Op == Oper::Parm || code.Op == Oper::Call || code.Op == Oper::Return) //Call应该是一个多子节点的数组
 			oper_type = 1;
@@ -871,6 +893,40 @@ Block Optimizer::DAG2block(vector<DAGitem>& DAGs, const Block& block, const set<
 
 				if (DAG.code.Op == Oper::J)
 					res.codes.push_back(DAG.code);
+				else if (DAG.code.Op == Oper::Get)
+				{
+					string parm = DAG.code.result;
+					for (const auto DAG : DAGs)
+					{
+						if ((DAG.isremain || DAG.useful) && DAG.op != string("Get") && (DAG.isleaf && DAG.value == parm) || find(DAG.label.begin(), DAG.label.end(), parm) != DAG.label.end())
+						{
+							if (DAG.label.size() == 0)
+							{
+								parm = DAG.value;
+							}
+							else
+							{
+								vector<string> labels = DAG.label;
+								labels.push_back(DAG.value);
+								for (auto& i : labels)
+								{
+									if (isNum(i))
+										continue;
+									else
+									{
+										if (find(activate_variable.begin(), activate_variable.end(), i) != activate_variable.end())
+										{
+											parm = i;
+											break;
+										}
+									}
+								}
+							}
+							break;
+						}
+					}
+					res.codes.push_back({ DAG.code.Op,DAG.value,DAG.code.arg2,parm });
+				}
 				else if (DAG.code.Op == Oper::Return || DAG.code.Op == Oper::Parm)
 					if (DAG.isleaf)
 						res.codes.push_back({ DAG.code.Op,DAG.value,DAG.code.arg2,DAG.code.result });

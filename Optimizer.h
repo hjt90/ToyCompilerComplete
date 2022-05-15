@@ -70,7 +70,7 @@ private:
 public:
 	Optimizer() = default;
 	void outputBlocks(ostream& out);
-	void divideBlocks(const parsing&);
+	void divideBlocks(const parsing&, const proc_symbolTable*);
 	void optimizer();
 	friend class ObjectCode;
 };

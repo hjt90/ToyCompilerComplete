@@ -27,6 +27,7 @@ enum class Oper : char
 	ArrayAssign,
 	Parm,
 	Call,
+	Get,
 	Return
 };
 string Oper2string(Oper op);
