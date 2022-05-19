@@ -1,40 +1,55 @@
+#pragma execution_character_set("utf-8")
 #include "Optimizer.h"
-#include<queue>
-#include<iostream>
+#include <queue>
+#include <iostream>
+#include <algorithm>
 
-static bool isVar(string name) {
+static bool isVar(string name)
+{
 	return name.size() > 0 && isalpha(name[0]);
 }
 
-static bool isNum(string name) {
+static bool isNum(string name)
+{
 	return name.size() > 0 && isdigit(name[0]);
 }
 
-NewLabeler::NewLabeler() :index(1), tmp(0)
-{}
+NewLabeler::NewLabeler() : index(1), tmp(0)
+{
+}
 
-string NewLabeler::newLabel() {
+string NewLabeler::newLabel()
+{
 	return string("Label") + to_string(index++);
 }
 
-string NewLabeler::newTmp() {
+string NewLabeler::newTmp()
+{
 	return string("Tmp") + to_string(tmp++);
 }
 
-void Optimizer::divideBlocks(const parsing& pars, const proc_symbolTable* ptr) {
-	vector<pair<int, string> > funcEnter = pars.p_symbolTable->getFuncEnter();
+void NewLabeler::clear()
+{
+	this->index = 1;
+	this->tmp = 0;
+}
+
+void Optimizer::divideBlocks(const parsing &pars, const proc_symbolTable *ptr)
+{
+	vector<pair<int, string>> funcEnter = pars.p_symbolTable->getFuncEnter();
 	this->code = pars.mid_code;
 
-	for (vector<pair<int, string> >::iterator iter = funcEnter.begin(); iter != funcEnter.end(); iter++) { //Ã¿Ò»¸öº¯Êı¿é
-		vector<Block>blocks;
-		priority_queue<int, vector<int>, greater<int> >block_enter; //ËùÓĞ»ù±¾¿éµÄÈë¿ÚÎ»ÖÃ
+	for (vector<pair<int, string>>::iterator iter = funcEnter.begin(); iter != funcEnter.end(); iter++)
+	{ //æ¯ä¸€ä¸ªå‡½æ•°å—
+		vector<Block> blocks;
+		priority_queue<int, vector<int>, greater<int>> block_enter; //æ‰€æœ‰åŸºæœ¬å—çš„å…¥å£ä½ç½®
 		block_enter.push(iter->first);
 
 		int endIndex = (iter + 1 == funcEnter.end()) ? code.nextquad : (iter + 1)->first;
-		for (int i = iter->first; i != endIndex; i++) {
+		for (int i = iter->first; i != endIndex; i++)
+		{
 			if (code.code[i - CODE_START_POS].Op == Oper::J || code.code[i - CODE_START_POS].Op == Oper::Jeq || code.code[i - CODE_START_POS].Op == Oper::Jge ||
-				code.code[i - CODE_START_POS].Op == Oper::Jgt || code.code[i - CODE_START_POS].Op == Oper::Jle
-				|| code.code[i - CODE_START_POS].Op == Oper::Jlt || code.code[i - CODE_START_POS].Op == Oper::Jne)
+				code.code[i - CODE_START_POS].Op == Oper::Jgt || code.code[i - CODE_START_POS].Op == Oper::Jle || code.code[i - CODE_START_POS].Op == Oper::Jlt || code.code[i - CODE_START_POS].Op == Oper::Jne)
 			{
 				if (code.code[i - CODE_START_POS].Op == Oper::J)
 				{
@@ -42,44 +57,52 @@ void Optimizer::divideBlocks(const parsing& pars, const proc_symbolTable* ptr) {
 				}
 				else
 				{
-					if (i + 1 < endIndex) {
+					if (i + 1 < endIndex)
+					{
 						block_enter.push(i + 1);
 					}
 					block_enter.push(atoi(code.code[i - CODE_START_POS].result.c_str()));
 				}
 			}
-			else if (code.code[i - CODE_START_POS].Op == Oper::Return) {
-				if (i + 1 < endIndex) {
+			else if (code.code[i - CODE_START_POS].Op == Oper::Return)
+			{
+				if (i + 1 < endIndex)
+				{
 					block_enter.push(i + 1);
 				}
 			}
 		}
 
-		//»®·Ö»ù±¾¿é	
+		//åˆ’åˆ†åŸºæœ¬å—
 		Block block;
-		map<int, string>labelEnter; //Èë¿ÚµãºÍ±êÇ©µÄ¶ÔÓ¦¹ØÏµ
-		map<int, int>enter_block; //½¨Á¢Èë¿ÚµãºÍblockµÄ¶ÔÓ¦¹ØÏµ
-		int firstFlag = true; //º¯Êı¿éµÚÒ»¿é±ê¼Ç£¬¸Ã¿éÃüÃûÎªº¯ÊıÃû
+		map<int, string> labelEnter; //å…¥å£ç‚¹å’Œæ ‡ç­¾çš„å¯¹åº”å…³ç³»
+		map<int, int> enter_block;	 //å»ºç«‹å…¥å£ç‚¹å’Œblockçš„å¯¹åº”å…³ç³»
+		int firstFlag = true;		 //å‡½æ•°å—ç¬¬ä¸€å—æ ‡è®°ï¼Œè¯¥å—å‘½åä¸ºå‡½æ•°å
 		int enter;
 		int lastEnter = block_enter.top();
 		block_enter.pop();
-		while (!block_enter.empty()) {
+		while (!block_enter.empty())
+		{
 			enter = block_enter.top();
 			block_enter.pop();
 
-			if (enter == lastEnter) {
+			if (enter == lastEnter)
+			{
 				continue;
 			}
 
-			for (int i = lastEnter; i != enter; i++) {
+			for (int i = lastEnter; i != enter; i++)
+			{
 				block.codes.push_back(code.code[i - CODE_START_POS]);
 			}
 
-			if (!firstFlag) { //¸Ã»ù±¾¿é²»ÊÇº¯Êı¿éµÄµÚÒ»¿é»ù±¾¿é
+			if (!firstFlag)
+			{ //è¯¥åŸºæœ¬å—ä¸æ˜¯å‡½æ•°å—çš„ç¬¬ä¸€å—åŸºæœ¬å—
 				block.name = label.newLabel();
 				labelEnter[lastEnter] = block.name;
 			}
-			else { //¸Ã»ù±¾¿éÊÇº¯Êı¿éµÄµÚÒ»¿é»ù±¾¿é
+			else
+			{ //è¯¥åŸºæœ¬å—æ˜¯å‡½æ•°å—çš„ç¬¬ä¸€å—åŸºæœ¬å—
 				block.name = iter->second;
 				firstFlag = false;
 			}
@@ -89,21 +112,27 @@ void Optimizer::divideBlocks(const parsing& pars, const proc_symbolTable* ptr) {
 			lastEnter = enter;
 			block.codes.clear();
 		}
-		if (!firstFlag) { //¸Ã»ù±¾¿é²»ÊÇº¯Êı¿éµÄµÚÒ»¿é»ù±¾¿é
+		if (!firstFlag)
+		{ //è¯¥åŸºæœ¬å—ä¸æ˜¯å‡½æ•°å—çš„ç¬¬ä¸€å—åŸºæœ¬å—
 			block.name = label.newLabel();
 			labelEnter[lastEnter] = block.name;
 		}
-		else { //¸Ã»ù±¾¿éÊÇº¯Êı¿éµÄµÚÒ»¿é»ù±¾¿é
+		else
+		{ //è¯¥åŸºæœ¬å—æ˜¯å‡½æ•°å—çš„ç¬¬ä¸€å—åŸºæœ¬å—
 			block.name = iter->second;
 			firstFlag = false;
 		}
-		if (iter + 1 != funcEnter.end()) { //ÔÚÁ½¸öº¯ÊıµÄÆğµãÖ®¼ä
-			for (int i = lastEnter; i != (iter + 1)->first; i++) {
+		if (iter + 1 != funcEnter.end())
+		{ //åœ¨ä¸¤ä¸ªå‡½æ•°çš„èµ·ç‚¹ä¹‹é—´
+			for (int i = lastEnter; i != (iter + 1)->first; i++)
+			{
 				block.codes.push_back(code.code[i - CODE_START_POS]);
 			}
 		}
-		else {//ÔÚ×îºóÒ»¸öº¯ÊıÖÁÖĞ¼ä´úÂëÄ©Î²
-			for (int i = lastEnter; i != code.nextquad; i++) {
+		else
+		{ //åœ¨æœ€åä¸€ä¸ªå‡½æ•°è‡³ä¸­é—´ä»£ç æœ«å°¾
+			for (int i = lastEnter; i != code.nextquad; i++)
+			{
 				block.codes.push_back(code.code[i - CODE_START_POS]);
 			}
 		}
@@ -111,26 +140,30 @@ void Optimizer::divideBlocks(const parsing& pars, const proc_symbolTable* ptr) {
 		blocks.push_back(block);
 
 		int blockIndex = 0;
-		for (vector<Block>::iterator bIter = blocks.begin(); bIter != blocks.end(); bIter++, blockIndex++) {
+		for (vector<Block>::iterator bIter = blocks.begin(); bIter != blocks.end(); bIter++, blockIndex++)
+		{
 			vector<quadruple>::reverse_iterator lastCode = bIter->codes.rbegin();
-			if (lastCode->Op == Oper::J || lastCode->Op == Oper::Jeq || lastCode->Op == Oper::Jge || lastCode->Op == Oper::Jgt
-				|| lastCode->Op == Oper::Jle || lastCode->Op == Oper::Jlt || lastCode->Op == Oper::Jne)
+			if (lastCode->Op == Oper::J || lastCode->Op == Oper::Jeq || lastCode->Op == Oper::Jge || lastCode->Op == Oper::Jgt || lastCode->Op == Oper::Jle || lastCode->Op == Oper::Jlt || lastCode->Op == Oper::Jne)
 			{
-				if (lastCode->Op == Oper::J) {
+				if (lastCode->Op == Oper::J)
+				{
 					bIter->next1 = enter_block[atoi(lastCode->result.c_str())];
 					bIter->next2 = -1;
 				}
-				else {
+				else
+				{
 					bIter->next1 = blockIndex + 1;
 					bIter->next2 = enter_block[atoi(lastCode->result.c_str())];
 					bIter->next2 = bIter->next1 == bIter->next2 ? -1 : bIter->next2;
 				}
 				lastCode->result = labelEnter[atoi(lastCode->result.c_str())];
 			}
-			else if (lastCode->Op == Oper::Return) {
+			else if (lastCode->Op == Oper::Return)
+			{
 				bIter->next1 = bIter->next2 = -1;
 			}
-			else {
+			else
+			{
 				bIter->next1 = blockIndex + 1;
 				bIter->next2 = -1;
 			}
@@ -138,110 +171,137 @@ void Optimizer::divideBlocks(const parsing& pars, const proc_symbolTable* ptr) {
 		funcBlocks[iter->second] = blocks;
 	}
 
-	for (map<string, vector<Block> >::iterator fbiter = funcBlocks.begin(); fbiter != funcBlocks.end(); fbiter++)
+	for (map<string, vector<Block>>::iterator fbiter = funcBlocks.begin(); fbiter != funcBlocks.end(); fbiter++)
 	{
-		const std::vector<symbolTableItem>& parms = ptr->functionTable.at(fbiter->first)->parm;
-		Block& block = fbiter->second[0];
+		const std::vector<symbolTableItem> &parms = ptr->functionTable.at(fbiter->first)->parm;
+		Block &block = fbiter->second[0];
 		vector<quadruple> get_parm;
 
 		if (fbiter->first != string("main"))
 		{
-			for (const auto& parm : parms)
+			for (const auto &parm : parms)
 			{
 				if (parm.type != symbolType::Array)
-					get_parm.push_back({ Oper::Get,string(""),string("") ,parm.gobalname });
+					get_parm.push_back({Oper::Get, string(""), string(""), parm.gobalname});
 			}
 		}
 		block.codes.insert(block.codes.begin(), get_parm.begin(), get_parm.end());
 	}
 }
 
-void Optimizer::outputBlocks(ostream& out)
+void Optimizer::outputBlocks(ostream &out)
 {
-	for (map<string, vector<Block> >::iterator iter = funcBlocks.begin(); iter != funcBlocks.end(); iter++) {
+	for (map<string, vector<Block>>::iterator iter = funcBlocks.begin(); iter != funcBlocks.end(); iter++)
+	{
 		out << "[" << iter->first << "]" << endl;
-		for (vector<Block>::iterator bIter = iter->second.begin(); bIter != iter->second.end(); bIter++) {
+		for (vector<Block>::iterator bIter = iter->second.begin(); bIter != iter->second.end(); bIter++)
+		{
 			out << bIter->name << ":" << endl;
-			for (vector<quadruple>::iterator cIter = bIter->codes.begin(); cIter != bIter->codes.end(); cIter++) {
-				out << "    " << "(" << Oper2string(cIter->Op) << "," << cIter->arg1 << "," << cIter->arg2 << "," << cIter->result << ")" << endl;
+			for (vector<quadruple>::iterator cIter = bIter->codes.begin(); cIter != bIter->codes.end(); cIter++)
+			{
+				out << "    "
+					<< "(" << Oper2string(cIter->Op) << "," << cIter->arg1 << "," << cIter->arg2 << "," << cIter->result << ")" << endl;
 			}
-			out << "    " << "next1 = " << bIter->next1 << endl;
-			out << "    " << "next2 = " << bIter->next2 << endl;
+			out << "    "
+				<< "next1 = " << bIter->next1 << endl;
+			out << "    "
+				<< "next2 = " << bIter->next2 << endl;
 		}
 		out << endl;
 	}
 }
 
 /***
-*     »îÔ¾±äÁ¿·ÖÎö
-* ²Î¿¼£ºhttps://blog.csdn.net/weixin_42815609/article/details/108022060
-*/
+ *     æ´»è·ƒå˜é‡åˆ†æ
+ * å‚è€ƒï¼šhttps://blog.csdn.net/weixin_42815609/article/details/108022060
+ */
 void Optimizer::init_INOUTL()
 {
-	for (map<string, vector<Block> >::iterator fbiter = this->funcBlocks.begin(); fbiter != this->funcBlocks.end(); fbiter++) {
-		vector<Block>& blocks = fbiter->second;
-		vector<set<string> >INL, OUTL, DEF, USE;
+	for (map<string, vector<Block>>::iterator fbiter = this->funcBlocks.begin(); fbiter != this->funcBlocks.end(); fbiter++)
+	{
+		vector<Block> &blocks = fbiter->second;
+		vector<set<string>> INL, OUTL, DEF, USE;
 
-		//»îÔ¾±äÁ¿µÄÊı¾İÁ÷·½³Ì
-		for (vector<Block>::iterator biter = blocks.begin(); biter != blocks.end(); biter++) {
-			set<string>def, use;
-			for (vector<quadruple>::iterator citer = biter->codes.begin(); citer != biter->codes.end(); citer++) {
-				if (citer->Op == Oper::ArrayAssign) {
-					if (isVar(citer->arg1) && def.count(citer->arg1) == 0) {//Èç¹ûÔ´²Ù×÷Êı1»¹Ã»ÓĞ±»¶¨Öµ
+		//æ´»è·ƒå˜é‡çš„æ•°æ®æµæ–¹ç¨‹
+		for (vector<Block>::iterator biter = blocks.begin(); biter != blocks.end(); biter++)
+		{
+			set<string> def, use;
+			for (vector<quadruple>::iterator citer = biter->codes.begin(); citer != biter->codes.end(); citer++)
+			{
+				if (citer->Op == Oper::ArrayAssign)
+				{
+					if (isVar(citer->arg1) && def.count(citer->arg1) == 0)
+					{ //å¦‚æœæºæ“ä½œæ•°1è¿˜æ²¡æœ‰è¢«å®šå€¼
 						use.insert(citer->arg1);
 					}
-					if (isVar(citer->arg2) && def.count(citer->arg2) == 0) {//Èç¹ûÔ´²Ù×÷Êı2»¹Ã»ÓĞ±»¶¨Öµ
+					if (isVar(citer->arg2) && def.count(citer->arg2) == 0)
+					{ //å¦‚æœæºæ“ä½œæ•°2è¿˜æ²¡æœ‰è¢«å®šå€¼
 						use.insert(citer->arg2);
 					}
-					if (isVar(citer->result) && use.count(citer->result) == 0) {//Èç¹ûÄ¿µÄ²Ù×÷Êı»¹Ã»ÓĞ±»ÒıÓÃ
+					if (isVar(citer->result) && use.count(citer->result) == 0)
+					{ //å¦‚æœç›®çš„æ“ä½œæ•°è¿˜æ²¡æœ‰è¢«å¼•ç”¨
 						def.insert(citer->result);
 					}
 				}
-				else if (citer->Op == Oper::Get) {
-					if (isVar(citer->result) && use.count(citer->result) == 0) {//Èç¹ûÄ¿µÄ²Ù×÷Êı»¹Ã»ÓĞ±»ÒıÓÃ
+				else if (citer->Op == Oper::Get)
+				{
+					if (isVar(citer->result) && use.count(citer->result) == 0)
+					{ //å¦‚æœç›®çš„æ“ä½œæ•°è¿˜æ²¡æœ‰è¢«å¼•ç”¨
 						def.insert(citer->result);
 					}
 				}
-				else if (citer->Op == Oper::AssignArray) {
-					if (isVar(citer->arg2) && def.count(citer->arg2) == 0) {//Èç¹ûÔ´²Ù×÷Êı2»¹Ã»ÓĞ±»¶¨Öµ
+				else if (citer->Op == Oper::AssignArray)
+				{
+					if (isVar(citer->arg2) && def.count(citer->arg2) == 0)
+					{ //å¦‚æœæºæ“ä½œæ•°2è¿˜æ²¡æœ‰è¢«å®šå€¼
 						use.insert(citer->arg2);
 					}
-					if (isVar(citer->result) && use.count(citer->result) == 0) {//Èç¹ûÄ¿µÄ²Ù×÷Êı»¹Ã»ÓĞ±»ÒıÓÃ
+					if (isVar(citer->result) && use.count(citer->result) == 0)
+					{ //å¦‚æœç›®çš„æ“ä½œæ•°è¿˜æ²¡æœ‰è¢«å¼•ç”¨
 						def.insert(citer->result);
 					}
 				}
-				else if (citer->Op == Oper::Call) {
-					if (isVar(citer->result) && use.count(citer->result) == 0) {//Èç¹ûÄ¿µÄ²Ù×÷Êı»¹Ã»ÓĞ±»ÒıÓÃ
+				else if (citer->Op == Oper::Call)
+				{
+					if (isVar(citer->result) && use.count(citer->result) == 0)
+					{ //å¦‚æœç›®çš„æ“ä½œæ•°è¿˜æ²¡æœ‰è¢«å¼•ç”¨
 						def.insert(citer->result);
 					}
 				}
-				else if (citer->Op == Oper::Parm || citer->Op == Oper::Return) {
-					if (isVar(citer->arg1) && def.count(citer->arg1) == 0) {//Èç¹ûÔ´²Ù×÷Êı1»¹Ã»ÓĞ±»¶¨Öµ
+				else if (citer->Op == Oper::Parm || citer->Op == Oper::Return)
+				{
+					if (isVar(citer->arg1) && def.count(citer->arg1) == 0)
+					{ //å¦‚æœæºæ“ä½œæ•°1è¿˜æ²¡æœ‰è¢«å®šå€¼
 						use.insert(citer->arg1);
 					}
 				}
 				else if (citer->Op == Oper::J)
 				{
-					//pass
+					// pass
 				}
-				else if (citer->Op == Oper::Jeq || citer->Op == Oper::Jge || citer->Op == Oper::Jgt || citer->Op == Oper::Jle
-					|| citer->Op == Oper::Jlt || citer->Op == Oper::Jne)
+				else if (citer->Op == Oper::Jeq || citer->Op == Oper::Jge || citer->Op == Oper::Jgt || citer->Op == Oper::Jle || citer->Op == Oper::Jlt || citer->Op == Oper::Jne)
 				{
-					if (isVar(citer->arg1) && def.count(citer->arg1) == 0) {//Èç¹ûÔ´²Ù×÷Êı1»¹Ã»ÓĞ±»¶¨Öµ
+					if (isVar(citer->arg1) && def.count(citer->arg1) == 0)
+					{ //å¦‚æœæºæ“ä½œæ•°1è¿˜æ²¡æœ‰è¢«å®šå€¼
 						use.insert(citer->arg1);
 					}
-					if (isVar(citer->arg2) && def.count(citer->arg2) == 0) {//Èç¹ûÔ´²Ù×÷Êı2»¹Ã»ÓĞ±»¶¨Öµ
+					if (isVar(citer->arg2) && def.count(citer->arg2) == 0)
+					{ //å¦‚æœæºæ“ä½œæ•°2è¿˜æ²¡æœ‰è¢«å®šå€¼
 						use.insert(citer->arg2);
 					}
 				}
-				else {
-					if (isVar(citer->arg1) && def.count(citer->arg1) == 0) {//Èç¹ûÔ´²Ù×÷Êı1»¹Ã»ÓĞ±»¶¨Öµ
+				else
+				{
+					if (isVar(citer->arg1) && def.count(citer->arg1) == 0)
+					{ //å¦‚æœæºæ“ä½œæ•°1è¿˜æ²¡æœ‰è¢«å®šå€¼
 						use.insert(citer->arg1);
 					}
-					if (isVar(citer->arg2) && def.count(citer->arg2) == 0) {//Èç¹ûÔ´²Ù×÷Êı2»¹Ã»ÓĞ±»¶¨Öµ
+					if (isVar(citer->arg2) && def.count(citer->arg2) == 0)
+					{ //å¦‚æœæºæ“ä½œæ•°2è¿˜æ²¡æœ‰è¢«å®šå€¼
 						use.insert(citer->arg2);
 					}
-					if (isVar(citer->result) && use.count(citer->result) == 0) {//Èç¹ûÄ¿µÄ²Ù×÷Êı»¹Ã»ÓĞ±»ÒıÓÃ
+					if (isVar(citer->result) && use.count(citer->result) == 0)
+					{ //å¦‚æœç›®çš„æ“ä½œæ•°è¿˜æ²¡æœ‰è¢«å¼•ç”¨
 						def.insert(citer->result);
 					}
 				}
@@ -250,33 +310,43 @@ void Optimizer::init_INOUTL()
 			DEF.push_back(def);
 			USE.push_back(use);
 			if (biter->codes.back().Op == Oper::Return)
-				OUTL.push_back(set<string>({ biter->codes.back().arg1 }));
+				OUTL.push_back(set<string>({biter->codes.back().arg1}));
 			else
 				OUTL.push_back(set<string>());
 		}
 
-		//È·¶¨INL£¬OUTL
+		//ç¡®å®šINLï¼ŒOUTL
 		bool change = true;
-		while (change) {
+		while (change)
+		{
 			change = false;
 			int blockIndex = 0;
-			for (vector<Block>::iterator biter = blocks.begin(); biter != blocks.end(); biter++, blockIndex++) {
+			for (vector<Block>::iterator biter = blocks.begin(); biter != blocks.end(); biter++, blockIndex++)
+			{
 				int next1 = biter->next1;
 				int next2 = biter->next2;
-				if (next1 != -1) {
-					for (set<string>::iterator inlIter = INL[next1].begin(); inlIter != INL[next1].end(); inlIter++) {
-						if (OUTL[blockIndex].insert(*inlIter).second == true) {
-							if (DEF[blockIndex].count(*inlIter) == 0) {
+				if (next1 != -1)
+				{
+					for (set<string>::iterator inlIter = INL[next1].begin(); inlIter != INL[next1].end(); inlIter++)
+					{
+						if (OUTL[blockIndex].insert(*inlIter).second == true)
+						{
+							if (DEF[blockIndex].count(*inlIter) == 0)
+							{
 								INL[blockIndex].insert(*inlIter);
 							}
 							change = true;
 						}
 					}
 				}
-				if (next2 != -1) {
-					for (set<string>::iterator inlIter = INL[next2].begin(); inlIter != INL[next2].end(); inlIter++) {
-						if (OUTL[blockIndex].insert(*inlIter).second == true) {
-							if (DEF[blockIndex].count(*inlIter) == 0) {
+				if (next2 != -1)
+				{
+					for (set<string>::iterator inlIter = INL[next2].begin(); inlIter != INL[next2].end(); inlIter++)
+					{
+						if (OUTL[blockIndex].insert(*inlIter).second == true)
+						{
+							if (DEF[blockIndex].count(*inlIter) == 0)
+							{
 								INL[blockIndex].insert(*inlIter);
 							}
 							change = true;
@@ -292,10 +362,10 @@ void Optimizer::init_INOUTL()
 
 void Optimizer::init_DAGs()
 {
-	for (auto& func : this->funcBlocks)
+	for (auto &func : this->funcBlocks)
 	{
 		vector<Block_DAG> DAGs = vector<Block_DAG>();
-		for (auto& block : func.second)
+		for (auto &block : func.second)
 		{
 			this->preparing(block);
 			DAGs.push_back(this->geneDAG(block));
@@ -306,39 +376,38 @@ void Optimizer::init_DAGs()
 
 void Optimizer::optimizer_Blocks()
 {
-	for (auto& func : this->funcBlocks)
+	for (auto &func : this->funcBlocks)
 	{
-		for (int i = 0; i < func.second.size(); i++)
+		for (int i = 0; i < (int)func.second.size(); i++)
 		{
 			func.second[i] = this->DAG2block(this->DAGBlocks[func.first][i], this->funcBlocks[func.first][i], this->funcOUTL[func.first][i]);
 		}
 	}
 }
 
-void Optimizer::preparing(Block& block)
+void Optimizer::preparing(Block &block)
 {
 	int index = 0;
-	for (auto& code : block.codes)
+	for (auto &code : block.codes)
 	{
 		if (code.Op == Oper::Parm)
 			code.result = code.result + to_string(index++);
 	}
 }
 
-vector<DAGitem> Optimizer::geneDAG(const Block& block)
+vector<DAGitem> Optimizer::geneDAG(const Block &block)
 {
 	vector<DAGitem> DAG;
 	int ArrayAss = 0;
-	for (const auto& code : block.codes)
+	for (const auto &code : block.codes)
 	{
 		int oper_type;
 		if (code.Op == Oper::J || code.Op == Oper::Get)
 			oper_type = -1;
-		else if (code.Op == Oper::Parm || code.Op == Oper::Call || code.Op == Oper::Return) //CallÓ¦¸ÃÊÇÒ»¸ö¶à×Ó½ÚµãµÄÊı×é
+		else if (code.Op == Oper::Parm || code.Op == Oper::Call || code.Op == Oper::Return) // Callåº”è¯¥æ˜¯ä¸€ä¸ªå¤šå­èŠ‚ç‚¹çš„æ•°ç»„
 			oper_type = 1;
-		else if (code.Op == Oper::Jeq || code.Op == Oper::Jge || code.Op == Oper::Jgt || code.Op == Oper::AssignArray
-			|| code.Op == Oper::Jle || code.Op == Oper::Jlt || code.Op == Oper::Jne || code.Op == Oper::Plus ||
-			code.Op == Oper::Divide || code.Op == Oper::Multiply || code.Op == Oper::Minus)
+		else if (code.Op == Oper::Jeq || code.Op == Oper::Jge || code.Op == Oper::Jgt || code.Op == Oper::AssignArray || code.Op == Oper::Jle || code.Op == Oper::Jlt || code.Op == Oper::Jne || code.Op == Oper::Plus ||
+				 code.Op == Oper::Divide || code.Op == Oper::Multiply || code.Op == Oper::Minus)
 			oper_type = 2;
 		else if (code.Op == Oper::Assign)
 			oper_type = 0;
@@ -351,7 +420,7 @@ vector<DAGitem> Optimizer::geneDAG(const Block& block)
 		string C = code.arg2;
 		string A = code.result;
 
-		//²»×öDAG×ª»¯µÄÖĞ¼ä´úÂë
+		//ä¸åšDAGè½¬åŒ–çš„ä¸­é—´ä»£ç 
 		if (oper_type == -1)
 		{
 			DAGitem newDAG;
@@ -363,11 +432,10 @@ vector<DAGitem> Optimizer::geneDAG(const Block& block)
 			continue;
 		}
 
-		//¶Ô¸ÃÖĞ¼ä´úÂëÉú³ÉDAG
+		//å¯¹è¯¥ä¸­é—´ä»£ç ç”ŸæˆDAG
 		int state = 1;
 		int n;
 		int A_no;
-		bool new_A;
 		int B_no;
 		bool new_B;
 		int C_no;
@@ -376,349 +444,349 @@ vector<DAGitem> Optimizer::geneDAG(const Block& block)
 		{
 			switch (state)
 			{
-				case 1:
+			case 1:
+			{
+				//åœ¨å·²æœ‰DAGèŠ‚ç‚¹ä¸­å¯»æ‰¾B
+				B_no = -1;
+				for (auto i = 0; i < (int)DAG.size(); i++)
 				{
-					//ÔÚÒÑÓĞDAG½ÚµãÖĞÑ°ÕÒB
-					B_no = -1;
-					for (auto i = 0; i < DAG.size(); i++)
+					if ((DAG[i].isleaf && DAG[i].value == B) || find(DAG[i].label.begin(), DAG[i].label.end(), B) != DAG[i].label.end())
 					{
-						if ((DAG[i].isleaf && DAG[i].value == B) || find(DAG[i].label.begin(), DAG[i].label.end(), B) != DAG[i].label.end())
-						{
-							B_no = i;
-							new_B = false;
-							break;
-						}
+						B_no = i;
+						new_B = false;
+						break;
 					}
-					//ÒÑÓĞDAGÖĞÃ»ÓĞBÔòĞÂ½¨BµÄDAG½Úµã
-					if (B_no == -1)
-					{
-						DAGitem newDAG;
-						newDAG.isleaf = true;
-						newDAG.value = B;
-						newDAG.code = code;
-						B_no = DAG.size();
-						new_B = true;
-						DAG.push_back(newDAG);
-					}
-					if (oper_type == 0)
-					{
-						n = B_no;
-						state = 4;
-					}
-					else if (oper_type == 1)
-					{
-						state = 21;
-					}
-					else if (oper_type == 2)
-					{
-						//ÔÚÒÑÓĞDAG½ÚµãÖĞÑ°ÕÒC
-						C_no = -1;
-						for (auto i = 0; i < DAG.size(); i++)
-						{
-							if ((DAG[i].isleaf && DAG[i].value == C) || find(DAG[i].label.begin(), DAG[i].label.end(), C) != DAG[i].label.end())
-							{
-								C_no = i;
-								new_C = false;
-								break;
-							}
-						}
-						//ÒÑÓĞDAGÖĞÃ»ÓĞCÔòĞÂ½¨CµÄDAG½Úµã
-						if (C_no == -1)
-						{
-							DAGitem newDAG;
-							newDAG.isleaf = true;
-							newDAG.value = C;
-							newDAG.code = code;
-							C_no = DAG.size();
-							new_C = true;
-							DAG.push_back(newDAG);
-						}
-						state = 22;
-					}
-					else if (oper_type == 3)
-					{
-						//ÔÚÒÑÓĞDAG½ÚµãÖĞÑ°ÕÒC
-						C_no = -1;
-						for (auto i = 0; i < DAG.size(); i++)
-						{
-							if ((DAG[i].isleaf && DAG[i].value == C) || find(DAG[i].label.begin(), DAG[i].label.end(), C) != DAG[i].label.end())
-							{
-								C_no = i;
-								new_C = false;
-								break;
-							}
-						}
-						//ÒÑÓĞDAGÖĞÃ»ÓĞCÔòĞÂ½¨CµÄDAG½Úµã
-						if (C_no == -1)
-						{
-							DAGitem newDAG;
-							newDAG.isleaf = true;
-							newDAG.value = C;
-							newDAG.code = code;
-							C_no = DAG.size();
-							new_C = true;
-							DAG.push_back(newDAG);
-						}
-						//ÔÚÒÑÓĞDAG½ÚµãÖĞÑ°ÕÒA
-						A_no = -1;
-						for (auto i = 0; i < DAG.size(); i++)
-						{
-							if ((DAG[i].isleaf && DAG[i].value == A) || find(DAG[i].label.begin(), DAG[i].label.end(), A) != DAG[i].label.end())
-							{
-								A_no = i;
-								new_A = false;
-								break;
-							}
-						}
-						//ÒÑÓĞDAGÖĞÃ»ÓĞAÔòĞÂ½¨AµÄDAG½Úµã
-						if (A_no == -1)
-						{
-							DAGitem newDAG;
-							newDAG.isleaf = true;
-							newDAG.value = A;
-							newDAG.code = code;
-							A_no = DAG.size();
-							new_A = true;
-							DAG.push_back(newDAG);
-						}
-						DAGitem newDAG;
-						newDAG.isremain = true;
-						newDAG.isleaf = false;
-						newDAG.op = Oper2string(code.Op);
-						newDAG.left_child = B_no;
-						newDAG.right_child = C_no;
-						newDAG.tri_child = A_no;
-						newDAG.code = code;
-						newDAG.label.push_back(string("ArrayAssigned") + to_string(ArrayAss++));
-						n = DAG.size();
-						DAG.push_back(newDAG);
-						DAG[B_no].parent = n;
-						DAG[C_no].parent = n;
-						DAG[A_no].parent = n;
-						//ÆäËûÖµÎª¸ÃÊı×éÖĞÈÎÒâÔªËØµÄÒ¶½áµãÊ§Ğ§
-						for (auto i = 0; i < DAG.size(); i++)
-						{
-							if (DAG[i].isleaf && DAG[i].value == A)
-							{
-								DAG[i].value = "-" + A;
-								break;
-							}
-						}
-						state = -1;
-					}
-					else
-					{
-						state = -1;
-					}
-					break;
 				}
-				case 21:
+				//å·²æœ‰DAGä¸­æ²¡æœ‰Båˆ™æ–°å»ºBçš„DAGèŠ‚ç‚¹
+				if (B_no == -1)
 				{
-					if (DAG[B_no].isleaf && isNum(DAG[B_no].value))
-					{
-						//BÊÇÁ¢¼´Êı
-						state = 23;
-					}
-					else
-					{
-						state = 31;
-					}
-					break;
-				}
-				case 22:
-				{
-					if ((DAG[B_no].isleaf && isNum(DAG[B_no].value)) && (DAG[C_no].isleaf && isNum(DAG[C_no].value)))
-					{
-						//BºÍCÊÇÁ¢¼´Êı
-						state = 24;
-					}
-					else
-					{
-						state = 32;
-					}
-					break;
-				}
-				case 23:
-				{
-					//Return Parm
-					int B = stoi(DAG[B_no].value);
-					int P;
-					if (code.Op == Oper::Return)
-					{
-						P = B;
-					}
-					else if (code.Op == Oper::Parm)
-					{
-						P = B;
-					}
-					DAGitem tmpB = DAG[B_no];
-					//Èç¹ûBÊÇĞÂ½¨µÄÔòÎŞĞèĞÂ½¨BµÄDAG½Úµã
-					if (new_B)
-					{
-						vector<DAGitem>::iterator i;
-						i = find(DAG.begin(), DAG.end(), tmpB);
-						DAG.erase(i);
-					}
-					//Ñ°ÕÒ¼ÆËã½á¹ûÊÇ·ñÒÑ¾­ÓĞDAG½Úµã
-
-					//·ñÔòĞÂ½¨¼ÆËã½á¹ûµÄÒ¶½Úµã
 					DAGitem newDAG;
 					newDAG.isleaf = true;
-					newDAG.value = to_string(P);
+					newDAG.value = B;
 					newDAG.code = code;
-					n = DAG.size();
+					B_no = DAG.size();
+					new_B = true;
 					DAG.push_back(newDAG);
-					state = 4;
-					break;
 				}
-				case 24:
+				if (oper_type == 0)
 				{
-					int B = stoi(DAG[B_no].value);
-					int C = stoi(DAG[C_no].value);
-					int P;
-					if (code.Op == Oper::Plus)
+					n = B_no;
+					state = 4;
+				}
+				else if (oper_type == 1)
+				{
+					state = 21;
+				}
+				else if (oper_type == 2)
+				{
+					//åœ¨å·²æœ‰DAGèŠ‚ç‚¹ä¸­å¯»æ‰¾C
+					C_no = -1;
+					for (auto i = 0u; i < DAG.size(); i++)
 					{
-						P = B + C;
-					}
-					else if (code.Op == Oper::Minus)
-					{
-						P = B - C;
-					}
-					else if (code.Op == Oper::Multiply)
-					{
-						P = B * C;
-					}
-					else if (code.Op == Oper::Divide)
-					{
-						P = B / C;
-					}
-					DAGitem tmpB = DAG[B_no], tmpC = DAG[C_no];
-					//Èç¹ûBÊÇĞÂ½¨µÄÔòÎŞĞèĞÂ½¨BµÄDAG½Úµã
-					if (new_B)
-					{
-						vector<DAGitem>::iterator i;
-						i = find(DAG.begin(), DAG.end(), tmpB);
-						DAG.erase(i);
-					}
-					//Èç¹ûCÊÇĞÂ½¨µÄÔòÎŞĞèĞÂ½¨CµÄDAG½Úµã
-					if (new_C)
-					{
-						vector<DAGitem>::iterator i;
-						i = find(DAG.begin(), DAG.end(), tmpC);
-						DAG.erase(i);
-					}
-					//Ñ°ÕÒ¼ÆËã½á¹ûÊÇ·ñÒÑ¾­ÓĞDAG½Úµã
-					n = -1;
-					for (auto i = 0; i < DAG.size(); i++)
-					{
-						if ((DAG[i].isleaf && DAG[i].value == to_string(P)) || find(DAG[i].label.begin(), DAG[i].label.end(), to_string(P)) != DAG[i].label.end())
+						if ((DAG[i].isleaf && DAG[i].value == C) || find(DAG[i].label.begin(), DAG[i].label.end(), C) != DAG[i].label.end())
 						{
-							n = i;
+							C_no = i;
+							new_C = false;
 							break;
 						}
 					}
-					//·ñÔòĞÂ½¨¼ÆËã½á¹ûµÄÒ¶½Úµã
-					if (n == -1)
+					//å·²æœ‰DAGä¸­æ²¡æœ‰Cåˆ™æ–°å»ºCçš„DAGèŠ‚ç‚¹
+					if (C_no == -1)
 					{
 						DAGitem newDAG;
 						newDAG.isleaf = true;
-						newDAG.value = to_string(P);
+						newDAG.value = C;
 						newDAG.code = code;
-						n = DAG.size();
+						C_no = DAG.size();
+						new_C = true;
 						DAG.push_back(newDAG);
 					}
-					state = 4;
-					break;
+					state = 22;
 				}
-				case 31:
+				else if (oper_type == 3)
 				{
-					//Ñ°ÕÒÊÇ·ñÓĞÏàÍ¬ÔËËãµÄDAG
-					n = -1;
-					for (auto i = 0; i < DAG.size(); i++)
+					//åœ¨å·²æœ‰DAGèŠ‚ç‚¹ä¸­å¯»æ‰¾C
+					C_no = -1;
+					for (auto i = 0; i < (int)DAG.size(); i++)
 					{
-						if (!DAG[i].isleaf && DAG[i].left_child == B_no && DAG[i].op == Oper2string(code.Op))
+						if ((DAG[i].isleaf && DAG[i].value == C) || find(DAG[i].label.begin(), DAG[i].label.end(), C) != DAG[i].label.end())
 						{
-							n = i;
+							C_no = i;
+							new_C = false;
 							break;
 						}
 					}
-					if (code.Op == Oper::Parm || code.Op == Oper::Call) //²»ĞíÓÅ»¯
-						n = -1;
-					//Ã»ÓĞÔòĞÂ½¨¸ù½Úµã
-					if (n == -1)
+					//å·²æœ‰DAGä¸­æ²¡æœ‰Cåˆ™æ–°å»ºCçš„DAGèŠ‚ç‚¹
+					if (C_no == -1)
 					{
 						DAGitem newDAG;
-						newDAG.isleaf = false;
-						newDAG.op = Oper2string(code.Op);
-						newDAG.left_child = B_no;
+						newDAG.isleaf = true;
+						newDAG.value = C;
 						newDAG.code = code;
-						n = DAG.size();
+						C_no = DAG.size();
+						new_C = true;
 						DAG.push_back(newDAG);
-						DAG[B_no].parent = n;
 					}
-					state = 4;
-					break;
-				}
-				case 32:
-				{
-					//Ñ°ÕÒÊÇ·ñÓĞÏàÍ¬ÔËËãµÄDAG
-					n = -1;
-					for (auto i = 0; i < DAG.size(); i++)
+					//åœ¨å·²æœ‰DAGèŠ‚ç‚¹ä¸­å¯»æ‰¾A
+					A_no = -1;
+					for (auto i = 0; i < (int)DAG.size(); i++)
 					{
-						if (!DAG[i].isleaf && DAG[i].left_child == B_no && DAG[i].right_child == C_no && DAG[i].op == Oper2string(code.Op))
+						if ((DAG[i].isleaf && DAG[i].value == A) || find(DAG[i].label.begin(), DAG[i].label.end(), A) != DAG[i].label.end())
 						{
-							n = i;
+							A_no = i;
 							break;
 						}
 					}
-					//Ã»ÓĞÔòĞÂ½¨¸ù½Úµã
-					if (n == -1)
+					//å·²æœ‰DAGä¸­æ²¡æœ‰Aåˆ™æ–°å»ºAçš„DAGèŠ‚ç‚¹
+					if (A_no == -1)
 					{
 						DAGitem newDAG;
-						newDAG.isleaf = false;
-						newDAG.op = Oper2string(code.Op);
+						newDAG.isleaf = true;
+						newDAG.value = A;
 						newDAG.code = code;
-						newDAG.left_child = B_no;
-						newDAG.right_child = C_no;
-						n = DAG.size();
+						A_no = DAG.size();
 						DAG.push_back(newDAG);
-						DAG[B_no].parent = n;
-						DAG[C_no].parent = n;
 					}
-					state = 4;
-					break;
-				}
-				case 4:
-				{
-					//Èç¹ûAÒÑ¾­ÓĞDAG½ÚµãÔò´ÓÕâĞ©½ÚµãÖĞÈ¥³ıA,µ«Òª±£Ö¤Ã¿Ò»¸öÒ¶½áµã¶¼ÓĞÖµ£¬¹ıÆÚµÄÖµÇ°Ãæ¼Ó-£¬·ÀÖ¹ÔÙ´Î±»Ñ¡ÎªÔ´²Ù×÷Êı
-					for (auto i = 0; i < DAG.size(); i++)
+					DAGitem newDAG;
+					newDAG.isremain = true;
+					newDAG.isleaf = false;
+					newDAG.op = Oper2string(code.Op);
+					newDAG.left_child = B_no;
+					newDAG.right_child = C_no;
+					newDAG.tri_child = A_no;
+					newDAG.code = code;
+					newDAG.label.push_back(string("ArrayAssigned") + to_string(ArrayAss++));
+					n = DAG.size();
+					DAG.push_back(newDAG);
+					DAG[B_no].parent = n;
+					DAG[C_no].parent = n;
+					DAG[A_no].parent = n;
+					//å…¶ä»–å€¼ä¸ºè¯¥æ•°ç»„ä¸­ä»»æ„å…ƒç´ çš„å¶ç»“ç‚¹å¤±æ•ˆ
+					for (auto i = 0; i < (int)DAG.size(); i++)
 					{
 						if (DAG[i].isleaf && DAG[i].value == A)
 						{
 							DAG[i].value = "-" + A;
 							break;
 						}
-						else if (find(DAG[i].label.begin(), DAG[i].label.end(), A) != DAG[i].label.end())
-						{
-							vector<string>::iterator iter;
-							iter = find(DAG[i].label.begin(), DAG[i].label.end(), A);
-							DAG[i].label.erase(iter);
-							break;
-						}
 					}
-					DAG[n].label.push_back(A);
 					state = -1;
-					break;
 				}
-				default:
-					break;
+				else
+				{
+					state = -1;
+				}
+				break;
+			}
+			case 21:
+			{
+				if (DAG[B_no].isleaf && isNum(DAG[B_no].value))
+				{
+					// Bæ˜¯ç«‹å³æ•°
+					state = 23;
+				}
+				else
+				{
+					state = 31;
+				}
+				break;
+			}
+			case 22:
+			{
+				if ((DAG[B_no].isleaf && isNum(DAG[B_no].value)) && (DAG[C_no].isleaf && isNum(DAG[C_no].value)))
+				{
+					// Bå’ŒCæ˜¯ç«‹å³æ•°
+					state = 24;
+				}
+				else
+				{
+					state = 32;
+				}
+				break;
+			}
+			case 23:
+			{
+				// Return Parm
+				int B = stoi(DAG[B_no].value);
+				int P;
+				if (code.Op == Oper::Return)
+				{
+					P = B;
+				}
+				else if (code.Op == Oper::Parm)
+				{
+					P = B;
+				}
+				else
+					P = B;
+				DAGitem tmpB = DAG[B_no];
+				//å¦‚æœBæ˜¯æ–°å»ºçš„åˆ™æ— éœ€æ–°å»ºBçš„DAGèŠ‚ç‚¹
+				if (new_B)
+				{
+					vector<DAGitem>::iterator i;
+					i = find(DAG.begin(), DAG.end(), tmpB);
+					DAG.erase(i);
+				}
+				//å¯»æ‰¾è®¡ç®—ç»“æœæ˜¯å¦å·²ç»æœ‰DAGèŠ‚ç‚¹
+
+				//å¦åˆ™æ–°å»ºè®¡ç®—ç»“æœçš„å¶èŠ‚ç‚¹
+				DAGitem newDAG;
+				newDAG.isleaf = true;
+				newDAG.value = to_string(P);
+				newDAG.code = code;
+				n = DAG.size();
+				DAG.push_back(newDAG);
+				state = 4;
+				break;
+			}
+			case 24:
+			{
+				int B = stoi(DAG[B_no].value);
+				int C = stoi(DAG[C_no].value);
+				int P;
+				if (code.Op == Oper::Plus)
+				{
+					P = B + C;
+				}
+				else if (code.Op == Oper::Minus)
+				{
+					P = B - C;
+				}
+				else if (code.Op == Oper::Multiply)
+				{
+					P = B * C;
+				}
+				else if (code.Op == Oper::Divide)
+				{
+					P = B / C;
+				}
+				DAGitem tmpB = DAG[B_no], tmpC = DAG[C_no];
+				//å¦‚æœBæ˜¯æ–°å»ºçš„åˆ™æ— éœ€æ–°å»ºBçš„DAGèŠ‚ç‚¹
+				if (new_B)
+				{
+					vector<DAGitem>::iterator i;
+					i = find(DAG.begin(), DAG.end(), tmpB);
+					DAG.erase(i);
+				}
+				//å¦‚æœCæ˜¯æ–°å»ºçš„åˆ™æ— éœ€æ–°å»ºCçš„DAGèŠ‚ç‚¹
+				if (new_C)
+				{
+					vector<DAGitem>::iterator i;
+					i = find(DAG.begin(), DAG.end(), tmpC);
+					DAG.erase(i);
+				}
+				//å¯»æ‰¾è®¡ç®—ç»“æœæ˜¯å¦å·²ç»æœ‰DAGèŠ‚ç‚¹
+				n = -1;
+				for (auto i = 0; i < (int)DAG.size(); i++)
+				{
+					if ((DAG[i].isleaf && DAG[i].value == to_string(P)) || find(DAG[i].label.begin(), DAG[i].label.end(), to_string(P)) != DAG[i].label.end())
+					{
+						n = i;
+						break;
+					}
+				}
+				//å¦åˆ™æ–°å»ºè®¡ç®—ç»“æœçš„å¶èŠ‚ç‚¹
+				if (n == -1)
+				{
+					DAGitem newDAG;
+					newDAG.isleaf = true;
+					newDAG.value = to_string(P);
+					newDAG.code = code;
+					n = DAG.size();
+					DAG.push_back(newDAG);
+				}
+				state = 4;
+				break;
+			}
+			case 31:
+			{
+				//å¯»æ‰¾æ˜¯å¦æœ‰ç›¸åŒè¿ç®—çš„DAG
+				n = -1;
+				for (auto i = 0; i < (int)DAG.size(); i++)
+				{
+					if (!DAG[i].isleaf && DAG[i].left_child == B_no && DAG[i].op == Oper2string(code.Op))
+					{
+						n = i;
+						break;
+					}
+				}
+				if (code.Op == Oper::Parm || code.Op == Oper::Call) //ä¸è®¸ä¼˜åŒ–
+					n = -1;
+				//æ²¡æœ‰åˆ™æ–°å»ºæ ¹èŠ‚ç‚¹
+				if (n == -1)
+				{
+					DAGitem newDAG;
+					newDAG.isleaf = false;
+					newDAG.op = Oper2string(code.Op);
+					newDAG.left_child = B_no;
+					newDAG.code = code;
+					n = DAG.size();
+					DAG.push_back(newDAG);
+					DAG[B_no].parent = n;
+				}
+				state = 4;
+				break;
+			}
+			case 32:
+			{
+				//å¯»æ‰¾æ˜¯å¦æœ‰ç›¸åŒè¿ç®—çš„DAG
+				n = -1;
+				for (auto i = 0; i < (int)DAG.size(); i++)
+				{
+					if (!DAG[i].isleaf && DAG[i].left_child == B_no && DAG[i].right_child == C_no && DAG[i].op == Oper2string(code.Op))
+					{
+						n = i;
+						break;
+					}
+				}
+				//æ²¡æœ‰åˆ™æ–°å»ºæ ¹èŠ‚ç‚¹
+				if (n == -1)
+				{
+					DAGitem newDAG;
+					newDAG.isleaf = false;
+					newDAG.op = Oper2string(code.Op);
+					newDAG.code = code;
+					newDAG.left_child = B_no;
+					newDAG.right_child = C_no;
+					n = DAG.size();
+					DAG.push_back(newDAG);
+					DAG[B_no].parent = n;
+					DAG[C_no].parent = n;
+				}
+				state = 4;
+				break;
+			}
+			case 4:
+			{
+				//å¦‚æœAå·²ç»æœ‰DAGèŠ‚ç‚¹åˆ™ä»è¿™äº›èŠ‚ç‚¹ä¸­å»é™¤A,ä½†è¦ä¿è¯æ¯ä¸€ä¸ªå¶ç»“ç‚¹éƒ½æœ‰å€¼ï¼Œè¿‡æœŸçš„å€¼å‰é¢åŠ -ï¼Œé˜²æ­¢å†æ¬¡è¢«é€‰ä¸ºæºæ“ä½œæ•°
+				for (auto i = 0; i < (int)DAG.size(); i++)
+				{
+					if (DAG[i].isleaf && DAG[i].value == A)
+					{
+						DAG[i].value = "-" + A;
+						break;
+					}
+					else if (find(DAG[i].label.begin(), DAG[i].label.end(), A) != DAG[i].label.end())
+					{
+						vector<string>::iterator iter;
+						iter = find(DAG[i].label.begin(), DAG[i].label.end(), A);
+						DAG[i].label.erase(iter);
+						break;
+					}
+				}
+				DAG[n].label.push_back(A);
+				state = -1;
+				break;
+			}
+			default:
+				break;
 			}
 		}
 	}
 	return DAG;
 }
 
-Block Optimizer::DAG2block(vector<DAGitem>& DAGs, const Block& block, const set<string>& block_OutVariable)
+Block Optimizer::DAG2block(vector<DAGitem> &DAGs, const Block &block, const set<string> &block_OutVariable)
 {
 	Block res = Block();
 	set<string> activate_variable = block_OutVariable;
@@ -736,7 +804,7 @@ Block Optimizer::DAG2block(vector<DAGitem>& DAGs, const Block& block, const set<
 	}
 
 	int ArrayAss = 0;
-	for (const auto& code : block.codes)
+	for (const auto &code : block.codes)
 	{
 		if (code.Op == Oper::Call)
 		{
@@ -757,14 +825,14 @@ Block Optimizer::DAG2block(vector<DAGitem>& DAGs, const Block& block, const set<
 	}
 
 	int len = 0;
-	while (len < activate_variable.size())
+	while (len < (int)activate_variable.size())
 	{
 		len = activate_variable.size();
-		for (const auto& vari : activate_variable) // »îÔ¾±äÁ¿µÄ×Ó½ÚµãÎª»îÔ¾
+		for (const auto &vari : activate_variable) // æ´»è·ƒå˜é‡çš„å­èŠ‚ç‚¹ä¸ºæ´»è·ƒ
 		{
-			// ÕÒµ½ÖµÎª»îÔ¾±äÁ¿µÄDAG¿é
+			// æ‰¾åˆ°å€¼ä¸ºæ´»è·ƒå˜é‡çš„DAGå—
 			int n = -1;
-			for (auto i = 0; i < DAGs.size(); i++)
+			for (auto i = 0; i < (int)DAGs.size(); i++)
 			{
 				if ((DAGs[i].isleaf && DAGs[i].value == vari) || find(DAGs[i].label.begin(), DAGs[i].label.end(), vari) != DAGs[i].label.end())
 				{
@@ -776,7 +844,7 @@ Block Optimizer::DAG2block(vector<DAGitem>& DAGs, const Block& block, const set<
 			{
 				continue;
 			}
-			// ½«ÆäËùÓĞ×Ó½Úµã¼ÇÂ¼Îªuseful
+			// å°†å…¶æ‰€æœ‰å­èŠ‚ç‚¹è®°å½•ä¸ºuseful
 			queue<int> que;
 			que.push(n);
 			while (!que.empty())
@@ -788,7 +856,7 @@ Block Optimizer::DAG2block(vector<DAGitem>& DAGs, const Block& block, const set<
 				DAGs[par].useful = true;
 				if (DAGs[par].isleaf)
 				{
-					// Ö»´¦Àí¶àÔª¸³Öµ
+					// åªå¤„ç†å¤šå…ƒèµ‹å€¼
 					if (isVar(DAGs[par].value))
 						activate_variable.insert(DAGs[par].value);
 					continue;
@@ -809,14 +877,13 @@ Block Optimizer::DAG2block(vector<DAGitem>& DAGs, const Block& block, const set<
 					que.push(DAGs[par].tri_child);
 			}
 		}
-
 	}
 
-	for (auto& DAG : DAGs) //°´Ë³Ğò»Ö¸´DAGÍ¼
+	for (auto &DAG : DAGs) //æŒ‰é¡ºåºæ¢å¤DAGå›¾
 	{
 		if (DAG.isremain || DAG.useful)
 		{
-			if (DAG.isleaf) //Ò¶×Ó½ÚµãÖ»´¦Àí¸³Öµ
+			if (DAG.isleaf) //å¶å­èŠ‚ç‚¹åªå¤„ç†èµ‹å€¼
 			{
 				if (DAG.value.size() >= 1 && DAG.value[0] == '-')
 					DAG.value = DAG.value.substr(1, DAG.value.size() - 1);
@@ -829,14 +896,13 @@ Block Optimizer::DAG2block(vector<DAGitem>& DAGs, const Block& block, const set<
 					if (find(activate_variable.begin(), activate_variable.end(), DAG.value) != activate_variable.end())
 						labels.push_back(DAG.value);
 				}
-				for (auto& i : DAG.label)
+				for (auto &i : DAG.label)
 				{
 					if (isNum(i))
 						val = i;
 					else
 					{
-						if (find(activate_variable.begin(), activate_variable.end(), i) != activate_variable.end()
-							&& find(labels.begin(), labels.end(), i) == labels.end())
+						if (find(activate_variable.begin(), activate_variable.end(), i) != activate_variable.end() && find(labels.begin(), labels.end(), i) == labels.end())
 							labels.push_back(i);
 					}
 				}
@@ -851,28 +917,28 @@ Block Optimizer::DAG2block(vector<DAGitem>& DAGs, const Block& block, const set<
 					if (isNum(val))
 					{
 						if (find(block_OutVariable.begin(), block_OutVariable.end(), labels[0]) != block_OutVariable.end())
-							res.codes.push_back({ Oper::Assign,val,string(""),labels[0] });
+							res.codes.push_back({Oper::Assign, val, string(""), labels[0]});
 					}
 					else if (isVar(val))
-						res.codes.push_back({ Oper::Assign,val,string(""),labels[0] });
+						res.codes.push_back({Oper::Assign, val, string(""), labels[0]});
 				}
 				else
 				{
 					if (isNum(val))
 					{
-						for (int i = 0; i < labels.size(); i++)
+						for (int i = 0; i < (int)labels.size(); i++)
 							if (find(block_OutVariable.begin(), block_OutVariable.end(), labels[i]) != block_OutVariable.end())
-								res.codes.push_back({ Oper::Assign,val,string(""),labels[i] });
+								res.codes.push_back({Oper::Assign, val, string(""), labels[i]});
 					}
 					else if (isVar(val))
 					{
-						for (int i = 0; i < labels.size(); i++)
-							res.codes.push_back({ Oper::Assign,val,string(""),labels[i] });
+						for (int i = 0; i < (int)labels.size(); i++)
+							res.codes.push_back({Oper::Assign, val, string(""), labels[i]});
 					}
 					else
 					{
-						for (int i = 1; i < labels.size(); i++)
-							res.codes.push_back({ Oper::Assign,labels[0],string(""),labels[i] });
+						for (int i = 1; i < (int)labels.size(); i++)
+							res.codes.push_back({Oper::Assign, labels[0], string(""), labels[i]});
 					}
 				}
 				if (isNum(val))
@@ -881,10 +947,9 @@ Block Optimizer::DAG2block(vector<DAGitem>& DAGs, const Block& block, const set<
 			else
 			{
 				vector<string> labels;
-				for (auto& i : DAG.label)
+				for (auto &i : DAG.label)
 				{
-					if (find(activate_variable.begin(), activate_variable.end(), i) != activate_variable.end()
-						&& find(labels.begin(), labels.end(), i) == labels.end())
+					if (find(activate_variable.begin(), activate_variable.end(), i) != activate_variable.end() && find(labels.begin(), labels.end(), i) == labels.end())
 						labels.push_back(i);
 				}
 				if (labels.size() == 0)
@@ -896,9 +961,9 @@ Block Optimizer::DAG2block(vector<DAGitem>& DAGs, const Block& block, const set<
 				else if (DAG.code.Op == Oper::Get)
 				{
 					string parm = DAG.code.result;
-					for (const auto DAG : DAGs)
+					for (const auto &DAG : DAGs)
 					{
-						if ((DAG.isremain || DAG.useful) && DAG.op != string("Get") && (DAG.isleaf && DAG.value == parm) || find(DAG.label.begin(), DAG.label.end(), parm) != DAG.label.end())
+						if (((DAG.isremain || DAG.useful) && DAG.op != string("Get") && (DAG.isleaf && DAG.value == parm)) || find(DAG.label.begin(), DAG.label.end(), parm) != DAG.label.end())
 						{
 							if (DAG.label.size() == 0)
 							{
@@ -908,7 +973,7 @@ Block Optimizer::DAG2block(vector<DAGitem>& DAGs, const Block& block, const set<
 							{
 								vector<string> labels = DAG.label;
 								labels.push_back(DAG.value);
-								for (auto& i : labels)
+								for (auto &i : labels)
 								{
 									if (isNum(i))
 										continue;
@@ -925,37 +990,36 @@ Block Optimizer::DAG2block(vector<DAGitem>& DAGs, const Block& block, const set<
 							break;
 						}
 					}
-					res.codes.push_back({ DAG.code.Op,DAG.value,DAG.code.arg2,parm });
+					res.codes.push_back({DAG.code.Op, DAG.value, DAG.code.arg2, parm});
 				}
 				else if (DAG.code.Op == Oper::Return || DAG.code.Op == Oper::Parm)
 					if (DAG.isleaf)
-						res.codes.push_back({ DAG.code.Op,DAG.value,DAG.code.arg2,DAG.code.result });
+						res.codes.push_back({DAG.code.Op, DAG.value, DAG.code.arg2, DAG.code.result});
 					else
-						res.codes.push_back({ DAG.code.Op,DAGs[DAG.left_child].label[0],DAG.code.arg2,DAG.code.result });
+						res.codes.push_back({DAG.code.Op, DAGs[DAG.left_child].label[0], DAG.code.arg2, DAG.code.result});
 				else if (DAG.code.Op == Oper::Call)
 					res.codes.push_back(DAG.code);
-				else if (DAG.code.Op == Oper::Jeq || DAG.code.Op == Oper::Jge || DAG.code.Op == Oper::Jgt
-					|| DAG.code.Op == Oper::Jle || DAG.code.Op == Oper::Jlt || DAG.code.Op == Oper::Jne || DAG.code.Op == Oper::Plus ||
-					DAG.code.Op == Oper::Divide || DAG.code.Op == Oper::Multiply || DAG.code.Op == Oper::Minus)
+				else if (DAG.code.Op == Oper::Jeq || DAG.code.Op == Oper::Jge || DAG.code.Op == Oper::Jgt || DAG.code.Op == Oper::Jle || DAG.code.Op == Oper::Jlt || DAG.code.Op == Oper::Jne || DAG.code.Op == Oper::Plus ||
+						 DAG.code.Op == Oper::Divide || DAG.code.Op == Oper::Multiply || DAG.code.Op == Oper::Minus)
 				{
 					if (labels.size() == 1)
 					{
-						res.codes.push_back({ DAG.code.Op,DAGs[DAG.left_child].label[0],DAGs[DAG.right_child].label[0],labels[0] });
+						res.codes.push_back({DAG.code.Op, DAGs[DAG.left_child].label[0], DAGs[DAG.right_child].label[0], labels[0]});
 					}
 					else
 					{
-						res.codes.push_back({ DAG.code.Op,DAGs[DAG.left_child].label[0],DAGs[DAG.right_child].label[0],labels[0] });
-						for (int i = 1; i < labels.size(); i++)
-							res.codes.push_back({ Oper::Assign,labels[0],string(""),labels[i] });
+						res.codes.push_back({DAG.code.Op, DAGs[DAG.left_child].label[0], DAGs[DAG.right_child].label[0], labels[0]});
+						for (int i = 1; i < (int)labels.size(); i++)
+							res.codes.push_back({Oper::Assign, labels[0], string(""), labels[i]});
 					}
 				}
 				else if (DAG.code.Op == Oper::ArrayAssign)
 				{
-					res.codes.push_back({ DAG.code.Op,DAG.code.arg1,DAGs[DAG.right_child].label[0] ,DAGs[DAG.tri_child].label[0] });
+					res.codes.push_back({DAG.code.Op, DAG.code.arg1, DAGs[DAG.right_child].label[0], DAGs[DAG.tri_child].label[0]});
 				}
 				else if (DAG.code.Op == Oper::AssignArray)
 				{
-					res.codes.push_back({ DAG.code.Op,DAG.code.arg1,DAGs[DAG.right_child].label[0],labels[0] });
+					res.codes.push_back({DAG.code.Op, DAG.code.arg1, DAGs[DAG.right_child].label[0], labels[0]});
 				}
 			}
 		}
@@ -968,4 +1032,14 @@ void Optimizer::optimizer()
 	this->init_INOUTL();
 	this->init_DAGs();
 	this->optimizer_Blocks();
+}
+
+void Optimizer::clear()
+{
+	this->code.clear();
+	this->funcBlocks.clear();
+	this->DAGBlocks.clear();
+	this->funcOUTL.clear();
+	this->funcINL.clear();
+	this->label.clear();
 }

@@ -1,3 +1,4 @@
+#pragma execution_character_set("utf-8")
 #include <sstream>
 #include <string>
 #include <iostream>
@@ -18,12 +19,12 @@ syntaxTreeNode::syntaxTreeNode() : index(0), parent(-1), productions(-1), type(0
 }
 
 /*********
- * ²åÈëµ½ symbolTable ÖĞ£¬Í¬Ê±¸üĞÂ symbol2Index ±í
- * Èç¹û²»´æÔÚ¾Í²åÈë£¬´æÔÚÔòÖ±½Ó·µ»ØĞòºÅ
+ * æ’å…¥åˆ° symbolTable ä¸­ï¼ŒåŒæ—¶æ›´æ–° symbol2Index è¡¨
+ * å¦‚æœä¸å­˜åœ¨å°±æ’å…¥ï¼Œå­˜åœ¨åˆ™ç›´æ¥è¿”å›åºå·
  * ********/
 symbolTableIndex parsing::insertSymbol(symbolItem insrt)
 {
-	if (!this->symbol2Index.count(insrt)) // mapÖĞ²»´æÔÚ
+	if (!this->symbol2Index.count(insrt)) // mapä¸­ä¸å­˜åœ¨
 	{
 		symbolTable.push_back(insrt);
 		symbol2Index[insrt] = symbolTable.size() - 1;
@@ -73,14 +74,14 @@ void parsing::initTerminalSymbol()
 }
 
 /*********
- * ³õÊ¼»¯ symbolTable¡¢terminalSymbolMax¡¢startIndex
- * 		symbol2Index¡¢syntaxTable
+ * åˆå§‹åŒ– symbolTableã€terminalSymbolMaxã€startIndex
+ * 		symbol2Indexã€syntaxTable
  * ********/
-void parsing::initSymbolTable(ifstream& infile)
+void parsing::initSymbolTable(istream& infile)
 {
 	initTerminalSymbol();
 	int line = 0;
-	char templine[1024]; //´æÒ»ĞĞ
+	char templine[1024]; //å­˜ä¸€è¡Œ
 	string tmpstr;
 	while (infile.getline(templine, 1024))
 	{
@@ -90,14 +91,14 @@ void parsing::initSymbolTable(ifstream& infile)
 		if (ss >> tmpstr)
 		{
 			if (!((tmpstr[0] == '<' && tmpstr.back() == '>') || tmpstr[0] == '$'))
-				cout << "Óï·¨·ÖÎöÆ÷´íÎó:"
-				<< "Óï·¨ÊäÈëµÚ" << line << "ĞĞ£¬×ó²à²»ÊÇ·ÇÖÕ½á·û " << tmpstr << endl;
+				cout << "è¯­æ³•åˆ†æå™¨é”™è¯¯:"
+				<< "è¯­æ³•è¾“å…¥ç¬¬" << line << "è¡Œï¼Œå·¦ä¾§ä¸æ˜¯éç»ˆç»“ç¬¦ " << tmpstr << endl;
 			tmpSyntax.lhs = insertSymbol(tmpstr);
 
 			ss >> tmpstr;
 			if (tmpstr != "::=")
-				cout << "Óï·¨·ÖÎöÆ÷´íÎó:"
-				<< "Óï·¨ÊäÈëµÚ" << line << "ĞĞ£¬Î´ÕÒµ½¸³Öµ·û(::=)£¬ÏÖÎª" << tmpstr << endl;
+				cout << "è¯­æ³•åˆ†æå™¨é”™è¯¯:"
+				<< "è¯­æ³•è¾“å…¥ç¬¬" << line << "è¡Œï¼Œæœªæ‰¾åˆ°èµ‹å€¼ç¬¦(::=)ï¼Œç°ä¸º" << tmpstr << endl;
 			while (ss >> tmpstr)
 			{
 				tmpSyntax.rhs.push_back(insertSymbol(tmpstr));
@@ -106,7 +107,7 @@ void parsing::initSymbolTable(ifstream& infile)
 		}
 	}
 
-	this->syntaxTable.push_back({ this->startIndex, {this->symbol2Index["$Start"]} }); //Ìí¼ÓS' ==> S
+	this->syntaxTable.push_back({ this->startIndex, {this->symbol2Index["$Start"]} }); //æ·»åŠ S' ==> S
 	searchSyntaxByLhs = vector<set<syntaxTableIndex>>(symbolTable.size());
 	for (int i = 0; i < syntaxTable.size(); i++)
 	{
@@ -115,41 +116,41 @@ void parsing::initSymbolTable(ifstream& infile)
 }
 
 /*********
- * ³õÊ¼»¯ firstTable
+ * åˆå§‹åŒ– firstTable
  * ********/
 void parsing::initFirstTable()
 {
 	this->firstTable = vector<firstTableItem>(symbolTable.size());
-	//ÖÕ½á·û FIRST¼¯ÎªÆä×ÔÉí
+	//ç»ˆç»“ç¬¦ FIRSTé›†ä¸ºå…¶è‡ªèº«
 	for (int i = 0; i <= this->terminalSymbolMax; i++)
 	{
 		this->firstTable[i].insert(i);
 	}
-	//·ÇÖÕ½á·ûFIRST¼¯¼ÓÈë²úÉúÊ½µÄ×ó²à
+	//éç»ˆç»“ç¬¦FIRSTé›†åŠ å…¥äº§ç”Ÿå¼çš„å·¦ä¾§
 	for (int i = this->terminalSymbolMax + 1; i < this->symbolTable.size(); i++)
 	{
 		for (auto syntaxIndexTmp : this->searchSyntaxByLhs[i])
 		{
 			symbolTableIndex symbolTmp = this->syntaxTable[syntaxIndexTmp].rhs[0];
-			if (symbolTmp < this->terminalSymbolMax) //²úÉúÊ½ÓÒ²àÊ×ÏîÎªÖÕ½á·û,·Ç¿Õ
+			if (symbolTmp < this->terminalSymbolMax) //äº§ç”Ÿå¼å³ä¾§é¦–é¡¹ä¸ºç»ˆç»“ç¬¦,éç©º
 				this->firstTable[i].insert(symbolTmp);
 		}
 	}
-	//·ÇÖÕ½á·ûFIRST¼¯»¥ÍÆ
+	//éç»ˆç»“ç¬¦FIRSTé›†äº’æ¨
 	bool inc = false;
 	do
 	{
 		inc = false;
-		for (int i = this->terminalSymbolMax + 1; i < this->symbolTable.size(); i++) //¶ÔÓÚÃ¿Ò»¸ö·ÇÖÕ½á·û¼¯
+		for (int i = this->terminalSymbolMax + 1; i < this->symbolTable.size(); i++) //å¯¹äºæ¯ä¸€ä¸ªéç»ˆç»“ç¬¦é›†
 		{
 			int cntTmp = this->firstTable[i].size();
-			for (auto syntaxIndexTmp : this->searchSyntaxByLhs[i]) //¶ÔÓÚÆäÎª×óÏîµÄ²úÉúÊ½
+			for (auto syntaxIndexTmp : this->searchSyntaxByLhs[i]) //å¯¹äºå…¶ä¸ºå·¦é¡¹çš„äº§ç”Ÿå¼
 			{
 				const vector<symbolTableIndex>& rhsTmp = this->syntaxTable[syntaxIndexTmp].rhs;
-				for (int rhsIndex = 0; rhsIndex < rhsTmp.size(); rhsIndex++) //±éÀúÆäÓÒÏî
+				for (int rhsIndex = 0; rhsIndex < rhsTmp.size(); rhsIndex++) //éå†å…¶å³é¡¹
 				{
 					const firstTableItem& firstSymbolSet = this->firstTable[rhsTmp[rhsIndex]];
-					if (rhsTmp[rhsIndex] <= this->terminalSymbolMax) //ÎªÖÕ½á·û
+					if (rhsTmp[rhsIndex] <= this->terminalSymbolMax) //ä¸ºç»ˆç»“ç¬¦
 					{
 						this->firstTable[i].insert(rhsTmp[rhsIndex]);
 						break;
@@ -160,29 +161,29 @@ void parsing::initFirstTable()
 					if (!haveEmpty && firstSymbolSet.count(this->emptyIndex))
 						this->firstTable[i].erase(this->emptyIndex);
 
-					if (!firstSymbolSet.count(this->emptyIndex)) //²»º¬¿Õ
+					if (!firstSymbolSet.count(this->emptyIndex)) //ä¸å«ç©º
 						break;
-					if (rhsIndex == rhsTmp.size() - 1) //Èç¹û²úÉúÊ½ÓÒ²àÈ«Îª¿Õ£¬¼ÓÈë¿Õ
+					if (rhsIndex == rhsTmp.size() - 1) //å¦‚æœäº§ç”Ÿå¼å³ä¾§å…¨ä¸ºç©ºï¼ŒåŠ å…¥ç©º
 						this->firstTable[i].insert(this->emptyIndex);
 				}
 			}
 			if (this->firstTable[i].size() > cntTmp)
 				inc = true;
 		}
-	} while (inc); //Ö±µ½²»ÔÙÔö³¤
+	} while (inc); //ç›´åˆ°ä¸å†å¢é•¿
 }
 
 /*********
- * ¼ÆËã¾ä×ÓµÄFIRST¼¯
+ * è®¡ç®—å¥å­çš„FIRSTé›†
  * ********/
 set<symbolTableIndex> parsing::firstForPhrase(vector<symbolTableIndex> rhsTmp)
 {
 	set<symbolTableIndex> res;
 
-	for (int rhsIndex = 0; rhsIndex < rhsTmp.size(); rhsIndex++) //±éÀúÆäÓÒÏî
+	for (int rhsIndex = 0; rhsIndex < rhsTmp.size(); rhsIndex++) //éå†å…¶å³é¡¹
 	{
 		const firstTableItem& firstSymbolSet = this->firstTable[rhsTmp[rhsIndex]];
-		if (rhsTmp[rhsIndex] <= this->terminalSymbolMax) //ÎªÖÕ½á·û
+		if (rhsTmp[rhsIndex] <= this->terminalSymbolMax) //ä¸ºç»ˆç»“ç¬¦
 		{
 			res.insert(rhsTmp[rhsIndex]);
 			break;
@@ -193,9 +194,9 @@ set<symbolTableIndex> parsing::firstForPhrase(vector<symbolTableIndex> rhsTmp)
 		if (!haveEmpty && firstSymbolSet.count(this->emptyIndex))
 			res.erase(this->emptyIndex);
 
-		if (!firstSymbolSet.count(this->emptyIndex)) //²»º¬¿Õ
+		if (!firstSymbolSet.count(this->emptyIndex)) //ä¸å«ç©º
 			break;
-		if (rhsIndex == rhsTmp.size() - 1) //Èç¹û²úÉúÊ½ÓÒ²àÈ«Îª¿Õ£¬¼ÓÈë¿Õ
+		if (rhsIndex == rhsTmp.size() - 1) //å¦‚æœäº§ç”Ÿå¼å³ä¾§å…¨ä¸ºç©ºï¼ŒåŠ å…¥ç©º
 			res.insert(this->emptyIndex);
 	}
 
@@ -203,7 +204,7 @@ set<symbolTableIndex> parsing::firstForPhrase(vector<symbolTableIndex> rhsTmp)
 }
 
 /*********
- * ÖØÔØ<ÓÃÓÚ±È½ÏDFA_item
+ * é‡è½½<ç”¨äºæ¯”è¾ƒDFA_item
  * ********/
 bool operator<(const DFA_item& A, const DFA_item& B)
 {
@@ -243,7 +244,7 @@ bool operator<(const DFA_item& A, const DFA_item& B)
 }
 
 /*********
- * ÖØÔØ==ÓÃÓÚ±È½ÏDFA_item
+ * é‡è½½==ç”¨äºæ¯”è¾ƒDFA_item
  * ********/
 bool operator==(const DFA_item& A, const DFA_item& B)
 {
@@ -254,7 +255,7 @@ bool operator==(const DFA_item& A, const DFA_item& B)
 }
 
 /*********
- * ¹¹Ôìclosure
+ * æ„é€ closure
  * ********/
 pair<int, bool> parsing::createClosure(DFA_status& sta)
 {
@@ -262,7 +263,7 @@ pair<int, bool> parsing::createClosure(DFA_status& sta)
 	vector<symbolTableIndex> restsentence;
 	stack<DFA_item> sd;
 	DFA_item temptop, tempd;
-	//ÏÈ°ÑËùÓĞÈëÕ»
+	//å…ˆæŠŠæ‰€æœ‰å…¥æ ˆ
 	for (auto it = sta.begin(); it != sta.end(); it++)
 	{
 		sd.push(*it);
@@ -270,17 +271,17 @@ pair<int, bool> parsing::createClosure(DFA_status& sta)
 	while (!sd.empty())
 	{
 		temptop = sd.top();
-		sd.pop();																			  //Õ»¶¥µÄÓï¾ä³öÕ»
-		if (temptop.pos < temptop.rhs.size() && temptop.rhs[temptop.pos] > terminalSymbolMax) //µãºóÃæÊÇ·ÇÖÕ½á·û
+		sd.pop();																			  //æ ˆé¡¶çš„è¯­å¥å‡ºæ ˆ
+		if (temptop.pos < temptop.rhs.size() && temptop.rhs[temptop.pos] > terminalSymbolMax) //ç‚¹åé¢æ˜¯éç»ˆç»“ç¬¦
 		{
 			restsentence.clear();
-			for (int i = temptop.pos + 1; i < temptop.rhs.size(); i++) //ÌáÈ¡ĞèÒªÕÒfirst¼¯µÄÓï¾ä
+			for (int i = temptop.pos + 1; i < temptop.rhs.size(); i++) //æå–éœ€è¦æ‰¾firsté›†çš„è¯­å¥
 			{
 				restsentence.push_back(temptop.rhs[i]);
 			}
 			restsentence.push_back(temptop.forecast);
-			tempfirst = firstForPhrase(restsentence); //²éfirst¼¯
-			//²éÍêÁËfirst¼¯£¬¿ªÊ¼¹¹ÔìĞÂµÄ¾ä×Ó
+			tempfirst = firstForPhrase(restsentence); //æŸ¥firsté›†
+			//æŸ¥å®Œäº†firsté›†ï¼Œå¼€å§‹æ„é€ æ–°çš„å¥å­
 			for (auto it = tempfirst.begin(); it != tempfirst.end(); it++)
 			{
 				for (auto it2 = searchSyntaxByLhs[temptop.rhs[temptop.pos]].begin(); it2 != searchSyntaxByLhs[temptop.rhs[temptop.pos]].end(); it2++)
@@ -289,15 +290,15 @@ pair<int, bool> parsing::createClosure(DFA_status& sta)
 					tempd.rhs = syntaxTable[*it2].rhs;
 					tempd.pos = 0;
 					tempd.forecast = *it;
-					if (sta.insert(tempd).second == true) //³É¹¦²åÈë
+					if (sta.insert(tempd).second == true) //æˆåŠŸæ’å…¥
 					{
-						sd.push(tempd); //×÷ÎªÒ»¸öĞÂµÄÊ½×ÓÈëÕ»
+						sd.push(tempd); //ä½œä¸ºä¸€ä¸ªæ–°çš„å¼å­å…¥æ ˆ
 					}
 				}
 			}
 		}
 	}
-	//¼ì²éÊÇ·ñÊÇĞÂ×´Ì¬
+	//æ£€æŸ¥æ˜¯å¦æ˜¯æ–°çŠ¶æ€
 	for (int i = 0; i < DFA.size(); i++)
 	{
 		if (DFA[i] == sta)
@@ -308,7 +309,7 @@ pair<int, bool> parsing::createClosure(DFA_status& sta)
 }
 
 /*********
- * ³õÊ¼»¯ DFA¡¢analyseTable
+ * åˆå§‹åŒ– DFAã€analyseTable
  * ********/
 void parsing::initAnalyseTable()
 {
@@ -319,46 +320,46 @@ void parsing::initAnalyseTable()
 	pair<int, bool> gt;
 	int statusno;
 	stack<int> si;
-	//ÏÈÊÖ¶¯¹¹Ôì³õÊ¼×´Ì¬0
-	//µÚÒ»ÌõS'->.S,#
+	//å…ˆæ‰‹åŠ¨æ„é€ åˆå§‹çŠ¶æ€0
+	//ç¬¬ä¸€æ¡S'->.S,#
 	tempd.lhs = symbol2Index["$Start0"];
 	tempd.rhs.push_back(symbol2Index["$Start"]);
 	tempd.pos = 0;
 	tempd.forecast = symbol2Index["$End"];
 	temps.insert(tempd);
 
-	createClosure(temps); //´´½¨0ºÅ×´Ì¬
+	createClosure(temps); //åˆ›å»º0å·çŠ¶æ€
 
-	si.push(0); //°Ñ×´Ì¬0ÈëÕ»
+	si.push(0); //æŠŠçŠ¶æ€0å…¥æ ˆ
 
-	//ÖÁ´ËµÚ0ºÅ×´Ì¬¹¹½¨Íê³É
-	//½ÓÏÂÀ´¿ªÊ¼ÍÆµ¼Ê£Óà×´Ì¬
-	set<int> transflag; //¼ÇÂ¼ÓĞÄÄĞ©·ûºÅ¿ÉÒÔÓÃÀ´×ªÒÆ
+	//è‡³æ­¤ç¬¬0å·çŠ¶æ€æ„å»ºå®Œæˆ
+	//æ¥ä¸‹æ¥å¼€å§‹æ¨å¯¼å‰©ä½™çŠ¶æ€
+	set<int> transflag; //è®°å½•æœ‰å“ªäº›ç¬¦å·å¯ä»¥ç”¨æ¥è½¬ç§»
 	analyseTable.push_back(vector<analyseTableItem>(symbolTable.size(), pair<char, int>('\0', -1)));
-	bool empty_flag = 0; //¼ÇÂ¼ÊÇ·ñÓĞÍÆ³ö¿Õ
+	bool empty_flag = 0; //è®°å½•æ˜¯å¦æœ‰æ¨å‡ºç©º
 
 	while (!si.empty())
 	{
 		empty_flag = 0;
-		// debugdfa();//µ÷ÊÔ
+		// debugdfa();//è°ƒè¯•
 		statusno = si.top();
 		// DFA_status& DFA[statusno] = DFA[statusno];
 		si.pop();
 		transflag.clear();
-		for (auto it = DFA[statusno].begin(); it != DFA[statusno].end(); it++) //ÕÒµ½Õâ¸ö¼¯ºÏÖĞËùÓĞ¿ÉÒÔ×ªÒÆµÄ×Ö·û
+		for (auto it = DFA[statusno].begin(); it != DFA[statusno].end(); it++) //æ‰¾åˆ°è¿™ä¸ªé›†åˆä¸­æ‰€æœ‰å¯ä»¥è½¬ç§»çš„å­—ç¬¦
 		{
 			if ((*it).pos < (*it).rhs.size())
 			{
 				transflag.insert((*it).rhs[(*it).pos]);
 			}
 		}
-		for (auto it = transflag.begin(); it != transflag.end(); it++) //¶ÔÓÚÃ¿¸ö¿ÉÒı·¢×ªÒÆµÄ×Ö·û£¬ÕÒÒÆ½ø×´Ì¬
+		for (auto it = transflag.begin(); it != transflag.end(); it++) //å¯¹äºæ¯ä¸ªå¯å¼•å‘è½¬ç§»çš„å­—ç¬¦ï¼Œæ‰¾ç§»è¿›çŠ¶æ€
 		{
-			if (*it == emptyIndex) //ÌØÊâ´¦ÀíÉú³ÉemptyµÄÄÚÈİ£¬¼ÓÈëÔ­±¾×´Ì¬²»Ğ´×ªÒÆ±í
+			if (*it == emptyIndex) //ç‰¹æ®Šå¤„ç†ç”Ÿæˆemptyçš„å†…å®¹ï¼ŒåŠ å…¥åŸæœ¬çŠ¶æ€ä¸å†™è½¬ç§»è¡¨
 			{
-				// empty_flag = 1;//±ê¼ÇÍÆ³ö¿Õ£¬×îºóÔÚ´¦Àí²»È»»áËÀÑ­»·
+				// empty_flag = 1;//æ ‡è®°æ¨å‡ºç©ºï¼Œæœ€ååœ¨å¤„ç†ä¸ç„¶ä¼šæ­»å¾ªç¯
 				/*
-				for (auto it2 = DFA[statusno].begin(); it2 != DFA[statusno].end(); it2++) //¶ÔÓÚÃ¿Ò»ÌõÓï¾ä
+				for (auto it2 = DFA[statusno].begin(); it2 != DFA[statusno].end(); it2++) //å¯¹äºæ¯ä¸€æ¡è¯­å¥
 				{
 					if ((*it2).pos < (*it2).rhs.size() && (*it2).rhs[(*it2).pos] == *it)
 					{
@@ -372,10 +373,10 @@ void parsing::initAnalyseTable()
 				*/
 				;
 			}
-			else //Õı³£×ªÒÆĞ´×ªÒÆ±í
+			else //æ­£å¸¸è½¬ç§»å†™è½¬ç§»è¡¨
 			{
 				temps.clear();
-				for (auto it2 = DFA[statusno].begin(); it2 != DFA[statusno].end(); it2++) //¶ÔÓÚÃ¿Ò»ÌõÓï¾ä
+				for (auto it2 = DFA[statusno].begin(); it2 != DFA[statusno].end(); it2++) //å¯¹äºæ¯ä¸€æ¡è¯­å¥
 				{
 					if ((*it2).pos < (*it2).rhs.size() && (*it2).rhs[(*it2).pos] == *it)
 					{
@@ -388,19 +389,19 @@ void parsing::initAnalyseTable()
 				}
 				gt = createClosure(temps);
 				analyseTable[statusno][*it] = pair<char, int>('s', gt.first);
-				if (gt.second == true) //ÊÇĞÂµÄ×´Ì¬
+				if (gt.second == true) //æ˜¯æ–°çš„çŠ¶æ€
 				{
 					si.push(gt.first);
 					analyseTable.push_back(vector<analyseTableItem>(symbolTable.size(), pair<char, int>('\0', -1)));
 				}
 			}
 		}
-		for (auto it = DFA[statusno].begin(); it != DFA[statusno].end(); it++) //ÕÒ¹æÔ¼×´Ì¬
+		for (auto it = DFA[statusno].begin(); it != DFA[statusno].end(); it++) //æ‰¾è§„çº¦çŠ¶æ€
 		{
 			if ((*it).pos >= (*it).rhs.size() || (*it).rhs[0] == emptyIndex)
 			{
 				int synno;
-				//ÕÒµ½ÊÇÄÄÒ»¸ö¹æÔ¼ÎÄ·¨
+				//æ‰¾åˆ°æ˜¯å“ªä¸€ä¸ªè§„çº¦æ–‡æ³•
 				for (auto it2 = searchSyntaxByLhs[(*it).lhs].begin(); it2 != searchSyntaxByLhs[(*it).lhs].end(); it2++)
 				{
 					if (syntaxTable[*it2].rhs == (*it).rhs)
@@ -409,9 +410,11 @@ void parsing::initAnalyseTable()
 						break;
 					}
 				}
-				//Ìî¹æÔ¼±í
+				//å¡«è§„çº¦è¡¨
 				if (analyseTable[statusno][(*it).forecast].first != '\0')
-					cout << "wrong" << endl;
+                {
+                    // cout << "wrong" << endl;
+                }
 				if ((*it).lhs == symbol2Index["$Start0"] && (*it).rhs[0] == symbol2Index["$Start"] && (*it).forecast == symbol2Index["$End"])
 					analyseTable[statusno][(*it).forecast] = pair<char, int>('a', -1);
 				else
@@ -419,31 +422,6 @@ void parsing::initAnalyseTable()
 			}
 		}
 	}
-}
-
-void parsing::debugdfa() //ÓÃÀ´µ÷ÊÔdfa
-{
-	ofstream of;
-	of.open("dfadebug.txt");
-	for (int i = 0; i < DFA.size(); i++)
-	{
-		of << "×´Ì¬" << i << endl;
-		for (auto it = DFA[i].begin(); it != DFA[i].end(); it++)
-		{
-			of << symbolTable[(*it).lhs] << " ::= ";
-			for (int j = 0; j < (*it).rhs.size(); j++)
-			{
-				if (j == (*it).pos)
-					of << " dot ";
-				of << symbolTable[(*it).rhs[j]] << ' ';
-			}
-			if ((*it).pos == (*it).rhs.size())
-				of << " dot ";
-			of << "," << symbolTable[(*it).forecast];
-			of << endl;
-		}
-	}
-	of.close();
 }
 
 void parsing::clear()
@@ -459,19 +437,20 @@ void parsing::clear()
 	statusStack = stack<DFA_statusIndex>();
 	analyseSymbolStack = stack<syntaxTreeNodeIndex>();
 	inputSymbolvector = stack<syntaxTreeNodeIndex>();
+	mid_code.clear();
+	p_symbolTable = NULL;
 }
 
-void parsing::initSyntax(ifstream& fin)
+void parsing::initSyntax(istream& fin)
 {
 	this->initSymbolTable(fin);
 	this->initFirstTable();
 	this->initAnalyseTable();
-	this->debugdfa();
 }
 
 void parsing::analyze(const vector<pair<Token, string>>& lexs)
 {
-	//³õÊ¼»¯ÊäÈë·ûºÅÕ»
+	//åˆå§‹åŒ–è¾“å…¥ç¬¦å·æ ˆ
 	this->syntaxTree.push_back(pair<Token, string>{Token::End, ""});
 	this->syntaxTree.back().index = syntaxTree.size() - 1;
 	this->inputSymbolvector.push(syntaxTree.size() - 1);
@@ -482,9 +461,9 @@ void parsing::analyze(const vector<pair<Token, string>>& lexs)
 		this->syntaxTree.back().index = index;
 		this->inputSymbolvector.push(index);
 	}
-	//³õÊ¼»¯·ÖÎö×´Ì¬Õ»
+	//åˆå§‹åŒ–åˆ†æçŠ¶æ€æ ˆ
 	this->statusStack.push(0);
-	//³õÊ¼»¯·ÖÎö·ûºÅÕ»
+	//åˆå§‹åŒ–åˆ†æç¬¦å·æ ˆ
 	this->syntaxTree.push_back(pair<Token, string>{Token::End, ""});
 	this->syntaxTree.back().index = syntaxTree.size() - 1;
 	this->analyseSymbolStack.push(syntaxTree.size() - 1);
@@ -495,16 +474,16 @@ void parsing::analyze(const vector<pair<Token, string>>& lexs)
 		if (this->syntaxTree[this->analyseSymbolStack.top()].type == this->symbol2Index["$Start"] && this->syntaxTree[this->inputSymbolvector.top()].type == this->symbol2Index["$End"])
 			break;
 		analyseTableItem nextAction = this->analyseTable[this->statusStack.top()][this->syntaxTree[this->inputSymbolvector.top()].type];
-		if (nextAction.first == 'a') //³É¹¦
+		if (nextAction.first == 'a') //æˆåŠŸ
 			break;
-		else if (nextAction.first == 's') //ÒÆ½ø
+		else if (nextAction.first == 's') //ç§»è¿›
 		{
 			this->statusStack.push(nextAction.second);
 			syntaxTreeNodeIndex tmp = this->inputSymbolvector.top();
 			this->inputSymbolvector.pop();
 			this->analyseSymbolStack.push(tmp);
 		}
-		else if (nextAction.first == 'r') //¹éÔ¼
+		else if (nextAction.first == 'r') //å½’çº¦
 		{
 			const syntaxTableItem& useSyntax = this->syntaxTable[nextAction.second];
 			vector<syntaxTreeNodeIndex> rhsTmp;
@@ -537,13 +516,13 @@ void parsing::analyze(const vector<pair<Token, string>>& lexs)
 			}
 			else
 			{
-				cout << "Óï·¨·ÖÎö³ö´í" << endl;
+                // cout << "è¯­æ³•åˆ†æå‡ºé”™" << endl;
 				break;
 			}
 		}
-		else //´íÎó
+		else //é”™è¯¯
 		{
-			cout << "Óï·¨·ÖÎö³ö´í" << endl;
+            // cout << "è¯­æ³•åˆ†æå‡ºé”™" << endl;
 			break;
 		}
 	}
@@ -554,12 +533,12 @@ void parsing::generate_midcode(syntaxTableIndex SyntaxIndex, syntaxTreeNode& lhs
 	proc_symbolTable* functmp;
 	switch (SyntaxIndex)
 	{
-		case 0: //$Start ::= <N> <ÉùÃ÷´®>
+		case 0: //$Start ::= <N> <å£°æ˜ä¸²>
 			mid_code.back_patch(syntaxTree[rhs[0]].nextlist, this->p_symbolTable->find_function("main")->get_enterquad());
 			break;
 		case 1: //<A> ::= $Empty
 			lhs.quad = mid_code.nextquad;
-			p_symbolTable = p_symbolTable->create_function(); //½øÈëº¯Êı
+			p_symbolTable = p_symbolTable->create_function(); //è¿›å…¥å‡½æ•°
 			break;
 		case 2: //<N> ::= $Empty
 			lhs.nextlist.push_back(mid_code.nextquad);
@@ -568,104 +547,106 @@ void parsing::generate_midcode(syntaxTableIndex SyntaxIndex, syntaxTreeNode& lhs
 		case 3: //<M> ::= $Empty
 			lhs.quad = mid_code.nextquad;
 			break;
-		case 4: //<ÉùÃ÷´®> ::= <ÉùÃ÷>
+		case 4: //<å£°æ˜ä¸²> ::= <å£°æ˜>
 			break;
-		case 5: //<ÉùÃ÷´®> ::= <ÉùÃ÷´®> <ÉùÃ÷>
+		case 5: //<å£°æ˜ä¸²> ::= <å£°æ˜ä¸²> <å£°æ˜>
 			break;
-		case 6: //<ÉùÃ÷> ::= $Int $ID <ÉùÃ÷ÀàĞÍ>
+		case 6: //<å£°æ˜> ::= $Int $ID <å£°æ˜ç±»å‹>
 			p_symbolTable->insert_variable({ symbolType::Int, syntaxTree[rhs[1]].val, proc_symbolTable::newtemp(), p_symbolTable->get_offset() });
 			break;
-		case 7: //<ÉùÃ÷> ::= $Void $ID <M> <A> <º¯ÊıÉùÃ÷>
+		case 7: //<å£°æ˜> ::= $Void $ID <M> <A> <å‡½æ•°å£°æ˜>
 			beforeSymbolTable->init_function(syntaxTree[rhs[4]].plist, syntaxTree[rhs[1]].val, symbolType::Void, syntaxTree[rhs[2]].quad);
 			break;
-		case 8: //<ÉùÃ÷> ::= $Int $ID <M> <A> <º¯ÊıÉùÃ÷>
+		case 8: //<å£°æ˜> ::= $Int $ID <M> <A> <å‡½æ•°å£°æ˜>
 			beforeSymbolTable->init_function(syntaxTree[rhs[4]].plist, syntaxTree[rhs[1]].val, symbolType::Int, syntaxTree[rhs[2]].quad);
 			break;
-		case 9: //<ÉùÃ÷ÀàĞÍ> ::=  $Semi
+		case 9: //<å£°æ˜ç±»å‹> ::=  $Semi
 			break;
-		case 10: //<º¯ÊıÉùÃ÷> ::= $LeftBracket <ĞÎ²Î> $RightBracket <Óï¾ä¿é>
+		case 10: //<å‡½æ•°å£°æ˜> ::= $LeftBracket <å½¢å‚> $RightBracket <è¯­å¥å—>
 			lhs.plist = syntaxTree[rhs[1]].plist;
 			break;
-		case 11: //<ĞÎ²Î> ::= <²ÎÊıÁĞ±í>
+		case 11: //<å½¢å‚> ::= <å‚æ•°åˆ—è¡¨>
 			lhs.plist = syntaxTree[rhs[0]].plist;
 			break;
-		case 12: //<ĞÎ²Î> ::= $Void
+		case 12: //<å½¢å‚> ::= $Void
 			lhs.plist = vector<symbolTableItem>();
 			break;
-		case 13: //<²ÎÊıÁĞ±í> ::= <²ÎÊı>
+		case 13: //<å‚æ•°åˆ—è¡¨> ::= <å‚æ•°>
 			lhs.plist.push_back(syntaxTree[rhs[0]].plist[0]);
 			break;
-		case 14: //<²ÎÊıÁĞ±í> ::= <²ÎÊı> $Comma <²ÎÊıÁĞ±í>
+		case 14: //<å‚æ•°åˆ—è¡¨> ::= <å‚æ•°> $Comma <å‚æ•°åˆ—è¡¨>
 			lhs.plist.push_back(syntaxTree[rhs[0]].plist[0]);
 			lhs.plist.insert(lhs.plist.end(), syntaxTree[rhs[2]].plist.begin(), syntaxTree[rhs[2]].plist.end());
 			break;
-		case 15: //<²ÎÊı> ::= $Int $ID
+		case 15: //<å‚æ•°> ::= $Int $ID
 		{
 			string parm_name = proc_symbolTable::newtemp();
 			lhs.plist.push_back({ symbolType::Int, syntaxTree[rhs[1]].val, parm_name, p_symbolTable->get_offset() });
 			p_symbolTable->insert_variable({ lhs.plist[0].type, lhs.plist[0].name, parm_name, p_symbolTable->get_offset() });
 			break;
 		}
-		case 16: //<Óï¾ä¿é> ::= $LeftBrace <ÄÚ²¿ÉùÃ÷> <Óï¾ä´®> $RightBrace
+		case 16: //<è¯­å¥å—> ::= $LeftBrace <å†…éƒ¨å£°æ˜> <è¯­å¥ä¸²> $RightBrace
 			lhs.nextlist = syntaxTree[rhs[2]].nextlist;
 			beforeSymbolTable = p_symbolTable;
 			p_symbolTable = p_symbolTable->return_block(mid_code.nextquad);
 			break;
-		case 17: //<ÄÚ²¿ÉùÃ÷> ::= $Empty
+		case 17: //<å†…éƒ¨å£°æ˜> ::= $Empty
 			break;
-		case 18: //<ÄÚ²¿ÉùÃ÷> ::= <ÄÚ²¿±äÁ¿ÉùÃ÷> <ÄÚ²¿ÉùÃ÷>
+		case 18: //<å†…éƒ¨å£°æ˜> ::= <å†…éƒ¨å˜é‡å£°æ˜> <å†…éƒ¨å£°æ˜>
 			break;
-		case 19: //<ÄÚ²¿±äÁ¿ÉùÃ÷> ::= $Int $ID $Semi
+		case 19: //<å†…éƒ¨å˜é‡å£°æ˜> ::= $Int $ID $Semi
 			p_symbolTable->insert_variable({ symbolType::Int, syntaxTree[rhs[1]].val, proc_symbolTable::newtemp(), p_symbolTable->get_offset() });
 			break;
-		case 20: //<Óï¾ä´®> ::= <Óï¾ä>
+		case 20: //<è¯­å¥ä¸²> ::= <è¯­å¥>
 			lhs.nextlist = syntaxTree[rhs[0]].nextlist;
 			break;
-		case 21: //<Óï¾ä´®> ::= <Óï¾ä> <M> <Óï¾ä´®>
+		case 21: //<è¯­å¥ä¸²> ::= <è¯­å¥> <M> <è¯­å¥ä¸²>
 			lhs.nextlist = syntaxTree[rhs[2]].nextlist;
 			mid_code.back_patch(syntaxTree[rhs[0]].nextlist, syntaxTree[rhs[1]].quad);
 			break;
-		case 22: //<Óï¾ä> ::= <ifÓï¾ä>
+		case 22: //<è¯­å¥> ::= <ifè¯­å¥>
 			lhs.nextlist = syntaxTree[rhs[0]].nextlist;
 			break;
-		case 23: //<Óï¾ä> :: = <whileÓï¾ä>
+		case 23: //<è¯­å¥> :: = <whileè¯­å¥>
 			lhs.nextlist = syntaxTree[rhs[0]].nextlist;
 			break;
-		case 24: //<Óï¾ä> ::= <returnÓï¾ä>
+		case 24: //<è¯­å¥> ::= <returnè¯­å¥>
 			break;
-		case 25: //<Óï¾ä> ::= <assignÓï¾ä>
+		case 25: //<è¯­å¥> ::= <assignè¯­å¥>
 			break;
-		case 26: //<assignÓï¾ä> ::= $ID $Equal <±í´ïÊ½> $Semi
+		case 26: //<assignè¯­å¥> ::= $ID $Equal <è¡¨è¾¾å¼> $Semi
 			if (p_symbolTable->find_variable(syntaxTree[rhs[0]].val).type == symbolType::None)
-				cout << syntaxTree[rhs[0]].val << "²»ÔÚ·ûºÅ±íÖĞ" << endl;
+            {
+                //cout << syntaxTree[rhs[0]].val << "ä¸åœ¨ç¬¦å·è¡¨ä¸­" << endl;
+            }
 			else
 				mid_code.emit_code(quadruple(Oper::Assign, syntaxTree[rhs[2]].place, string(""), p_symbolTable->find_variable(syntaxTree[rhs[0]].val).gobalname));
 			break;
-		case 27: //<returnÓï¾ä> ::= $Return $Semi
+		case 27: //<returnè¯­å¥> ::= $Return $Semi
 			mid_code.emit_code(quadruple(Oper::Return, string(""), string(""), string("")));
 			break;
-		case 28: //<returnÓï¾ä> ::= $Return <±í´ïÊ½> $Semi
+		case 28: //<returnè¯­å¥> ::= $Return <è¡¨è¾¾å¼> $Semi
 			mid_code.emit_code(quadruple(Oper::Return, syntaxTree[rhs[1]].place, string(""), string("ReturnValue")));
 			break;
-		case 29: //<whileÓï¾ä> ::= $While <M> $LeftBracket <±í´ïÊ½> $RightBracket <A> <Óï¾ä¿é>
+		case 29: //<whileè¯­å¥> ::= $While <M> $LeftBracket <è¡¨è¾¾å¼> $RightBracket <A> <è¯­å¥å—>
 			mid_code.back_patch(syntaxTree[rhs[6]].nextlist, syntaxTree[rhs[1]].quad);
 			mid_code.back_patch(syntaxTree[rhs[3]].truelist, syntaxTree[rhs[5]].quad);
 			lhs.nextlist = syntaxTree[rhs[3]].falselist;
 			mid_code.emit_code(quadruple(Oper::J, string(""), string(""), to_string(syntaxTree[rhs[1]].quad)));
 			break;
-		case 30: //<ifÓï¾ä> ::= $If $LeftBracket <±í´ïÊ½> $RightBracket <A> <Óï¾ä¿é>
+		case 30: //<ifè¯­å¥> ::= $If $LeftBracket <è¡¨è¾¾å¼> $RightBracket <A> <è¯­å¥å—>
 			mid_code.back_patch(syntaxTree[rhs[2]].truelist, syntaxTree[rhs[4]].quad);
 			lhs.nextlist = mergelist(syntaxTree[rhs[2]].falselist, syntaxTree[rhs[4]].nextlist);
 			break;
-		case 31: //<ifÓï¾ä> ::= $If $LeftBracket <±í´ïÊ½> $RightBracket <A> <Óï¾ä¿é> <N> $Else <M> <A> <Óï¾ä¿é>
+		case 31: //<ifè¯­å¥> ::= $If $LeftBracket <è¡¨è¾¾å¼> $RightBracket <A> <è¯­å¥å—> <N> $Else <M> <A> <è¯­å¥å—>
 			mid_code.back_patch(syntaxTree[rhs[2]].truelist, syntaxTree[rhs[4]].quad);
 			mid_code.back_patch(syntaxTree[rhs[2]].falselist, syntaxTree[rhs[8]].quad);
 			lhs.nextlist = mergelist(syntaxTree[rhs[5]].nextlist, syntaxTree[rhs[6]].nextlist, syntaxTree[rhs[10]].nextlist);
 			break;
-		case 32: //<±í´ïÊ½> ::= <¼Ó·¨±í´ïÊ½>
+		case 32: //<è¡¨è¾¾å¼> ::= <åŠ æ³•è¡¨è¾¾å¼>
 			lhs.place = syntaxTree[rhs[0]].place;
 			break;
-		case 33: //<±í´ïÊ½> ::= <±í´ïÊ½> <±È½ÏÔËËã·û> <¼Ó·¨±í´ïÊ½>
+		case 33: //<è¡¨è¾¾å¼> ::= <è¡¨è¾¾å¼> <æ¯”è¾ƒè¿ç®—ç¬¦> <åŠ æ³•è¡¨è¾¾å¼>
 			lhs.truelist.push_back(mid_code.nextquad);
 			lhs.falselist.push_back(mid_code.nextquad + 1);
 			if (syntaxTree[rhs[1]].place == "$Smaller")
@@ -681,62 +662,64 @@ void parsing::generate_midcode(syntaxTableIndex SyntaxIndex, syntaxTreeNode& lhs
 			else if (syntaxTree[rhs[1]].place == "$NotEqual")
 				mid_code.emit_code(quadruple(Oper::Jne, syntaxTree[rhs[0]].place, syntaxTree[rhs[2]].place, string("0")));
 			else
-				cout << "wrong comparation" << endl;
+            {
+                //cout << "wrong comparation" << endl;
+            }
 
 			mid_code.emit_code(quadruple(Oper::J, string(""), string(""), string("0")));
 			break;
-		case 34: //<±È½ÏÔËËã·û> ::= $Smaller
+		case 34: //<æ¯”è¾ƒè¿ç®—ç¬¦> ::= $Smaller
 			lhs.place = "$Smaller";
 			break;
-		case 35: //<±È½ÏÔËËã·û> ::= $SmallerEqual
+		case 35: //<æ¯”è¾ƒè¿ç®—ç¬¦> ::= $SmallerEqual
 			lhs.place = "$SmallerEqual";
 			break;
-		case 36: //<±È½ÏÔËËã·û> ::= $Bigger
+		case 36: //<æ¯”è¾ƒè¿ç®—ç¬¦> ::= $Bigger
 			lhs.place = "$Bigger";
 			break;
-		case 37: //<±È½ÏÔËËã·û> ::= $BiggerEqual
+		case 37: //<æ¯”è¾ƒè¿ç®—ç¬¦> ::= $BiggerEqual
 			lhs.place = "$BiggerEqual";
 			break;
-		case 38: //<±È½ÏÔËËã·û> ::= $Equal2
+		case 38: //<æ¯”è¾ƒè¿ç®—ç¬¦> ::= $Equal2
 			lhs.place = "$Equal2";
 			break;
-		case 39: //<±È½ÏÔËËã·û> ::= $NotEqual
+		case 39: //<æ¯”è¾ƒè¿ç®—ç¬¦> ::= $NotEqual
 			lhs.place = "$NotEqual";
 			break;
-		case 40: //<¼Ó·¨±í´ïÊ½> ::= <Ïî>
+		case 40: //<åŠ æ³•è¡¨è¾¾å¼> ::= <é¡¹>
 			lhs.place = syntaxTree[rhs[0]].place;
 			break;
-		case 41: //<¼Ó·¨±í´ïÊ½> ::= <Ïî> $Plus <¼Ó·¨±í´ïÊ½>
+		case 41: //<åŠ æ³•è¡¨è¾¾å¼> ::= <é¡¹> $Plus <åŠ æ³•è¡¨è¾¾å¼>
 			lhs.place = proc_symbolTable::newtemp();
 			mid_code.emit_code(quadruple(Oper::Plus, syntaxTree[rhs[0]].place, syntaxTree[rhs[2]].place, lhs.place));
 			break;
-		case 42: //<¼Ó·¨±í´ïÊ½> ::= <Ïî> $Minus <¼Ó·¨±í´ïÊ½>
+		case 42: //<åŠ æ³•è¡¨è¾¾å¼> ::= <é¡¹> $Minus <åŠ æ³•è¡¨è¾¾å¼>
 			lhs.place = proc_symbolTable::newtemp();
 			mid_code.emit_code(quadruple(Oper::Minus, syntaxTree[rhs[0]].place, syntaxTree[rhs[2]].place, lhs.place));
 			break;
-		case 43: //<Ïî> ::= <Òò×Ó>
+		case 43: //<é¡¹> ::= <å› å­>
 			lhs.place = syntaxTree[rhs[0]].place;
 			break;
-		case 44: //<Ïî> ::= <Òò×Ó> $Multiply <Ïî>
+		case 44: //<é¡¹> ::= <å› å­> $Multiply <é¡¹>
 			lhs.place = proc_symbolTable::newtemp();
 			mid_code.emit_code(quadruple(Oper::Multiply, syntaxTree[rhs[0]].place, syntaxTree[rhs[2]].place, lhs.place));
 			break;
-		case 45: //<Ïî> ::= <Òò×Ó> $Divide <Ïî>
+		case 45: //<é¡¹> ::= <å› å­> $Divide <é¡¹>
 			lhs.place = proc_symbolTable::newtemp();
 			mid_code.emit_code(quadruple(Oper::Divide, syntaxTree[rhs[0]].place, syntaxTree[rhs[2]].place, lhs.place));
 			break;
-		case 46: //<Òò×Ó> ::= $Number
+		case 46: //<å› å­> ::= $Number
 			lhs.place = syntaxTree[rhs[0]].val;
 			break;
-		case 47: //<Òò×Ó> ::= $LeftBracket <±í´ïÊ½> $RightBracket
+		case 47: //<å› å­> ::= $LeftBracket <è¡¨è¾¾å¼> $RightBracket
 			lhs.place = syntaxTree[rhs[1]].place;
 			break;
-		case 48: //<Òò×Ó> ::= $ID $LeftBracket <Êµ²ÎÁĞ±í> $RightBracket
+		case 48: //<å› å­> ::= $ID $LeftBracket <å®å‚åˆ—è¡¨> $RightBracket
 			functmp = p_symbolTable->find_function(syntaxTree[rhs[0]].val);
 			if (functmp == NULL)
-				cout << syntaxTree[rhs[0]].val << "²»ÔÚº¯Êı±íÖĞ" << endl;
+				cout << syntaxTree[rhs[0]].val << "ä¸åœ¨å‡½æ•°è¡¨ä¸­" << endl;
 			else if (functmp->parm.size() != syntaxTree[rhs[2]].plist.size())
-				cout << syntaxTree[rhs[0]].val << "º¯ÊıÊµ²ÎÁĞ±í²»·û" << endl;
+				cout << syntaxTree[rhs[0]].val << "å‡½æ•°å®å‚åˆ—è¡¨ä¸ç¬¦" << endl;
 			else
 			{
 				for (const auto& i : syntaxTree[rhs[2]].plist)
@@ -754,28 +737,28 @@ void parsing::generate_midcode(syntaxTableIndex SyntaxIndex, syntaxTreeNode& lhs
 				}
 			}
 			break;
-		case 49: //<Òò×Ó> ::= $ID
+		case 49: //<å› å­> ::= $ID
 			if (p_symbolTable->find_variable(syntaxTree[rhs[0]].val).type == symbolType::None)
-				cout << syntaxTree[rhs[0]].val << "²»ÔÚ·ûºÅ±íÖĞ" << endl;
+				cout << syntaxTree[rhs[0]].val << "ä¸åœ¨ç¬¦å·è¡¨ä¸­" << endl;
 			else
 				lhs.place = p_symbolTable->find_variable(syntaxTree[rhs[0]].val).gobalname;
 			break;
-		case 50: //<Êµ²ÎÁĞ±í> ::= $Empty
+		case 50: //<å®å‚åˆ—è¡¨> ::= $Empty
 			break;
-		case 51: //<Êµ²ÎÁĞ±í> ::= <±í´ïÊ½>
+		case 51: //<å®å‚åˆ—è¡¨> ::= <è¡¨è¾¾å¼>
 
 			lhs.plist.push_back({ symbolType::Unknown, syntaxTree[rhs[0]].place, syntaxTree[rhs[0]].place, 0 });
 			break;
-		case 52: //<Êµ²ÎÁĞ±í> ::= <±í´ïÊ½> $Comma <Êµ²ÎÁĞ±í>
+		case 52: //<å®å‚åˆ—è¡¨> ::= <è¡¨è¾¾å¼> $Comma <å®å‚åˆ—è¡¨>
 			lhs.plist.push_back({ symbolType::Unknown, syntaxTree[rhs[0]].place, syntaxTree[rhs[0]].place, 0 });
 			lhs.plist.insert(lhs.plist.end(), syntaxTree[rhs[2]].plist.begin(), syntaxTree[rhs[2]].plist.end());
 			break;
-		case 53: //<Òò×Ó> ::= <Êı×é>
+		case 53: //<å› å­> ::= <æ•°ç»„>
 		{
 			symbolTableItem variable = p_symbolTable->find_variable(syntaxTree[rhs[0]].place);
 			if (variable.array.size() != syntaxTree[rhs[0]].array_vec.size())
 			{
-				cout << syntaxTree[rhs[0]].place << "Êı×éÎ¬¶È²»¶ÔÓ¦" << variable.array.size() << syntaxTree[rhs[0]].array_vec.size() << endl;
+				cout << syntaxTree[rhs[0]].place << "æ•°ç»„ç»´åº¦ä¸å¯¹åº”" << variable.array.size() << syntaxTree[rhs[0]].array_vec.size() << endl;
 				break;
 			}
 			string this_place, before_place;
@@ -798,14 +781,14 @@ void parsing::generate_midcode(syntaxTableIndex SyntaxIndex, syntaxTreeNode& lhs
 			mid_code.emit_code(quadruple(Oper::AssignArray, variable.gobalname, this_place, lhs.place));
 			break;
 		}
-		case 54: //<Êı×é> ::= $ID $LeftArray <±í´ïÊ½> $RightArray
+		case 54: //<æ•°ç»„> ::= $ID $LeftArray <è¡¨è¾¾å¼> $RightArray
 			if (p_symbolTable->find_variable(syntaxTree[rhs[0]].val).type == symbolType::None)
-				cout << syntaxTree[rhs[0]].val << "²»ÔÚ·ûºÅ±íÖĞ" << endl;
+				cout << syntaxTree[rhs[0]].val << "ä¸åœ¨ç¬¦å·è¡¨ä¸­" << endl;
 			else
 			{
 				symbolTableItem variable = p_symbolTable->find_variable(syntaxTree[rhs[0]].val);
 				if (variable.type != symbolType::Array)
-					cout << syntaxTree[rhs[0]].val << "²»ÊÇÊı×é" << endl;
+					cout << syntaxTree[rhs[0]].val << "ä¸æ˜¯æ•°ç»„" << endl;
 				else
 				{
 					lhs.place = syntaxTree[rhs[0]].val;
@@ -813,17 +796,17 @@ void parsing::generate_midcode(syntaxTableIndex SyntaxIndex, syntaxTreeNode& lhs
 				}
 			}
 			break;
-		case 55: //<Êı×é> ::= <Êı×é> $LeftArray <±í´ïÊ½> $RightArray
+		case 55: //<æ•°ç»„> ::= <æ•°ç»„> $LeftArray <è¡¨è¾¾å¼> $RightArray
 			lhs.place = syntaxTree[rhs[0]].place;
 			lhs.array_vec = syntaxTree[rhs[0]].array_vec;
 			lhs.array_vec.push_back(syntaxTree[rhs[2]].place);
 			break;
-		case 56: //<assignÓï¾ä> ::= <Êı×é> $Equal <±í´ïÊ½> $Semi
+		case 56: //<assignè¯­å¥> ::= <æ•°ç»„> $Equal <è¡¨è¾¾å¼> $Semi
 		{
 			symbolTableItem variable = p_symbolTable->find_variable(syntaxTree[rhs[0]].place);
 			if (variable.array.size() != syntaxTree[rhs[0]].array_vec.size())
 			{
-				cout << syntaxTree[rhs[0]].place << "Êı×éÎ¬¶È²»¶ÔÓ¦" << endl;
+				cout << syntaxTree[rhs[0]].place << "æ•°ç»„ç»´åº¦ä¸å¯¹åº”" << endl;
 				break;
 			}
 			string this_place, before_place;
@@ -847,7 +830,7 @@ void parsing::generate_midcode(syntaxTableIndex SyntaxIndex, syntaxTreeNode& lhs
 			break;
 		}
 		break;
-		case 57: //<ÉùÃ÷> ::= $Int $ID <Êı×éÉùÃ÷> $Semi
+		case 57: //<å£°æ˜> ::= $Int $ID <æ•°ç»„å£°æ˜> $Semi
 		{
 			vector<int> vec;
 			for (const auto& i : syntaxTree[rhs[2]].array_vec)
@@ -855,14 +838,14 @@ void parsing::generate_midcode(syntaxTableIndex SyntaxIndex, syntaxTreeNode& lhs
 			p_symbolTable->insert_variable({ symbolType::Array, syntaxTree[rhs[1]].val, proc_symbolTable::newtemp(), p_symbolTable->get_offset(), vec });
 			break;
 		}
-		case 58: //<Êı×éÉùÃ÷> ::= $LeftArray $Number $RightArray
+		case 58: //<æ•°ç»„å£°æ˜> ::= $LeftArray $Number $RightArray
 			lhs.array_vec.push_back(syntaxTree[rhs[1]].val);
 			break;
-		case 59: //<Êı×éÉùÃ÷> ::= <Êı×éÉùÃ÷> $LeftArray $Number $RightArray
+		case 59: //<æ•°ç»„å£°æ˜> ::= <æ•°ç»„å£°æ˜> $LeftArray $Number $RightArray
 			lhs.array_vec = syntaxTree[rhs[0]].array_vec;
 			lhs.array_vec.push_back(syntaxTree[rhs[2]].val);
 			break;
-		case 60: //<ÄÚ²¿±äÁ¿ÉùÃ÷> ::= $Int $ID <Êı×éÉùÃ÷> $Semi
+		case 60: //<å†…éƒ¨å˜é‡å£°æ˜> ::= $Int $ID <æ•°ç»„å£°æ˜> $Semi
 		{
 			vector<int> vec;
 			for (const auto& i : syntaxTree[rhs[2]].array_vec)
@@ -876,7 +859,7 @@ void parsing::generate_midcode(syntaxTableIndex SyntaxIndex, syntaxTreeNode& lhs
 	return;
 }
 
-void parsing::outputStruction(ofstream& struction, syntaxTreeNodeIndex Node, int pad)
+void parsing::outputStruction(ostream& struction, syntaxTreeNodeIndex Node, int pad)
 {
 	this->syntaxTree[Node].inTree = true;
 	struction << string(pad, '	') << "{" << endl;
@@ -919,7 +902,7 @@ void parsing::outputStruction(ofstream& struction, syntaxTreeNodeIndex Node, int
 	struction << string(pad, '	') << "}";
 }
 
-void parsing::outputDot(ofstream& graph, syntaxTreeNodeIndex Node)
+void parsing::outputDot(ostream& graph, syntaxTreeNodeIndex Node)
 {
 	if (!this->syntaxTree[Node].children.empty())
 	{
@@ -958,7 +941,7 @@ void parsing::outputDot(ofstream& graph, syntaxTreeNodeIndex Node)
 	}
 }
 
-void parsing::output(ofstream& struction, ofstream& graph)
+void parsing::output(ostream& struction, ostream& graph)
 {
 	this->outputStruction(struction, this->topNode, 0);
 	graph << "#@startdot" << endl
@@ -981,7 +964,7 @@ void parsing::output(ofstream& struction, ofstream& graph)
 	graph << "#@enddot" << endl;
 }
 
-void parsing::outputMidcode(ofstream& midcode)
+void parsing::outputMidcode(ostream& midcode)
 {
 	this->mid_code.output(midcode);
 }

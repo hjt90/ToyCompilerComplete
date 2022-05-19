@@ -1,5 +1,7 @@
+#pragma execution_character_set("utf-8")
 #include <iostream>
 #include <string.h>
+#include <QMessageBox>
 #include "lexer.h"
 
 void Lexer::printresult()
@@ -7,11 +9,11 @@ void Lexer::printresult()
 	int len = this->result.size();
 	for (int i = 0; i < len; i++)
 	{
-		cout << translatetoken(this->result[i].first) << ' ' <<  this->result[i].second<< endl;
+        // cout << translatetoken(this->result[i].first) << ' ' <<  this->result[i].second<< endl;
 	}
 }
 
-string Lexer::translatetoken(Token i)//·­ÒëtokenÒÔ±ãÊä³ö
+string Lexer::translatetoken(Token i)//ç¿»è¯‘tokenä»¥ä¾¿è¾“å‡º
 {
 	switch (int(i))
 	{
@@ -85,19 +87,19 @@ string Lexer::translatetoken(Token i)//·­ÒëtokenÒÔ±ãÊä³ö
 
 void Lexer::dealerror(int line, int cr)
 {
-	cout << "ÔÚµÚ" << line << "ĞĞµÚ" << cr << "¸ö×Ö·û·¢ÏÖ´íÎó" << endl;
+    // cout << "åœ¨ç¬¬" << line << "è¡Œç¬¬" << cr << "ä¸ªå­—ç¬¦å‘ç°é”™è¯¯" << endl;
 }
 
 Token Lexer::search_keyword(string& s)
 {
 	for (vector<string>::size_type i = 0; i < this->keywordlist.size(); i++)
 	{
-		if (s == this->keywordlist[i]) //Èç¹û²éµ½ÊÇ¹Ø¼ü×Ö
+		if (s == this->keywordlist[i]) //å¦‚æœæŸ¥åˆ°æ˜¯å…³é”®å­—
 		{
-			return Token(int(Token::Int) + i); //·µ»ØÕâ¸ö¹Ø¼ü×ÖµÄÀà±ğºÅ
+			return Token(int(Token::Int) + i); //è¿”å›è¿™ä¸ªå…³é”®å­—çš„ç±»åˆ«å·
 		}
 	}
-	return Token::Id; //ÊÇ±êÊ¶·û²»ÊÇ¹Ø¼ü×Ö
+	return Token::Id; //æ˜¯æ ‡è¯†ç¬¦ä¸æ˜¯å…³é”®å­—
 }
 
 int Lexer::search_identifier(string& s)
@@ -105,14 +107,14 @@ int Lexer::search_identifier(string& s)
 	vector<string>::size_type i;
 	for (i = 0; i < this->idtlist.size(); i++)
 	{
-		if (s == this->idtlist[i]) //Èç¹û²éµ½ÊÇ±êÊ¶·û
+		if (s == this->idtlist[i]) //å¦‚æœæŸ¥åˆ°æ˜¯æ ‡è¯†ç¬¦
 		{
-			return i; //·µ»ØÕâ¸ö±êÊ¶·ûµÄË÷Òı
+			return i; //è¿”å›è¿™ä¸ªæ ‡è¯†ç¬¦çš„ç´¢å¼•
 		}
 	}
-	//Ã»²éµ½£¬ĞÂÔö
+	//æ²¡æŸ¥åˆ°ï¼Œæ–°å¢
 	this->idtlist.push_back(s);
-	return i; //·µ»ØÕâ¸ö±êÊ¶·ûµÄË÷Òı
+	return i; //è¿”å›è¿™ä¸ªæ ‡è¯†ç¬¦çš„ç´¢å¼•
 }
 
 Ftype Lexer::chtype(char ch)
@@ -130,37 +132,37 @@ Ftype Lexer::chtype(char ch)
 Status Lexer::dealnumber(char* templine, int& cr, int len)
 {
 	string tempstr = "";
-	while (cr < len && chtype(templine[cr]) == Ftype::Number) //Ò»Ö±Íùºó¶Á×Ö·û£¬¶Áµ½²»ÊÇÊı×ÖÎªÖ¹
+	while (cr < len && chtype(templine[cr]) == Ftype::Number) //ä¸€ç›´å¾€åè¯»å­—ç¬¦ï¼Œè¯»åˆ°ä¸æ˜¯æ•°å­—ä¸ºæ­¢
 	{
 		tempstr += templine[cr];
 		cr++;
 	}
-	this->result.push_back({ Token::Number, tempstr }); //°ÑÕâÒ»¸öÊı×ÖµÄ½á¹û¼ÓÈëresult
-	return Status::Success;                           //³É¹¦
+	this->result.push_back({ Token::Number, tempstr }); //æŠŠè¿™ä¸€ä¸ªæ•°å­—çš„ç»“æœåŠ å…¥result
+	return Status::Success;                           //æˆåŠŸ
 }
 
 Status Lexer::dealalpha(char* templine, int& cr, int len)
 {
 	string tempstr = "";
-	Ftype chtp;      //ÎªÁË±ÜÃâÖØ¸´µ÷ÓÃchtypeº¯Êı£¬¼ÇÂ¼Ò»ÏÂ
-	while (cr < len) //Ò»Ö±Íùºó¶Á×Ö·û£¬¶Áµ½²»ÊÇÊı×Ö»ò×ÖÄ¸ÎªÖ¹
+	Ftype chtp;      //ä¸ºäº†é¿å…é‡å¤è°ƒç”¨chtypeå‡½æ•°ï¼Œè®°å½•ä¸€ä¸‹
+	while (cr < len) //ä¸€ç›´å¾€åè¯»å­—ç¬¦ï¼Œè¯»åˆ°ä¸æ˜¯æ•°å­—æˆ–å­—æ¯ä¸ºæ­¢
 	{
-		//ÎªÁËĞ§ÂÊ´úÌæÔ­À´µÄwhileÑ­»·Óï¾ä
+		//ä¸ºäº†æ•ˆç‡ä»£æ›¿åŸæ¥çš„whileå¾ªç¯è¯­å¥
 		chtp = chtype(templine[cr]);
 		if (chtp != Ftype::Alpha && chtp != Ftype::Number)
 			break;
-		//Ñ­»·ÄÚµÄÄÚÈİ
+		//å¾ªç¯å†…çš„å†…å®¹
 		tempstr += templine[cr];
 		cr++;
 	}
 	Token tk;
-	tk = search_keyword(tempstr); //²éÊÇ²»ÊÇ¹Ø¼ü×Ö
-	if (tk != Token::Id)          //ÊÇ¹Ø¼ü×Ö
+	tk = search_keyword(tempstr); //æŸ¥æ˜¯ä¸æ˜¯å…³é”®å­—
+	if (tk != Token::Id)          //æ˜¯å…³é”®å­—
 		this->result.push_back({ tk, "" });
-	else //ÊÇ±êÊ¶·û
+	else //æ˜¯æ ‡è¯†ç¬¦
 	{
-		int index = search_identifier(tempstr);                //²éÓĞÃ»ÓĞµÇ¼Ç£¬Èç¹ûÃ»ÓĞ×Ô¶¯´´½¨
-		//this->result.push_back({ Token::Id, to_string(index) }); //ÕâÀïÎÒ·µ»ØµÄÖµÊÇËüµÄË÷Òı¶ø²»ÊÇÃû×Ö£¬¿ÉÒÔÔÙ¸Ä
+        search_identifier(tempstr);                //æŸ¥æœ‰æ²¡æœ‰ç™»è®°ï¼Œå¦‚æœæ²¡æœ‰è‡ªåŠ¨åˆ›å»º
+		//this->result.push_back({ Token::Id, to_string(index) }); //è¿™é‡Œæˆ‘è¿”å›çš„å€¼æ˜¯å®ƒçš„ç´¢å¼•è€Œä¸æ˜¯åå­—ï¼Œå¯ä»¥å†æ”¹
 		this->result.push_back({ Token::Id, tempstr });
 	}
 	return Status::Success;
@@ -272,25 +274,25 @@ Status Lexer::dealsymbol(char* templine, int& cr, int len)
 		cr++;
 		return Status::Success;
 	}
-	else if (templine[cr] == '/') //Õâ¸ö×¢ÊÍ´¦ÀíÆğÀ´±È½ÏÌØ±ğ
+	else if (templine[cr] == '/') //è¿™ä¸ªæ³¨é‡Šå¤„ç†èµ·æ¥æ¯”è¾ƒç‰¹åˆ«
 	{
 		if (cr + 1 >= len)
 			return Status::Fail;
-		else if (templine[cr + 1] == '/') //±ä³ÉË«Ğ±¸Ü×¢ÊÍ£¬Ö±½Ó°ÑÖ¸ÕëÒÆµ½ÕâÒ»ĞĞ×îÄ©
+		else if (templine[cr + 1] == '/') //å˜æˆåŒæ–œæ æ³¨é‡Šï¼Œç›´æ¥æŠŠæŒ‡é’ˆç§»åˆ°è¿™ä¸€è¡Œæœ€æœ«
 		{
 			cr = len;
 			return Status::Success;
 		}
 		else if (templine[cr + 1] == '*')
 		{
-			this->annflag = true; //¿ªÆô×¢ÊÍ¿ª¹Ø
+			this->annflag = true; //å¼€å¯æ³¨é‡Šå¼€å…³
 			cr += 2;
 			return Status::Success;
 		}
 		else
 			return Status::Fail;
 	}
-	//ÌØ±ğĞèÒª×¢Òâ£¬ÎÒÃÇÕâÀï²»ÅĞ¶Ï*/£¬Áôµ½analyzeÀï´¦Àí
+	//ç‰¹åˆ«éœ€è¦æ³¨æ„ï¼Œæˆ‘ä»¬è¿™é‡Œä¸åˆ¤æ–­*/ï¼Œç•™åˆ°analyzeé‡Œå¤„ç†
 	else if (templine[cr] == '(')
 	{
 		this->result.push_back({ Token::LeftBracket, "" });
@@ -328,14 +330,14 @@ Status Lexer::dealsymbol(char* templine, int& cr, int len)
 	}
 }
 
-void Lexer::analyze(ifstream& file)
+void Lexer::analyze(istream& file)
 {
-	int line = 0;        //¼ÇÂ¼ÊÇÄÄÒ»ĞĞ
-	char templine[1024]; //´æÒ»ĞĞ
-	int cr;              //iÊÇÖ¸Ïòµ±Ç°ĞĞµÄ×Ö·ûµÄÎ»ÖÃµÄÖ¸Õë£¬´Ótempline[0]¿ªÊ¼
-	int len;             //len¼ÇÂ¼templineÖĞÒ»ĞĞµÄ³¤¶È
-	Status res;          //½ÓÊÜÒ»Ğ©·µ»Ø×´Ì¬
-	Ftype chtp;          //¼ÇÂ¼ÀàĞÍ
+	int line = 0;        //è®°å½•æ˜¯å“ªä¸€è¡Œ
+	char templine[1024]; //å­˜ä¸€è¡Œ
+	int cr;              //iæ˜¯æŒ‡å‘å½“å‰è¡Œçš„å­—ç¬¦çš„ä½ç½®çš„æŒ‡é’ˆï¼Œä»templine[0]å¼€å§‹
+	int len;             //lenè®°å½•templineä¸­ä¸€è¡Œçš„é•¿åº¦
+	Status res;          //æ¥å—ä¸€äº›è¿”å›çŠ¶æ€
+	Ftype chtp;          //è®°å½•ç±»å‹
 	while (file.getline(templine, 1024))
 	{
 		line++;
@@ -343,7 +345,7 @@ void Lexer::analyze(ifstream& file)
 		cr = 0;
 		while (cr < len)
 		{
-			if (this->annflag == true) //µ±Ç°´¦ÔÚ/**/µÄ×¢ÊÍÖĞ
+			if (this->annflag == true) //å½“å‰å¤„åœ¨/**/çš„æ³¨é‡Šä¸­
 			{
 				while (cr < len)
 				{
@@ -356,16 +358,16 @@ void Lexer::analyze(ifstream& file)
 					cr++;
 				}
 			}
-			else //Õı³£Çé¿ö
+			else //æ­£å¸¸æƒ…å†µ
 			{
 				chtp = chtype(templine[cr]);
-				if (chtp == Ftype::Blank) //¿ªÍ·ÊÇtab»ò¿Õ¸ñ
+				if (chtp == Ftype::Blank) //å¼€å¤´æ˜¯tabæˆ–ç©ºæ ¼
 					cr++;
-				else if (chtp == Ftype::Number) //¿ªÍ·ÊÇÊı×Ö
+				else if (chtp == Ftype::Number) //å¼€å¤´æ˜¯æ•°å­—
 					res = dealnumber(templine, cr, len);
-				else if (chtp == Ftype::Alpha) //¿ªÍ·ÊÇ×ÖÄ¸
+				else if (chtp == Ftype::Alpha) //å¼€å¤´æ˜¯å­—æ¯
 					res = dealalpha(templine, cr, len);
-				else if (chtp == Ftype::Symbol) //¿ªÍ·ÊÇ·ûºÅ
+				else if (chtp == Ftype::Symbol) //å¼€å¤´æ˜¯ç¬¦å·
 				{
 					res = dealsymbol(templine, cr, len);
 					if (res == Status::Fail)

@@ -1,37 +1,44 @@
+#pragma execution_character_set("utf-8")
 #include "objectCode.h"
-#include<iostream>
+#include <iostream>
 
-static bool isVar(string name) {
+static bool isVar(string name)
+{
 	return isalpha(name[0]);
 }
 
-static bool isNum(string name) {
+static bool isNum(string name)
+{
 	return isdigit(name[0]);
 }
 
-static bool isControlOp(string op) {
-	if (op[0] == 'J' || op == "Call" || op == "Return" || op == "Get") {
+static bool isControlOp(string op)
+{
+	if (op[0] == 'J' || op == "Call" || op == "Return" || op == "Get")
+	{
 		return true;
 	}
 	return false;
 }
 
-VarInfomation::VarInfomation(int next, bool active) {
+VarInfomation::VarInfomation(int next, bool active)
+{
 	this->next = next;
 	this->active = active;
 }
 
-VarInfomation::VarInfomation(const VarInfomation& other) {
+VarInfomation::VarInfomation(const VarInfomation &other)
+{
 	this->active = other.active;
 	this->next = other.next;
 }
 
-VarInfomation::VarInfomation() :next(0), active(false)
+VarInfomation::VarInfomation() : next(0), active(false)
 {
-
 }
 
-void VarInfomation::output(ostream& out) {
+void VarInfomation::output(ostream &out)
+{
 	out << "(";
 	if (next == -1)
 		out << "^";
@@ -46,29 +53,34 @@ void VarInfomation::output(ostream& out) {
 	out << ")";
 }
 
-QuaternaryWithInfo::QuaternaryWithInfo(quadruple q, VarInfomation info1, VarInfomation info2, VarInfomation info3) {
+QuaternaryWithInfo::QuaternaryWithInfo(quadruple q, VarInfomation info1, VarInfomation info2, VarInfomation info3)
+{
 	this->q = q;
 	this->info1 = info1;
 	this->info2 = info2;
 	this->info3 = info3;
 }
 
-void QuaternaryWithInfo::output(ostream& out) {
+void QuaternaryWithInfo::output(ostream &out)
+{
 	out << "(" << Oper2string(q.Op) << "," << q.arg1 << "," << q.arg2 << "," << q.result << ")";
 	info1.output(out);
 	info2.output(out);
 	info3.output(out);
 }
 
-ObjectCode::ObjectCode() :top(0)
+ObjectCode::ObjectCode() : top(0)
 {
 }
 
-void ObjectCode::storeVar(string reg, string var) {
-	if (varOffset.find(var) != varOffset.end()) {//Èç¹ûÒÑ¾­Îª*iter·ÖÅäºÃÁË´æ´¢¿Õ¼ä
+void ObjectCode::storeVar(string reg, string var)
+{
+	if (varOffset.find(var) != varOffset.end())
+	{ //å¦‚æœå·²ç»ä¸º*iteråˆ†é…å¥½äº†å­˜å‚¨ç©ºé—´
 		objectCodes.push_back(string("sw ") + reg + " " + to_string(varOffset[var]) + "($sp)");
 	}
-	else {
+	else
+	{
 		varOffset[var] = top;
 		top += 4;
 		objectCodes.push_back(string("sw ") + reg + " " + to_string(varOffset[var]) + "($sp)");
@@ -76,11 +88,15 @@ void ObjectCode::storeVar(string reg, string var) {
 	Avalue[var].insert(var);
 }
 
-void ObjectCode::releaseVar(string var) {
-	for (set<string>::iterator iter = Avalue[var].begin(); iter != Avalue[var].end(); iter++) {
-		if ((*iter)[0] == '$') {
+void ObjectCode::releaseVar(string var)
+{
+	for (set<string>::iterator iter = Avalue[var].begin(); iter != Avalue[var].end(); iter++)
+	{
+		if ((*iter)[0] == '$')
+		{
 			Rvalue[*iter].erase(var);
-			if (Rvalue[*iter].size() == 0 && (*iter)[1] == 's') {
+			if (Rvalue[*iter].size() == 0 && (*iter)[1] == 's')
+			{
 				freeReg.push_back(*iter);
 			}
 		}
@@ -88,110 +104,136 @@ void ObjectCode::releaseVar(string var) {
 	Avalue[var].clear();
 }
 
-//ÎªÒıÓÃ±äÁ¿·ÖÅä¼Ä´æÆ÷
-string ObjectCode::allocateReg() {
-	//Èç¹ûÓĞÉĞÎ´·ÖÅäµÄ¼Ä´æÆ÷£¬Ôò´ÓÖĞÑ¡È¡Ò»¸öRiÎªËùĞèÒªµÄ¼Ä´æÆ÷R
+//ä¸ºå¼•ç”¨å˜é‡åˆ†é…å¯„å­˜å™¨
+string ObjectCode::allocateReg()
+{
+	//å¦‚æœæœ‰å°šæœªåˆ†é…çš„å¯„å­˜å™¨ï¼Œåˆ™ä»ä¸­é€‰å–ä¸€ä¸ªRiä¸ºæ‰€éœ€è¦çš„å¯„å­˜å™¨R
 	string ret;
-	if (freeReg.size()) {
+	if (freeReg.size())
+	{
 		ret = freeReg.back();
 		freeReg.pop_back();
 		return ret;
 	}
 
 	/*
-	´ÓÒÑ·ÖÅäµÄ¼Ä´æÆ÷ÖĞÑ¡È¡Ò»¸öRiÎªËùĞèÒªµÄ¼Ä´æÆ÷R¡£×îºÃÊ¹µÃRiÂú×ãÒÔÏÂÌõ¼ş£º
-	Õ¼ÓÃRiµÄ±äÁ¿µÄÖµÒ²Í¬Ê±´æ·ÅÔÚ¸Ã±äÁ¿µÄÖü´æµ¥ÔªÖĞ
-	»òÕßÔÚ»ù±¾¿éÖĞÒªÔÚ×îÔ¶µÄ½«À´²Å»áÒıÓÃµ½»ò²»»áÒıÓÃµ½¡£
+	ä»å·²åˆ†é…çš„å¯„å­˜å™¨ä¸­é€‰å–ä¸€ä¸ªRiä¸ºæ‰€éœ€è¦çš„å¯„å­˜å™¨Rã€‚æœ€å¥½ä½¿å¾—Riæ»¡è¶³ä»¥ä¸‹æ¡ä»¶ï¼š
+	å ç”¨Riçš„å˜é‡çš„å€¼ä¹ŸåŒæ—¶å­˜æ”¾åœ¨è¯¥å˜é‡çš„è´®å­˜å•å…ƒä¸­
+	æˆ–è€…åœ¨åŸºæœ¬å—ä¸­è¦åœ¨æœ€è¿œçš„å°†æ¥æ‰ä¼šå¼•ç”¨åˆ°æˆ–ä¸ä¼šå¼•ç”¨åˆ°ã€‚
 	*/
 
 	const int inf = 1000000;
 	int maxNextPos = 0;
-	for (map<string, set<string> >::iterator iter = Rvalue.begin(); iter != Rvalue.end(); iter++) {//±éÀúËùÓĞµÄ¼Ä´æÆ÷
+	for (map<string, set<string>>::iterator iter = Rvalue.begin(); iter != Rvalue.end(); iter++)
+	{ //éå†æ‰€æœ‰çš„å¯„å­˜å™¨
 		int nextpos = inf;
-		for (set<string>::iterator viter = iter->second.begin(); viter != iter->second.end(); viter++) {//±éÀú¼Ä´æÆ÷ÖĞ´¢´æµÄ±äÁ¿
-			bool inFlag = false;//±äÁ¿ÒÑÔÚÆäËûµØ·½´æ´¢µÄ±êÖ¾
-			for (set<string>::iterator aiter = Avalue[*viter].begin(); aiter != Avalue[*viter].end(); aiter++) {//±éÀú±äÁ¿µÄ´æ´¢Î»ÖÃ
-				if (*aiter != iter->first) {//Èç¹û±äÁ¿´æ´¢ÔÚÆäËûµØ·½
+		for (set<string>::iterator viter = iter->second.begin(); viter != iter->second.end(); viter++)
+		{						 //éå†å¯„å­˜å™¨ä¸­å‚¨å­˜çš„å˜é‡
+			bool inFlag = false; //å˜é‡å·²åœ¨å…¶ä»–åœ°æ–¹å­˜å‚¨çš„æ ‡å¿—
+			for (set<string>::iterator aiter = Avalue[*viter].begin(); aiter != Avalue[*viter].end(); aiter++)
+			{ //éå†å˜é‡çš„å­˜å‚¨ä½ç½®
+				if (*aiter != iter->first)
+				{ //å¦‚æœå˜é‡å­˜å‚¨åœ¨å…¶ä»–åœ°æ–¹
 					inFlag = true;
 					break;
 				}
 			}
-			if (!inFlag) {//Èç¹û±äÁ¿½ö´æ´¢ÔÚ¼Ä´æÆ÷ÖĞ£¬¾Í¿´Î´À´ÔÚºÎ´¦»áÒıÓÃ¸Ã±äÁ¿
-				for (vector<QuaternaryWithInfo>::iterator cIter = nowQuatenary; cIter != nowIBlock->codes.end(); cIter++) {
-					if (*viter == cIter->q.arg1 || *viter == cIter->q.arg2) {
+			if (!inFlag)
+			{ //å¦‚æœå˜é‡ä»…å­˜å‚¨åœ¨å¯„å­˜å™¨ä¸­ï¼Œå°±çœ‹æœªæ¥åœ¨ä½•å¤„ä¼šå¼•ç”¨è¯¥å˜é‡
+				for (vector<QuaternaryWithInfo>::iterator cIter = nowQuatenary; cIter != nowIBlock->codes.end(); cIter++)
+				{
+					if (*viter == cIter->q.arg1 || *viter == cIter->q.arg2)
+					{
 						nextpos = cIter - nowQuatenary;
 					}
-					else if (*viter == cIter->q.result) {
+					else if (*viter == cIter->q.result)
+					{
 						break;
 					}
 				}
 			}
 		}
-		if (nextpos == inf) {
+		if (nextpos == inf)
+		{
 			ret = iter->first;
 			break;
 		}
-		else if (nextpos > maxNextPos) {
+		else if (nextpos > maxNextPos)
+		{
 			maxNextPos = nextpos;
 			ret = iter->first;
 		}
 	}
 
-	for (set<string>::iterator iter = Rvalue[ret].begin(); iter != Rvalue[ret].end(); iter++) {
-		//¶ÔretµÄ¼Ä´æÆ÷ÖĞ±£´æµÄ±äÁ¿*iter£¬ËûÃÇ¶¼½«²»ÔÙ´æ´¢ÔÚretÖĞ
+	for (set<string>::iterator iter = Rvalue[ret].begin(); iter != Rvalue[ret].end(); iter++)
+	{
+		//å¯¹retçš„å¯„å­˜å™¨ä¸­ä¿å­˜çš„å˜é‡*iterï¼Œä»–ä»¬éƒ½å°†ä¸å†å­˜å‚¨åœ¨retä¸­
 		Avalue[*iter].erase(ret);
-		//Èç¹ûVµÄµØÖ·ÃèÊöÊı×éAVALUE[V]ËµV»¹±£´æÔÚRÖ®ÍâµÄÆäËûµØ·½£¬Ôò²»ĞèÒªÉú³É´æÊıÖ¸Áî
-		if (Avalue[*iter].size() > 0) {
-			//pass
+		//å¦‚æœVçš„åœ°å€æè¿°æ•°ç»„AVALUE[V]è¯´Vè¿˜ä¿å­˜åœ¨Rä¹‹å¤–çš„å…¶ä»–åœ°æ–¹ï¼Œåˆ™ä¸éœ€è¦ç”Ÿæˆå­˜æ•°æŒ‡ä»¤
+		if (Avalue[*iter].size() > 0)
+		{
+			// pass
 		}
-		//Èç¹ûV²»»áÔÚ´ËÖ®ºó±»Ê¹ÓÃ£¬Ôò²»ĞèÒªÉú³É´æÊıÖ¸Áî
-		else {
+		//å¦‚æœVä¸ä¼šåœ¨æ­¤ä¹‹åè¢«ä½¿ç”¨ï¼Œåˆ™ä¸éœ€è¦ç”Ÿæˆå­˜æ•°æŒ‡ä»¤
+		else
+		{
 			bool storeFlag = true;
 			vector<QuaternaryWithInfo>::iterator cIter;
-			for (cIter = nowQuatenary; cIter != nowIBlock->codes.end(); cIter++) {
-				if (cIter->q.arg1 == *iter || cIter->q.arg2 == *iter) {//Èç¹ûVÔÚ±¾»ù±¾¿éÖĞ±»ÒıÓÃ
+			for (cIter = nowQuatenary; cIter != nowIBlock->codes.end(); cIter++)
+			{
+				if (cIter->q.arg1 == *iter || cIter->q.arg2 == *iter)
+				{ //å¦‚æœVåœ¨æœ¬åŸºæœ¬å—ä¸­è¢«å¼•ç”¨
 					storeFlag = true;
 					break;
 				}
-				if (cIter->q.result == *iter) {//Èç¹ûVÔÚ±¾»ù±¾¿éÖĞ±»¸³Öµ
+				if (cIter->q.result == *iter)
+				{ //å¦‚æœVåœ¨æœ¬åŸºæœ¬å—ä¸­è¢«èµ‹å€¼
 					storeFlag = false;
 					break;
 				}
 			}
-			if (cIter == nowIBlock->codes.end()) {//Èç¹ûVÔÚ±¾»ù±¾¿éÖĞÎ´±»ÒıÓÃ£¬ÇÒÒ²Ã»ÓĞ±»¸³Öµ
+			if (cIter == nowIBlock->codes.end())
+			{ //å¦‚æœVåœ¨æœ¬åŸºæœ¬å—ä¸­æœªè¢«å¼•ç”¨ï¼Œä¸”ä¹Ÿæ²¡æœ‰è¢«èµ‹å€¼
 				int index = nowIBlock - funcIBlocks[nowFunc].begin();
-				if (funcOUTL[nowFunc][index].count(*iter) == 1) {//Èç¹û´Ë±äÁ¿ÊÇ³ö¿ÚÖ®ºóµÄ»îÔ¾±äÁ¿
+				if (funcOUTL[nowFunc][index].count(*iter) == 1)
+				{ //å¦‚æœæ­¤å˜é‡æ˜¯å‡ºå£ä¹‹åçš„æ´»è·ƒå˜é‡
 					storeFlag = true;
 				}
-				else {
+				else
+				{
 					storeFlag = false;
 				}
 			}
-			if (storeFlag) {//Éú³É´æÊıÖ¸Áî
+			if (storeFlag)
+			{ //ç”Ÿæˆå­˜æ•°æŒ‡ä»¤
 				storeVar(ret, *iter);
 			}
 		}
 	}
-	Rvalue[ret].clear();//Çå¿Õret¼Ä´æÆ÷ÖĞ±£´æµÄ±äÁ¿
+	Rvalue[ret].clear(); //æ¸…ç©ºretå¯„å­˜å™¨ä¸­ä¿å­˜çš„å˜é‡
 
 	return ret;
 }
 
-//ÎªÒıÓÃ±äÁ¿·ÖÅä¼Ä´æÆ÷
-string ObjectCode::allocateReg(string var) {
-	if (isNum(var)) {
+//ä¸ºå¼•ç”¨å˜é‡åˆ†é…å¯„å­˜å™¨
+string ObjectCode::allocateReg(string var)
+{
+	if (isNum(var))
+	{
 		string ret = allocateReg();
 		objectCodes.push_back(string("addi ") + ret + " $zero " + var);
 		return ret;
 	}
 
-	for (set<string>::iterator iter = Avalue[var].begin(); iter != Avalue[var].end(); iter++) {
-		if ((*iter)[0] == '$') {//Èç¹û±äÁ¿ÒÑ¾­±£´æÔÚÄ³¸ö¼Ä´æÆ÷ÖĞ
-			return *iter;//Ö±½Ó·µ»Ø¸Ã¼Ä´æÆ÷
+	for (set<string>::iterator iter = Avalue[var].begin(); iter != Avalue[var].end(); iter++)
+	{
+		if ((*iter)[0] == '$')
+		{				  //å¦‚æœå˜é‡å·²ç»ä¿å­˜åœ¨æŸä¸ªå¯„å­˜å™¨ä¸­
+			return *iter; //ç›´æ¥è¿”å›è¯¥å¯„å­˜å™¨
 		}
 	}
 
-	//Èç¹û¸Ã±äÁ¿Ã»ÓĞÔÚÄ³¸ö¼Ä´æÆ÷ÖĞ
+	//å¦‚æœè¯¥å˜é‡æ²¡æœ‰åœ¨æŸä¸ªå¯„å­˜å™¨ä¸­
 	string ret = allocateReg();
 	objectCodes.push_back(string("lw ") + ret + " " + to_string(varOffset[var]) + "($sp)");
 	Avalue[var].insert(ret);
@@ -199,21 +241,27 @@ string ObjectCode::allocateReg(string var) {
 	return ret;
 }
 
-//ÎªÄ¿±ê±äÁ¿·ÖÅä¼Ä´æÆ÷
-string ObjectCode::getReg() {
-	//i: A:=B op C
-	//Èç¹ûBµÄÏÖĞĞÖµÔÚÄ³¸ö¼Ä´æÆ÷RiÖĞ£¬RVALUE[Ri]ÖĞÖ»°üº¬B
-	//´ËÍâ£¬»òÕßBÓëAÊÇÍ¬Ò»¸ö±êÊ¶·û»òÕßBµÄÏÖĞĞÖµÔÚÖ´ĞĞËÄÔªÊ½A:=B op CÖ®ºó²»»áÔÙÒıÓÃ
-	//ÔòÑ¡È¡RiÎªËùĞèÒªµÄ¼Ä´æÆ÷R
+//ä¸ºç›®æ ‡å˜é‡åˆ†é…å¯„å­˜å™¨
+string ObjectCode::getReg()
+{
+	// i: A:=B op C
+	//å¦‚æœBçš„ç°è¡Œå€¼åœ¨æŸä¸ªå¯„å­˜å™¨Riä¸­ï¼ŒRVALUE[Ri]ä¸­åªåŒ…å«B
+	//æ­¤å¤–ï¼Œæˆ–è€…Bä¸Aæ˜¯åŒä¸€ä¸ªæ ‡è¯†ç¬¦æˆ–è€…Bçš„ç°è¡Œå€¼åœ¨æ‰§è¡Œå››å…ƒå¼A:=B op Cä¹‹åä¸ä¼šå†å¼•ç”¨
+	//åˆ™é€‰å–Riä¸ºæ‰€éœ€è¦çš„å¯„å­˜å™¨R
 
-	//Èç¹ûsrc1²»ÊÇÊı×Ö
-	if (!isNum(nowQuatenary->q.arg1)) {
-		//±éÀúsrc1ËùÔÚµÄ¼Ä´æÆ÷
-		set<string>& src1pos = Avalue[nowQuatenary->q.arg1];
-		for (set<string>::iterator iter = src1pos.begin(); iter != src1pos.end(); iter++) {
-			if ((*iter)[0] == '$') {
-				if (Rvalue[*iter].size() == 1) {//Èç¹û¸Ã¼Ä´æÆ÷ÖĞÖµ½ö½ö´æÓĞsrc1
-					if (nowQuatenary->q.result == nowQuatenary->q.arg1 || !nowQuatenary->info1.active) {//Èç¹ûA,BÊÇÍ¬Ò»±êÊ¶·û»òBÒÔºó²»»îÔ¾
+	//å¦‚æœsrc1ä¸æ˜¯æ•°å­—
+	if (!isNum(nowQuatenary->q.arg1))
+	{
+		//éå†src1æ‰€åœ¨çš„å¯„å­˜å™¨
+		set<string> &src1pos = Avalue[nowQuatenary->q.arg1];
+		for (set<string>::iterator iter = src1pos.begin(); iter != src1pos.end(); iter++)
+		{
+			if ((*iter)[0] == '$')
+			{
+				if (Rvalue[*iter].size() == 1)
+				{ //å¦‚æœè¯¥å¯„å­˜å™¨ä¸­å€¼ä»…ä»…å­˜æœ‰src1
+					if (nowQuatenary->q.result == nowQuatenary->q.arg1 || !nowQuatenary->info1.active)
+					{ //å¦‚æœA,Bæ˜¯åŒä¸€æ ‡è¯†ç¬¦æˆ–Bä»¥åä¸æ´»è·ƒ
 						Avalue[nowQuatenary->q.result].insert(*iter);
 						Rvalue[*iter].insert(nowQuatenary->q.result);
 						return *iter;
@@ -223,29 +271,35 @@ string ObjectCode::getReg() {
 		}
 	}
 
-	//ÎªÄ¿±ê±äÁ¿·ÖÅä¿ÉÄÜ²»ÕıÈ·
-	//return allocateReg(nowQuatenary->q.des);
+	//ä¸ºç›®æ ‡å˜é‡åˆ†é…å¯èƒ½ä¸æ­£ç¡®
+	// return allocateReg(nowQuatenary->q.des);
 	string ret = allocateReg();
 	Avalue[nowQuatenary->q.result].insert(ret);
 	Rvalue[ret].insert(nowQuatenary->q.result);
 	return ret;
 }
 
-//ÎªÊı×é¸³Öµ·ÖÅä¼Ä´æÆ÷
-string ObjectCode::getArrayReg() {
-	//i: A:=B op C
-	//Èç¹ûBµÄÏÖĞĞÖµÔÚÄ³¸ö¼Ä´æÆ÷RiÖĞ£¬RVALUE[Ri]ÖĞÖ»°üº¬B
-	//´ËÍâ£¬»òÕßBÓëAÊÇÍ¬Ò»¸ö±êÊ¶·û»òÕßBµÄÏÖĞĞÖµÔÚÖ´ĞĞËÄÔªÊ½A:=B op CÖ®ºó²»»áÔÙÒıÓÃ
-	//ÔòÑ¡È¡RiÎªËùĞèÒªµÄ¼Ä´æÆ÷R
+//ä¸ºæ•°ç»„èµ‹å€¼åˆ†é…å¯„å­˜å™¨
+string ObjectCode::getArrayReg()
+{
+	// i: A:=B op C
+	//å¦‚æœBçš„ç°è¡Œå€¼åœ¨æŸä¸ªå¯„å­˜å™¨Riä¸­ï¼ŒRVALUE[Ri]ä¸­åªåŒ…å«B
+	//æ­¤å¤–ï¼Œæˆ–è€…Bä¸Aæ˜¯åŒä¸€ä¸ªæ ‡è¯†ç¬¦æˆ–è€…Bçš„ç°è¡Œå€¼åœ¨æ‰§è¡Œå››å…ƒå¼A:=B op Cä¹‹åä¸ä¼šå†å¼•ç”¨
+	//åˆ™é€‰å–Riä¸ºæ‰€éœ€è¦çš„å¯„å­˜å™¨R
 
-	//Èç¹ûsrc1²»ÊÇÊı×Ö
-	if (!isNum(nowQuatenary->q.arg2)) {
-		//±éÀúsrc1ËùÔÚµÄ¼Ä´æÆ÷
-		set<string>& src1pos = Avalue[nowQuatenary->q.arg2];
-		for (set<string>::iterator iter = src1pos.begin(); iter != src1pos.end(); iter++) {
-			if ((*iter)[0] == '$') {
-				if (Rvalue[*iter].size() == 1) {//Èç¹û¸Ã¼Ä´æÆ÷ÖĞÖµ½ö½ö´æÓĞsrc1
-					if (nowQuatenary->q.result == nowQuatenary->q.arg2 || !nowQuatenary->info2.active) {//Èç¹ûA,BÊÇÍ¬Ò»±êÊ¶·û»òBÒÔºó²»»îÔ¾
+	//å¦‚æœsrc1ä¸æ˜¯æ•°å­—
+	if (!isNum(nowQuatenary->q.arg2))
+	{
+		//éå†src1æ‰€åœ¨çš„å¯„å­˜å™¨
+		set<string> &src1pos = Avalue[nowQuatenary->q.arg2];
+		for (set<string>::iterator iter = src1pos.begin(); iter != src1pos.end(); iter++)
+		{
+			if ((*iter)[0] == '$')
+			{
+				if (Rvalue[*iter].size() == 1)
+				{ //å¦‚æœè¯¥å¯„å­˜å™¨ä¸­å€¼ä»…ä»…å­˜æœ‰src1
+					if (nowQuatenary->q.result == nowQuatenary->q.arg2 || !nowQuatenary->info2.active)
+					{ //å¦‚æœA,Bæ˜¯åŒä¸€æ ‡è¯†ç¬¦æˆ–Bä»¥åä¸æ´»è·ƒ
 						Avalue[nowQuatenary->q.result].insert(*iter);
 						Rvalue[*iter].insert(nowQuatenary->q.result);
 						return *iter;
@@ -255,174 +309,207 @@ string ObjectCode::getArrayReg() {
 		}
 	}
 
-	//ÎªÄ¿±ê±äÁ¿·ÖÅä¿ÉÄÜ²»ÕıÈ·
-	//return allocateReg(nowQuatenary->q.des);
+	//ä¸ºç›®æ ‡å˜é‡åˆ†é…å¯èƒ½ä¸æ­£ç¡®
+	// return allocateReg(nowQuatenary->q.des);
 	string ret = allocateReg();
 	Avalue[nowQuatenary->q.result].insert(ret);
 	Rvalue[ret].insert(nowQuatenary->q.result);
 	return ret;
 }
 
-void ObjectCode::analyseBlock(Optimizer& optim) {
-	map<string, vector<Block> >& funcBlocks = optim.funcBlocks;
-	const map<string, vector<set<string> > >& funcOUTL = optim.funcOUTL;
+void ObjectCode::analyseBlock(Optimizer &optim)
+{
+	map<string, vector<Block>> &funcBlocks = optim.funcBlocks;
+	const map<string, vector<set<string>>> &funcOUTL = optim.funcOUTL;
 	this->funcOUTL = optim.funcOUTL;
 	this->funcINL = optim.funcINL;
 
-	for (map<string, vector<Block> >::iterator fbiter = funcBlocks.begin(); fbiter != funcBlocks.end(); fbiter++) {
+	for (map<string, vector<Block>>::iterator fbiter = funcBlocks.begin(); fbiter != funcBlocks.end(); fbiter++)
+	{
 		vector<IBlock> iBlocks;
-		vector<Block>& blocks = fbiter->second;
-		vector<set<string> >OUTL = funcOUTL.at(fbiter->first);
+		vector<Block> &blocks = fbiter->second;
+		vector<set<string>> OUTL = funcOUTL.at(fbiter->first);
 
-		for (vector<Block>::iterator iter = blocks.begin(); iter != blocks.end(); iter++) {
+		for (vector<Block>::iterator iter = blocks.begin(); iter != blocks.end(); iter++)
+		{
 			IBlock iBlock;
 			iBlock.next1 = iter->next1;
 			iBlock.next2 = iter->next2;
 			iBlock.name = iter->name;
-			for (vector<quadruple>::iterator qIter = iter->codes.begin(); qIter != iter->codes.end(); qIter++) {
+			for (vector<quadruple>::iterator qIter = iter->codes.begin(); qIter != iter->codes.end(); qIter++)
+			{
 				iBlock.codes.push_back(QuaternaryWithInfo(*qIter, VarInfomation(-1, false), VarInfomation(-1, false), VarInfomation(-1, false)));
 			}
 			iBlocks.push_back(iBlock);
 		}
 
-		vector<map<string, VarInfomation> > symTables;//Ã¿¸ö»ù±¾¿é¶ÔÓ¦Ò»ÕÅ·ûºÅ±í
-		//³õÊ¼»¯·ûºÅ±í
-		for (vector<Block>::iterator biter = blocks.begin(); biter != blocks.end(); biter++) {//±éÀúÃ¿Ò»¸ö»ù±¾¿é
-			map<string, VarInfomation>symTable;
-			for (vector<quadruple>::iterator citer = biter->codes.begin(); citer != biter->codes.end(); citer++) {//±éÀú»ù±¾¿éÖĞµÄÃ¿¸öËÄÔªÊ½
-				if (citer->Op == Oper::J) {
-					//pass
+		vector<map<string, VarInfomation>> symTables; //æ¯ä¸ªåŸºæœ¬å—å¯¹åº”ä¸€å¼ ç¬¦å·è¡¨
+		//åˆå§‹åŒ–ç¬¦å·è¡¨
+		for (vector<Block>::iterator biter = blocks.begin(); biter != blocks.end(); biter++)
+		{ //éå†æ¯ä¸€ä¸ªåŸºæœ¬å—
+			map<string, VarInfomation> symTable;
+			for (vector<quadruple>::iterator citer = biter->codes.begin(); citer != biter->codes.end(); citer++)
+			{ //éå†åŸºæœ¬å—ä¸­çš„æ¯ä¸ªå››å…ƒå¼
+				if (citer->Op == Oper::J)
+				{
+					// pass
 				}
 				else if (citer->Op == Oper::Call)
 				{
-					if (isVar(citer->result)) {
-						symTable[citer->result] = VarInfomation{ -1,false };
+					if (isVar(citer->result))
+					{
+						symTable[citer->result] = VarInfomation{-1, false};
 					}
 				}
-				else if (citer->Op == Oper::Jeq || citer->Op == Oper::Jge || citer->Op == Oper::Jgt || citer->Op == Oper::Jle
-					|| citer->Op == Oper::Jlt || citer->Op == Oper::Jne)
+				else if (citer->Op == Oper::Jeq || citer->Op == Oper::Jge || citer->Op == Oper::Jgt || citer->Op == Oper::Jle || citer->Op == Oper::Jlt || citer->Op == Oper::Jne)
 				{
-					if (isVar(citer->arg1)) {
-						symTable[citer->arg1] = VarInfomation{ -1,false };
+					if (isVar(citer->arg1))
+					{
+						symTable[citer->arg1] = VarInfomation{-1, false};
 					}
-					if (isVar(citer->arg2)) {
-						symTable[citer->arg2] = VarInfomation{ -1,false };
+					if (isVar(citer->arg2))
+					{
+						symTable[citer->arg2] = VarInfomation{-1, false};
 					}
 				}
 				else if (citer->Op == Oper::Return)
 				{
-					if (isVar(citer->arg1)) {
-						symTable[citer->arg1] = VarInfomation{ -1,false };
+					if (isVar(citer->arg1))
+					{
+						symTable[citer->arg1] = VarInfomation{-1, false};
 					}
 				}
 				else if (citer->Op == Oper::ArrayAssign)
 				{
-					if (isVar(citer->arg1)) {
-						symTable[citer->arg1] = VarInfomation{ -1,false };
+					if (isVar(citer->arg1))
+					{
+						symTable[citer->arg1] = VarInfomation{-1, false};
 					}
-					if (isVar(citer->result)) {
-						symTable[citer->result] = VarInfomation{ -1,false };
+					if (isVar(citer->result))
+					{
+						symTable[citer->result] = VarInfomation{-1, false};
 					}
 				}
 				else if (citer->Op == Oper::AssignArray)
 				{
-					if (isVar(citer->arg2)) {
-						symTable[citer->arg2] = VarInfomation{ -1,false };
+					if (isVar(citer->arg2))
+					{
+						symTable[citer->arg2] = VarInfomation{-1, false};
 					}
-					if (isVar(citer->result)) {
-						symTable[citer->result] = VarInfomation{ -1,false };
+					if (isVar(citer->result))
+					{
+						symTable[citer->result] = VarInfomation{-1, false};
 					}
 				}
-				else {
-					if (isVar(citer->arg1)) {
-						symTable[citer->arg1] = VarInfomation{ -1,false };
+				else
+				{
+					if (isVar(citer->arg1))
+					{
+						symTable[citer->arg1] = VarInfomation{-1, false};
 					}
-					if (isVar(citer->arg2)) {
-						symTable[citer->arg2] = VarInfomation{ -1,false };
+					if (isVar(citer->arg2))
+					{
+						symTable[citer->arg2] = VarInfomation{-1, false};
 					}
-					if (isVar(citer->result)) {
-						symTable[citer->result] = VarInfomation{ -1,false };
+					if (isVar(citer->result))
+					{
+						symTable[citer->result] = VarInfomation{-1, false};
 					}
 				}
 			}
 			symTables.push_back(symTable);
 		}
 		int blockIndex = 0;
-		for (vector<set<string> >::iterator iter = OUTL.begin(); iter != OUTL.end(); iter++, blockIndex++) {//±éÀúÃ¿¸ö»ù±¾¿éµÄ»îÔ¾±äÁ¿±í
-			for (set<string>::iterator viter = iter->begin(); viter != iter->end(); viter++) {//±éÀú»îÔ¾±äÁ¿±íÖĞµÄ±äÁ¿
-				symTables[blockIndex][*viter] = VarInfomation{ -1,true };
+		for (vector<set<string>>::iterator iter = OUTL.begin(); iter != OUTL.end(); iter++, blockIndex++)
+		{ //éå†æ¯ä¸ªåŸºæœ¬å—çš„æ´»è·ƒå˜é‡è¡¨
+			for (set<string>::iterator viter = iter->begin(); viter != iter->end(); viter++)
+			{ //éå†æ´»è·ƒå˜é‡è¡¨ä¸­çš„å˜é‡
+				symTables[blockIndex][*viter] = VarInfomation{-1, true};
 			}
-
 		}
 
 		blockIndex = 0;
-		//¼ÆËãÃ¿¸öËÄÔªÊ½µÄ´ıÓÃĞÅÏ¢ºÍ»îÔ¾ĞÅÏ¢
-		for (vector<IBlock>::iterator ibiter = iBlocks.begin(); ibiter != iBlocks.end(); ibiter++, blockIndex++) {//±éÀúÃ¿Ò»¸ö»ù±¾¿é
+		//è®¡ç®—æ¯ä¸ªå››å…ƒå¼çš„å¾…ç”¨ä¿¡æ¯å’Œæ´»è·ƒä¿¡æ¯
+		for (vector<IBlock>::iterator ibiter = iBlocks.begin(); ibiter != iBlocks.end(); ibiter++, blockIndex++)
+		{ //éå†æ¯ä¸€ä¸ªåŸºæœ¬å—
 			int codeIndex = ibiter->codes.size() - 1;
-			for (vector<QuaternaryWithInfo>::reverse_iterator citer = ibiter->codes.rbegin(); citer != ibiter->codes.rend(); citer++, codeIndex--) {//ÄæĞò±éÀú»ù±¾¿éÖĞµÄ´úÂë
-				if (citer->q.Op == Oper::J) {
-					//pass
+			for (vector<QuaternaryWithInfo>::reverse_iterator citer = ibiter->codes.rbegin(); citer != ibiter->codes.rend(); citer++, codeIndex--)
+			{ //é€†åºéå†åŸºæœ¬å—ä¸­çš„ä»£ç 
+				if (citer->q.Op == Oper::J)
+				{
+					// pass
 				}
 				else if (citer->q.Op == Oper::Call)
 				{
-					if (isVar(citer->q.result)) {
+					if (isVar(citer->q.result))
+					{
 						citer->info3 = symTables[blockIndex][citer->q.result];
-						symTables[blockIndex][citer->q.result] = VarInfomation{ -1,false };
+						symTables[blockIndex][citer->q.result] = VarInfomation{-1, false};
 					}
 				}
-				else if (citer->q.Op == Oper::Jeq || citer->q.Op == Oper::Jge || citer->q.Op == Oper::Jgt || citer->q.Op == Oper::Jle
-					|| citer->q.Op == Oper::Jlt || citer->q.Op == Oper::Jne)
+				else if (citer->q.Op == Oper::Jeq || citer->q.Op == Oper::Jge || citer->q.Op == Oper::Jgt || citer->q.Op == Oper::Jle || citer->q.Op == Oper::Jlt || citer->q.Op == Oper::Jne)
 				{
-					if (isVar(citer->q.arg1)) {
+					if (isVar(citer->q.arg1))
+					{
 						citer->info1 = symTables[blockIndex][citer->q.arg1];
-						symTables[blockIndex][citer->q.arg1] = VarInfomation{ codeIndex,true };
+						symTables[blockIndex][citer->q.arg1] = VarInfomation{codeIndex, true};
 					}
-					if (isVar(citer->q.arg2)) {
+					if (isVar(citer->q.arg2))
+					{
 						citer->info2 = symTables[blockIndex][citer->q.arg2];
-						symTables[blockIndex][citer->q.arg2] = VarInfomation{ codeIndex,true };
+						symTables[blockIndex][citer->q.arg2] = VarInfomation{codeIndex, true};
 					}
 				}
 				else if (citer->q.Op == Oper::Return)
 				{
-					if (isVar(citer->q.arg1)) {
+					if (isVar(citer->q.arg1))
+					{
 						citer->info1 = symTables[blockIndex][citer->q.arg1];
-						symTables[blockIndex][citer->q.arg1] = VarInfomation{ codeIndex,true };
+						symTables[blockIndex][citer->q.arg1] = VarInfomation{codeIndex, true};
 					}
 				}
 				else if (citer->q.Op == Oper::ArrayAssign)
 				{
-					if (isVar(citer->q.arg1)) {
+					if (isVar(citer->q.arg1))
+					{
 						citer->info1 = symTables[blockIndex][citer->q.arg1];
-						symTables[blockIndex][citer->q.arg1] = VarInfomation{ codeIndex,true };
+						symTables[blockIndex][citer->q.arg1] = VarInfomation{codeIndex, true};
 					}
-					if (isVar(citer->q.result)) {
+					if (isVar(citer->q.result))
+					{
 						citer->info3 = symTables[blockIndex][citer->q.result];
-						symTables[blockIndex][citer->q.result] = VarInfomation{ -1,false };
+						symTables[blockIndex][citer->q.result] = VarInfomation{-1, false};
 					}
 				}
 				else if (citer->q.Op == Oper::AssignArray)
 				{
-					if (isVar(citer->q.arg2)) {
+					if (isVar(citer->q.arg2))
+					{
 						citer->info2 = symTables[blockIndex][citer->q.arg2];
-						symTables[blockIndex][citer->q.arg2] = VarInfomation{ codeIndex,true };
+						symTables[blockIndex][citer->q.arg2] = VarInfomation{codeIndex, true};
 					}
-					if (isVar(citer->q.result)) {
+					if (isVar(citer->q.result))
+					{
 						citer->info3 = symTables[blockIndex][citer->q.result];
-						symTables[blockIndex][citer->q.result] = VarInfomation{ -1,false };
+						symTables[blockIndex][citer->q.result] = VarInfomation{-1, false};
 					}
 				}
-				else {
-					if (isVar(citer->q.arg1)) {
+				else
+				{
+					if (isVar(citer->q.arg1))
+					{
 						citer->info1 = symTables[blockIndex][citer->q.arg1];
-						symTables[blockIndex][citer->q.arg1] = VarInfomation{ codeIndex,true };
+						symTables[blockIndex][citer->q.arg1] = VarInfomation{codeIndex, true};
 					}
-					if (isVar(citer->q.arg2)) {
+					if (isVar(citer->q.arg2))
+					{
 						citer->info2 = symTables[blockIndex][citer->q.arg2];
-						symTables[blockIndex][citer->q.arg2] = VarInfomation{ codeIndex,true };
+						symTables[blockIndex][citer->q.arg2] = VarInfomation{codeIndex, true};
 					}
-					if (isVar(citer->q.result)) {
+					if (isVar(citer->q.result))
+					{
 						citer->info3 = symTables[blockIndex][citer->q.result];
-						symTables[blockIndex][citer->q.result] = VarInfomation{ -1,false };
+						symTables[blockIndex][citer->q.result] = VarInfomation{-1, false};
 					}
 				}
 			}
@@ -432,65 +519,82 @@ void ObjectCode::analyseBlock(Optimizer& optim) {
 	}
 }
 
-void ObjectCode::outputIBlocks(ostream& out) {
-	for (map<string, vector<IBlock> >::iterator iter = funcIBlocks.begin(); iter != funcIBlocks.end(); iter++) {
+void ObjectCode::outputIBlocks(ostream &out)
+{
+	for (map<string, vector<IBlock>>::iterator iter = funcIBlocks.begin(); iter != funcIBlocks.end(); iter++)
+	{
 		out << "[" << iter->first << "]" << endl;
-		for (vector<IBlock>::iterator bIter = iter->second.begin(); bIter != iter->second.end(); bIter++) {
+		for (vector<IBlock>::iterator bIter = iter->second.begin(); bIter != iter->second.end(); bIter++)
+		{
 			out << bIter->name << ":" << endl;
-			for (vector<QuaternaryWithInfo>::iterator cIter = bIter->codes.begin(); cIter != bIter->codes.end(); cIter++) {
+			for (vector<QuaternaryWithInfo>::iterator cIter = bIter->codes.begin(); cIter != bIter->codes.end(); cIter++)
+			{
 				out << "    ";
 				cIter->output(out);
 				out << endl;
 			}
-			out << "    " << "next1 = " << bIter->next1 << endl;
-			out << "    " << "next2 = " << bIter->next2 << endl;
+			out << "    "
+				<< "next1 = " << bIter->next1 << endl;
+			out << "    "
+				<< "next2 = " << bIter->next2 << endl;
 		}
 		out << endl;
 	}
 }
 
-void ObjectCode::outputObjectCode(ostream& out) {
-	for (vector<string>::iterator iter = objectCodes.begin(); iter != objectCodes.end(); iter++) {
+void ObjectCode::outputObjectCode(ostream &out)
+{
+	for (vector<string>::iterator iter = objectCodes.begin(); iter != objectCodes.end(); iter++)
+	{
 		out << *iter << endl;
 	}
 }
 
-//»ù±¾¿é³ö¿Ú£¬½«³ö¿Ú»îÔ¾±äÁ¿±£´æÔÚÄÚ´æ
-void ObjectCode::storeOutLiveVar(set<string>& outl) {
-	for (set<string>::iterator oiter = outl.begin(); oiter != outl.end(); oiter++) {
-		string reg;//»îÔ¾±äÁ¿ËùÔÚµÄ¼Ä´æÆ÷Ãû³Æ
-		bool inFlag = false;//»îÔ¾±äÁ¿ÔÚÄÚ´æÖĞµÄ±êÖ¾
-		for (set<string>::iterator aiter = Avalue[*oiter].begin(); aiter != Avalue[*oiter].end(); aiter++) {
-			if ((*aiter)[0] != '$') {//¸Ã»îÔ¾±äÁ¿ÒÑ¾­´æ´¢ÔÚÄÚ´æÖĞ
+//åŸºæœ¬å—å‡ºå£ï¼Œå°†å‡ºå£æ´»è·ƒå˜é‡ä¿å­˜åœ¨å†…å­˜
+void ObjectCode::storeOutLiveVar(set<string> &outl)
+{
+	for (set<string>::iterator oiter = outl.begin(); oiter != outl.end(); oiter++)
+	{
+		string reg;			 //æ´»è·ƒå˜é‡æ‰€åœ¨çš„å¯„å­˜å™¨åç§°
+		bool inFlag = false; //æ´»è·ƒå˜é‡åœ¨å†…å­˜ä¸­çš„æ ‡å¿—
+		for (set<string>::iterator aiter = Avalue[*oiter].begin(); aiter != Avalue[*oiter].end(); aiter++)
+		{
+			if ((*aiter)[0] != '$')
+			{ //è¯¥æ´»è·ƒå˜é‡å·²ç»å­˜å‚¨åœ¨å†…å­˜ä¸­
 				inFlag = true;
 				break;
 			}
-			else {
+			else
+			{
 				reg = *aiter;
 			}
 		}
-		if (!inFlag) {//Èç¹û¸Ã»îÔ¾±äÁ¿²»ÔÚÄÚ´æÖĞ£¬Ôò½«regÖĞµÄvar±äÁ¿´æÈëÄÚ´æ
+		if (!inFlag)
+		{ //å¦‚æœè¯¥æ´»è·ƒå˜é‡ä¸åœ¨å†…å­˜ä¸­ï¼Œåˆ™å°†regä¸­çš„varå˜é‡å­˜å…¥å†…å­˜
 			storeVar(reg, *oiter);
 		}
 	}
 }
 
-void ObjectCode::generateCodeForQuatenary(int nowBaseBlockIndex, int& arg_num, int& par_num, list<pair<string, bool> >& par_list)
+void ObjectCode::generateCodeForQuatenary(int nowBaseBlockIndex, int &arg_num, int &par_num, list<pair<string, bool>> &par_list)
 {
-	if (Oper2string(nowQuatenary->q.Op)[0] != 'J' && nowQuatenary->q.Op != Oper::Call) {
-		if (isVar(nowQuatenary->q.arg1) && Avalue[nowQuatenary->q.arg1].empty()) {
-			cout << string("±äÁ¿") << nowQuatenary->q.arg1 << "ÔÚÒıÓÃÇ°Î´¸³Öµ" << endl;
+	if (Oper2string(nowQuatenary->q.Op)[0] != 'J' && nowQuatenary->q.Op != Oper::Call)
+	{
+		if (isVar(nowQuatenary->q.arg1) && Avalue[nowQuatenary->q.arg1].empty())
+		{
+            // cout << string("å˜é‡") << nowQuatenary->q.arg1 << "åœ¨å¼•ç”¨å‰æœªèµ‹å€¼" << endl;
 		}
-		if (isVar(nowQuatenary->q.arg2) && Avalue[nowQuatenary->q.arg2].empty()) {
-			cout << string("±äÁ¿") << nowQuatenary->q.arg2 << "ÔÚÒıÓÃÇ°Î´¸³Öµ" << endl;
+		if (isVar(nowQuatenary->q.arg2) && Avalue[nowQuatenary->q.arg2].empty())
+		{
+            // cout << string("å˜é‡") << nowQuatenary->q.arg2 << "åœ¨å¼•ç”¨å‰æœªèµ‹å€¼" << endl;
 		}
 	}
 
-
-	if (nowQuatenary->q.Op == Oper::J) {
+	if (nowQuatenary->q.Op == Oper::J)
+	{
 		objectCodes.push_back(Oper2string(nowQuatenary->q.Op) + " " + nowQuatenary->q.result);
 	}
-	else if (Oper2string(nowQuatenary->q.Op)[0] == 'J') 
+	else if (Oper2string(nowQuatenary->q.Op)[0] == 'J')
 	{
 		string op;
 		if (nowQuatenary->q.Op == Oper::Jge)
@@ -508,70 +612,85 @@ void ObjectCode::generateCodeForQuatenary(int nowBaseBlockIndex, int& arg_num, i
 		string pos1 = allocateReg(nowQuatenary->q.arg1);
 		string pos2 = allocateReg(nowQuatenary->q.arg2);
 		objectCodes.push_back(op + " " + pos1 + " " + pos2 + " " + nowQuatenary->q.result);
-		if (!nowQuatenary->info1.active) {
+		if (!nowQuatenary->info1.active)
+		{
 			releaseVar(nowQuatenary->q.arg1);
 		}
-		if (!nowQuatenary->info2.active) {
+		if (!nowQuatenary->info2.active)
+		{
 			releaseVar(nowQuatenary->q.arg2);
 		}
 	}
-	else if (nowQuatenary->q.Op == Oper::Parm) {
+	else if (nowQuatenary->q.Op == Oper::Parm)
+	{
 		par_list.push_back(pair<string, bool>(nowQuatenary->q.arg1, nowQuatenary->info1.active));
 	}
-	else if (nowQuatenary->q.Op == Oper::Call) {
-		/*½«²ÎÊıÑ¹Õ»*/
-		for (list<pair<string, bool> >::iterator aiter = par_list.begin(); aiter != par_list.end(); aiter++) {
+	else if (nowQuatenary->q.Op == Oper::Call)
+	{
+		/*å°†å‚æ•°å‹æ ˆ*/
+		for (list<pair<string, bool>>::iterator aiter = par_list.begin(); aiter != par_list.end(); aiter++)
+		{
 			string pos = allocateReg(aiter->first);
 			objectCodes.push_back(string("sw ") + pos + " " + to_string(top + 4 * (++arg_num + 1)) + "($sp)");
-			if (!aiter->second) {
+			if (!aiter->second)
+			{
 				releaseVar(aiter->first);
 			}
 		}
-		/*¸üĞÂ$sp*/
+		/*æ›´æ–°$sp*/
 		objectCodes.push_back(string("sw $sp ") + to_string(top) + "($sp)");
 		objectCodes.push_back(string("addi $sp $sp ") + to_string(top));
 
-		/*Ìø×ªµ½¶ÔÓ¦º¯Êı*/
+		/*è·³è½¬åˆ°å¯¹åº”å‡½æ•°*/
 		objectCodes.push_back(string("jal ") + nowQuatenary->q.arg1);
 
-		/*»Ö¸´ÏÖ³¡*/
+		/*æ¢å¤ç°åœº*/
 		objectCodes.push_back(string("lw $sp 0($sp)"));
 
-		/*±£´æ·µ»ØÖµ*/
+		/*ä¿å­˜è¿”å›å€¼*/
 		string src1Pos = "$v0";
 		Rvalue[src1Pos].insert(nowQuatenary->q.result);
 		Avalue[nowQuatenary->q.result].insert(src1Pos);
 		par_list.clear();
 		arg_num = 0;
 	}
-	else if (nowQuatenary->q.Op == Oper::Return) {
-		if (isNum(nowQuatenary->q.arg1)) {//·µ»ØÖµÎªÊı×Ö
+	else if (nowQuatenary->q.Op == Oper::Return)
+	{
+		if (isNum(nowQuatenary->q.arg1))
+		{ //è¿”å›å€¼ä¸ºæ•°å­—
 			objectCodes.push_back("addi $v0 $zero " + nowQuatenary->q.arg1);
 		}
-		else if (isVar(nowQuatenary->q.arg1)) {//·µ»ØÖµÎª±äÁ¿
+		else if (isVar(nowQuatenary->q.arg1))
+		{ //è¿”å›å€¼ä¸ºå˜é‡
 			set<string>::iterator piter = Avalue[nowQuatenary->q.arg1].begin();
-			if ((*piter)[0] == '$') {
+			if ((*piter)[0] == '$')
+			{
 				objectCodes.push_back(string("add $v0 $zero ") + *piter);
 			}
-			else {
+			else
+			{
 				objectCodes.push_back(string("lw $v0 ") + to_string(varOffset[*piter]) + "($sp)");
 			}
 		}
-		if (nowFunc == "main") {
+		if (nowFunc == "main")
+		{
 			objectCodes.push_back("j end");
 		}
-		else {
+		else
+		{
 			objectCodes.push_back("lw $ra 4($sp)");
 			objectCodes.push_back("jr $ra");
 		}
 	}
-	else if (nowQuatenary->q.Op == Oper::Get) {
-		//varOffset[nowQuatenary->q.src1] = 4 * (par_num++ + 2);
+	else if (nowQuatenary->q.Op == Oper::Get)
+	{
+		// varOffset[nowQuatenary->q.src1] = 4 * (par_num++ + 2);
 		varOffset[nowQuatenary->q.result] = top;
 		top += 4;
 		Avalue[nowQuatenary->q.result].insert(nowQuatenary->q.result);
 	}
-	else if (nowQuatenary->q.Op == Oper::Assign) {
+	else if (nowQuatenary->q.Op == Oper::Assign)
+	{
 		string src1Pos;
 		src1Pos = allocateReg(nowQuatenary->q.arg1);
 		Rvalue[src1Pos].insert(nowQuatenary->q.result);
@@ -579,51 +698,61 @@ void ObjectCode::generateCodeForQuatenary(int nowBaseBlockIndex, int& arg_num, i
 	}
 	else if (nowQuatenary->q.Op == Oper::ArrayAssign)
 	{
-		//sw $t1, n($t0)
+		// sw $t1, n($t0)
 		string src1Pos = allocateReg(nowQuatenary->q.arg1);
 		string arrayIndex = allocateReg(nowQuatenary->q.result);
 		objectCodes.push_back(string("mul ") + arrayIndex + " " + arrayIndex + " " + to_string(4));
 		objectCodes.push_back(string("sw ") + src1Pos + string(" ") + nowQuatenary->q.arg2 + string("(") + arrayIndex + string(")"));
-		if (!nowQuatenary->info1.active && isVar(nowQuatenary->q.arg1)) {
+		if (!nowQuatenary->info1.active && isVar(nowQuatenary->q.arg1))
+		{
 			releaseVar(nowQuatenary->q.arg1);
 		}
-		if (!nowQuatenary->info3.active && isVar(nowQuatenary->q.result)) {
+		if (!nowQuatenary->info3.active && isVar(nowQuatenary->q.result))
+		{
 			releaseVar(nowQuatenary->q.result);
 		}
 	}
 	else if (nowQuatenary->q.Op == Oper::AssignArray)
 	{
-		//lw $t7, n($t0)
-		//AssignArray n $t0 t7
+		// lw $t7, n($t0)
+		// AssignArray n $t0 t7
 		string arrayIndex = allocateReg(nowQuatenary->q.arg2);
 		objectCodes.push_back(string("mul ") + arrayIndex + " " + arrayIndex + " " + to_string(4));
 		string desPos = getArrayReg();
 		objectCodes.push_back(string("lw ") + desPos + string(" ") + nowQuatenary->q.arg1 + string("(") + arrayIndex + string(")"));
-		if (!nowQuatenary->info2.active && isVar(nowQuatenary->q.arg2)) {
+		if (!nowQuatenary->info2.active && isVar(nowQuatenary->q.arg2))
+		{
 			releaseVar(nowQuatenary->q.arg2);
 		}
 	}
-	else {// + - * /
+	else
+	{ // + - * /
 		string src1Pos = allocateReg(nowQuatenary->q.arg1);
 		string src2Pos = allocateReg(nowQuatenary->q.arg2);
 		string desPos = getReg();
-		if (nowQuatenary->q.Op == Oper::Plus) {
+		if (nowQuatenary->q.Op == Oper::Plus)
+		{
 			objectCodes.push_back(string("add ") + desPos + " " + src1Pos + " " + src2Pos);
 		}
-		else if (nowQuatenary->q.Op == Oper::Minus) {
+		else if (nowQuatenary->q.Op == Oper::Minus)
+		{
 			objectCodes.push_back(string("sub ") + desPos + " " + src1Pos + " " + src2Pos);
 		}
-		else if (nowQuatenary-> q.Op == Oper::Multiply) {
+		else if (nowQuatenary->q.Op == Oper::Multiply)
+		{
 			objectCodes.push_back(string("mul ") + desPos + " " + src1Pos + " " + src2Pos);
 		}
-		else if (nowQuatenary->q.Op == Oper::Divide) {
+		else if (nowQuatenary->q.Op == Oper::Divide)
+		{
 			objectCodes.push_back(string("div ") + src1Pos + " " + src2Pos);
 			objectCodes.push_back(string("mflo ") + desPos);
 		}
-		if (!nowQuatenary->info1.active) {
+		if (!nowQuatenary->info1.active)
+		{
 			releaseVar(nowQuatenary->q.arg1);
 		}
-		if (!nowQuatenary->info2.active) {
+		if (!nowQuatenary->info2.active)
+		{
 			releaseVar(nowQuatenary->q.arg2);
 		}
 	}
@@ -631,92 +760,102 @@ void ObjectCode::generateCodeForQuatenary(int nowBaseBlockIndex, int& arg_num, i
 
 void ObjectCode::generateCodeForBaseBlocks(int nowBaseBlockIndex)
 {
-	int arg_num = 0;//parµÄÊµ²Î¸öÊı
-	int par_num = 0;//getµÄĞÎ²Î¸öÊı
-	list<pair<string, bool> > par_list;//º¯Êıµ÷ÓÃÓÃµ½µÄÊµ²Î¼¯list<Êµ²ÎÃû,ÊÇ·ñ»îÔ¾>
+	int arg_num = 0;				   // parçš„å®å‚ä¸ªæ•°
+	int par_num = 0;				   // getçš„å½¢å‚ä¸ªæ•°
+	list<pair<string, bool>> par_list; //å‡½æ•°è°ƒç”¨ç”¨åˆ°çš„å®å‚é›†list<å®å‚å,æ˜¯å¦æ´»è·ƒ>
 
 	Avalue.clear();
 	Rvalue.clear();
-	set<string>& inl = funcINL[nowFunc][nowBaseBlockIndex];
-	for (set<string>::iterator iter = inl.begin(); iter != inl.end(); iter++) {
+	set<string> &inl = funcINL[nowFunc][nowBaseBlockIndex];
+	for (set<string>::iterator iter = inl.begin(); iter != inl.end(); iter++)
+	{
 		Avalue[*iter].insert(*iter);
 	}
 
-	//³õÊ¼»¯¿ÕÏĞ¼Ä´æÆ÷
+	//åˆå§‹åŒ–ç©ºé—²å¯„å­˜å™¨
 	freeReg.clear();
-	for (int i = 0; i <= 7; i++) {
+	for (int i = 0; i <= 7; i++)
+	{
 		freeReg.push_back(string("$s") + to_string(i));
 	}
 
 	objectCodes.push_back(nowIBlock->name + ":");
-	if (nowBaseBlockIndex == 0) {
-		if (nowFunc == "main") {
+	if (nowBaseBlockIndex == 0)
+	{
+		if (nowFunc == "main")
+		{
 			top = 8;
 		}
-		else {
-			objectCodes.push_back("sw $ra 4($sp)");//°Ñ·µ»ØµØÖ·Ñ¹Õ»
+		else
+		{
+			objectCodes.push_back("sw $ra 4($sp)"); //æŠŠè¿”å›åœ°å€å‹æ ˆ
 			top = 8;
 		}
 	}
 
-	for (vector<QuaternaryWithInfo>::iterator cIter = nowIBlock->codes.begin(); cIter != nowIBlock->codes.end(); cIter++) {//¶Ô»ù±¾¿éÄÚµÄÃ¿Ò»ÌõÓï¾ä
+	for (vector<QuaternaryWithInfo>::iterator cIter = nowIBlock->codes.begin(); cIter != nowIBlock->codes.end(); cIter++)
+	{ //å¯¹åŸºæœ¬å—å†…çš„æ¯ä¸€æ¡è¯­å¥
 		nowQuatenary = cIter;
-		//Èç¹ûÊÇ»ù±¾¿éµÄ×îºóÒ»ÌõÓï¾ä
-		if (cIter + 1 == nowIBlock->codes.end()) {
-			//Èç¹û×îºóÒ»ÌõÓï¾äÊÇ¿ØÖÆÓï¾ä£¬ÔòÏÈ½«³ö¿Ú»îÔ¾±äÁ¿±£´æ£¬ÔÙ½øĞĞÌø×ª(j,call,return)
-			if (isControlOp(Oper2string(cIter->q.Op))) {
+		//å¦‚æœæ˜¯åŸºæœ¬å—çš„æœ€åä¸€æ¡è¯­å¥
+		if (cIter + 1 == nowIBlock->codes.end())
+		{
+			//å¦‚æœæœ€åä¸€æ¡è¯­å¥æ˜¯æ§åˆ¶è¯­å¥ï¼Œåˆ™å…ˆå°†å‡ºå£æ´»è·ƒå˜é‡ä¿å­˜ï¼Œå†è¿›è¡Œè·³è½¬(j,call,return)
+			if (isControlOp(Oper2string(cIter->q.Op)))
+			{
 				storeOutLiveVar(funcOUTL[nowFunc][nowBaseBlockIndex]);
 				generateCodeForQuatenary(nowBaseBlockIndex, arg_num, par_num, par_list);
 			}
-			//Èç¹û×îºóÒ»ÌõÓï¾ä²»ÊÇ¿ØÖÆÓï¾ä£¨ÊÇ¸³ÖµÓï¾ä£©£¬ÔòÏÈ¼ÆËã£¬ÔÙ½«³ö¿Ú»îÔ¾±äÁ¿±£´æ
-			else {
+			//å¦‚æœæœ€åä¸€æ¡è¯­å¥ä¸æ˜¯æ§åˆ¶è¯­å¥ï¼ˆæ˜¯èµ‹å€¼è¯­å¥ï¼‰ï¼Œåˆ™å…ˆè®¡ç®—ï¼Œå†å°†å‡ºå£æ´»è·ƒå˜é‡ä¿å­˜
+			else
+			{
 				generateCodeForQuatenary(nowBaseBlockIndex, arg_num, par_num, par_list);
 				storeOutLiveVar(funcOUTL[nowFunc][nowBaseBlockIndex]);
 			}
 		}
-		else {
+		else
+		{
 			generateCodeForQuatenary(nowBaseBlockIndex, arg_num, par_num, par_list);
 		}
-
 	}
 }
 
-void ObjectCode::generateCodeForFuncBlocks(map<string, vector<IBlock> >::iterator& fiter)
+void ObjectCode::generateCodeForFuncBlocks(map<string, vector<IBlock>>::iterator &fiter)
 {
 	varOffset.clear();
 	nowFunc = fiter->first;
-	vector<IBlock>& iBlocks = fiter->second;
-	for (vector<IBlock>::iterator iter = iBlocks.begin(); iter != iBlocks.end(); iter++) {//¶ÔÃ¿Ò»¸ö»ù±¾¿é
+	vector<IBlock> &iBlocks = fiter->second;
+	for (vector<IBlock>::iterator iter = iBlocks.begin(); iter != iBlocks.end(); iter++)
+	{ //å¯¹æ¯ä¸€ä¸ªåŸºæœ¬å—
 		nowIBlock = iter;
 		generateCodeForBaseBlocks(nowIBlock - iBlocks.begin());
 	}
 }
 
-void ObjectCode::generateArrayData(const proc_symbolTable* ptr)
+void ObjectCode::generateArrayData(const proc_symbolTable *ptr)
 {
 	objectCodes.push_back(".data");
 
-	for (const auto& item : ptr->itemTable)	//È«¾ÖÊı×é
+	for (const auto &item : ptr->itemTable) //å…¨å±€æ•°ç»„
 	{
 		if (item.second.type == symbolType::Array)
 		{
 			objectCodes.push_back(item.second.gobalname + string(":"));
 			int len = 1;
-			for (const auto& arr : item.second.array)
+			for (const auto &arr : item.second.array)
 				len *= arr;
 			objectCodes.push_back(string(".word ") + to_string(len));
 		}
 	}
 
-	for (const auto& func : ptr->functionTable)	//¾Ö²¿Êı×é
+	for (const auto &func : ptr->functionTable) //å±€éƒ¨æ•°ç»„
 	{
-		for (const auto& item : func.second->itemTable)
+		for (const auto &item : func.second->itemTable)
 		{
 			if (item.second.type == symbolType::Array)
 			{
 				objectCodes.push_back(item.second.gobalname + string(":"));
 				int len = 1;
-				for (const auto& arr : item.second.array)
+				for (const auto &arr : item.second.array)
 					len *= arr;
 				objectCodes.push_back(string(".word ") + to_string(len));
 			}
@@ -724,14 +863,29 @@ void ObjectCode::generateArrayData(const proc_symbolTable* ptr)
 	}
 }
 
-void ObjectCode::generateCode(const proc_symbolTable* ptr)
+void ObjectCode::generateCode(const proc_symbolTable *ptr)
 {
 	this->generateArrayData(ptr);
 	objectCodes.push_back(".text");
 	objectCodes.push_back("lui $sp,0x1002");
 	objectCodes.push_back("j main");
-	for (map<string, vector<IBlock> >::iterator fiter = funcIBlocks.begin(); fiter != funcIBlocks.end(); fiter++) {//¶ÔÃ¿Ò»¸öº¯Êı¿é
+	for (map<string, vector<IBlock>>::iterator fiter = funcIBlocks.begin(); fiter != funcIBlocks.end(); fiter++)
+	{ //å¯¹æ¯ä¸€ä¸ªå‡½æ•°å—
 		generateCodeForFuncBlocks(fiter);
 	}
 	objectCodes.push_back("end:");
+}
+
+void ObjectCode::clear()
+{
+	this->funcIBlocks.clear();
+	this->Avalue.clear();
+	this->Rvalue.clear();
+	this->varOffset.clear();
+	this->top = 0;
+	this->freeReg.clear();
+	this->funcOUTL.clear();
+	this->funcINL.clear();
+	this->nowFunc = string("");
+	this->objectCodes.clear();
 }

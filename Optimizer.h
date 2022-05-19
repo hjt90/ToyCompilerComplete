@@ -1,4 +1,5 @@
 #pragma once
+#pragma execution_character_set("utf-8")
 #include "quadruple.h"
 #include "Parsing.h"
 
@@ -10,6 +11,7 @@ public:
 	NewLabeler();
 	string newLabel();
 	string newTmp();
+	void clear();
 };
 
 struct DAGitem
@@ -35,7 +37,7 @@ struct DAGitem
 		bool f6 = this->left_child == b.left_child;
 		bool f7 = this->right_child == b.right_child;
 		bool f8 = true;
-		for (auto i = 0; i < this->label.size() && i < b.label.size(); i++)
+        for (auto i = 0; i < (int)this->label.size() && i < (int)b.label.size(); i++)
 		{
 			if (this->label[i] != b.label[i])
 			{
@@ -54,23 +56,24 @@ class Optimizer {
 private:
 	IntermediateLanguage code;
 	map<string, vector<Block> >funcBlocks;
-	map<string, vector<Block_DAG> >DAGBlocks;  //¸÷º¯ÊıµÄDAGÍ¼
-	map<string, vector<set<string> > >funcOUTL; //¸÷º¯Êı¿éÖĞ»ù±¾¿éµÄ³ö¿Ú»îÔ¾±äÁ¿¼¯
-	map<string, vector<set<string> > >funcINL; //¸÷º¯Êı¿éÖĞ»ù±¾¿éµÄÈë¿Ú»îÔ¾±äÁ¿¼¯
+	map<string, vector<Block_DAG> >DAGBlocks;  //å„å‡½æ•°çš„DAGå›¾
+	map<string, vector<set<string> > >funcOUTL; //å„å‡½æ•°å—ä¸­åŸºæœ¬å—çš„å‡ºå£æ´»è·ƒå˜é‡é›†
+	map<string, vector<set<string> > >funcINL; //å„å‡½æ•°å—ä¸­åŸºæœ¬å—çš„å…¥å£æ´»è·ƒå˜é‡é›†
 	NewLabeler label;
 
 	void preparing(Block&);
-	void init_INOUTL(); //³õÊ¼»¯³öÈë¿Ú»îÔ¾±äÁ¿¼¯
+	void init_INOUTL(); //åˆå§‹åŒ–å‡ºå…¥å£æ´»è·ƒå˜é‡é›†
 	void init_DAGs();
 	void optimizer_Blocks();
 
-	vector<DAGitem> geneDAG(const Block&); //½«»ù±¾¿é×ªÎªDAGÍ¼
-	Block DAG2block(vector<DAGitem>&, const Block&, const set<string>&); //½«DAGÍ¼×ªÎª»ù±¾¿é
+	vector<DAGitem> geneDAG(const Block&); //å°†åŸºæœ¬å—è½¬ä¸ºDAGå›¾
+	Block DAG2block(vector<DAGitem>&, const Block&, const set<string>&); //å°†DAGå›¾è½¬ä¸ºåŸºæœ¬å—
 
 public:
 	Optimizer() = default;
 	void outputBlocks(ostream& out);
 	void divideBlocks(const parsing&, const proc_symbolTable*);
 	void optimizer();
+	void clear();
 	friend class ObjectCode;
 };

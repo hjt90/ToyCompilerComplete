@@ -1,5 +1,6 @@
 #ifndef TOKEN_H
 #define TOKEN_H
+#pragma execution_character_set("utf-8")
 
 enum class Token
 {

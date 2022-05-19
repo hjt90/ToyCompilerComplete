@@ -1,4 +1,5 @@
 #pragma once
+#pragma execution_character_set("utf-8")
 #include <string>
 #include <vector>
 #include <map>
@@ -36,7 +37,7 @@ struct symbolTableItem
 	symbolType type;
 	std::string name;
 	std::string gobalname;
-	int offset; //Æ«ÒÆÁ¿
+	int offset; //åç§»é‡
 	vector<int> array;
 	symbolTableItem() = default;
 	symbolTableItem(symbolType, std::string, std::string, int);
@@ -47,19 +48,19 @@ class Optimizer;
 class ObjectCode;
 class proc_symbolTable
 {
-	procSymbolTableType type; //ÖÖÀà
-	int enter_quad; //Èë¿ÚµØÖ·
+	procSymbolTableType type; //ç§ç±»
+	int enter_quad; //å…¥å£åœ°å€
 	std::string name;
-	proc_symbolTable* returnAddr;      //·µ»ØµØÖ·
+	proc_symbolTable* returnAddr;      //è¿”å›åœ°å€
 	std::map<std::string, proc_symbolTable*> functionTable;
 	std::map<std::string, symbolTableItem> itemTable;
-	int itemTable_offset; //µ±Ç°·ûºÅ±íµÄoffset
+	int itemTable_offset; //å½“å‰ç¬¦å·è¡¨çš„offset
 
 public:
 	static int nexttmpname;
 	static std::string newtemp();
 
-	std::vector<symbolTableItem> parm; //²ÎÊıÁĞ±í
+	std::vector<symbolTableItem> parm; //å‚æ•°åˆ—è¡¨
 	symbolType return_type;
 
 	proc_symbolTable();

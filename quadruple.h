@@ -1,4 +1,5 @@
 #pragma once
+#pragma execution_character_set("utf-8")
 #include <string>
 #include <vector>
 #include <fstream>
@@ -58,6 +59,7 @@ public:
 
 	int emit_code(const quadruple& newqr);
 	void back_patch(std::vector<quadrupleIndex> qrlist, int pos);
-	void output(ofstream& midcode);
+    void output(ostream& midcode);
+	void clear();
 	IntermediateLanguage();
 };

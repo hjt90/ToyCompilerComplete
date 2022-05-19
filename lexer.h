@@ -1,5 +1,6 @@
 #ifndef LEXER_H
 #define LEXER_H
+#pragma execution_character_set("utf-8")
 #include <vector>
 #include <fstream>
 #include <string>
@@ -22,23 +23,23 @@ class Lexer
 {
 public:
 	Lexer() = default;
-	string translatetoken(Token i);        //·­ÒëtokenÒÔ±ãÊä³ö
-	void printresult();           //´òÓ¡½á¹û
-	void analyze(ifstream& file); //·ÖÎö
+	string translatetoken(Token i);        //ç¿»è¯‘tokenä»¥ä¾¿è¾“å‡º
+	void printresult();           //æ‰“å°ç»“æœ
+    void analyze(istream& file); //åˆ†æ
 	const vector<pair<Token, string>>& output();
 private:
-	vector<string> keywordlist = { "int", "void", "if", "else", "while", "return" }; //±£Áô×Ö±í£¨ÀïÃæË³Ğò±ØĞëÑÏ¸ñºÍTokenÖĞË³ĞòÒ»Ñù£©
-	vector<string> idtlist;                                                        //±êÊ¶·û±í
-	bool annflag = false;                                                          //¿ØÖÆ×¢ÊÍ¿ª¹Ø£¬ÓÃÀ´ÅĞ¶ÏÊÇ·ñ´¦ÓÚ/**/ÄÚ
-	vector<pair<Token, string>> result;                                            //½á¹û
+	vector<string> keywordlist = { "int", "void", "if", "else", "while", "return" }; //ä¿ç•™å­—è¡¨ï¼ˆé‡Œé¢é¡ºåºå¿…é¡»ä¸¥æ ¼å’ŒTokenä¸­é¡ºåºä¸€æ ·ï¼‰
+	vector<string> idtlist;                                                        //æ ‡è¯†ç¬¦è¡¨
+	bool annflag = false;                                                          //æ§åˆ¶æ³¨é‡Šå¼€å…³ï¼Œç”¨æ¥åˆ¤æ–­æ˜¯å¦å¤„äº/**/å†…
+	vector<pair<Token, string>> result;                                            //ç»“æœ
 
-	Ftype chtype(char ch);                               //²é¿´×Ö·ûÊÇÊ²Ã´ÀàĞÍ
-	Status dealnumber(char* templine, int& cr, int len); //´¦Àí¿ªÍ·ÊÇÊı×ÖµÄ´Ê
-	Status dealalpha(char* templine, int& cr, int len);  //´¦Àí¿ªÍ·ÊÇ×ÖÄ¸µÄ´Ê
-	Status dealsymbol(char* templine, int& cr, int len); //´¦Àí¿ªÍ·ÊÇ·ûºÅµÄ´Ê
-	void dealerror(int line, int cr);                    //Êä³ö´íÎó
-	Token search_keyword(string& s);                     //²éÑ¯¹Ø¼ü×Ö±í
-	int search_identifier(string& s);                    //²é±êÊ¶·û±í
+	Ftype chtype(char ch);                               //æŸ¥çœ‹å­—ç¬¦æ˜¯ä»€ä¹ˆç±»å‹
+	Status dealnumber(char* templine, int& cr, int len); //å¤„ç†å¼€å¤´æ˜¯æ•°å­—çš„è¯
+	Status dealalpha(char* templine, int& cr, int len);  //å¤„ç†å¼€å¤´æ˜¯å­—æ¯çš„è¯
+	Status dealsymbol(char* templine, int& cr, int len); //å¤„ç†å¼€å¤´æ˜¯ç¬¦å·çš„è¯
+	void dealerror(int line, int cr);                    //è¾“å‡ºé”™è¯¯
+	Token search_keyword(string& s);                     //æŸ¥è¯¢å…³é”®å­—è¡¨
+	int search_identifier(string& s);                    //æŸ¥æ ‡è¯†ç¬¦è¡¨
 };
 
 #endif

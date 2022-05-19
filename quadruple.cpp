@@ -1,3 +1,4 @@
+#pragma execution_character_set("utf-8")
 #include "quadruple.h"
 
 IntermediateLanguage::IntermediateLanguage() :nextquad(CODE_START_POS)
@@ -15,7 +16,7 @@ void IntermediateLanguage::back_patch(std::vector<quadrupleIndex> qrlist, int po
 {
 	for (auto it = qrlist.begin(); it != qrlist.end(); it++)
 	{
-		code[(*it) - CODE_START_POS].result = std::to_string(pos); //这里注意减去代码段的初始偏移
+		code[(*it) - CODE_START_POS].result = std::to_string(pos); //杩欓噷娉ㄦ剰鍑忓幓浠ｇ爜娈电殑鍒濆鍋忕Щ
 	}
 	return;
 }
@@ -83,13 +84,19 @@ string Oper2string(Oper op)
 	}
 }
 
-void IntermediateLanguage::output(ofstream& midcode)
+void IntermediateLanguage::output(ostream& midcode)
 {
 	int pos = CODE_START_POS;
 	for (auto i : code)
 	{
 		midcode << pos++ << "," << Oper2string(i.Op) << "," << i.arg1 << "," << i.arg2 << "," << i.result << "," << endl;
 	}
+}
+
+void IntermediateLanguage::clear()
+{
+    this->nextquad = CODE_START_POS;
+	this->code.clear();
 }
 
 quadruple::quadruple(Oper Op, std::string arg1, std::string arg2, std::string result)

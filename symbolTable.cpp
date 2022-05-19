@@ -1,3 +1,4 @@
+#pragma execution_character_set("utf-8")
 #include "symbolTable.h"
 #include <algorithm>
 using namespace std;
@@ -34,7 +35,7 @@ proc_symbolTable* proc_symbolTable::create_function()
 
 void proc_symbolTable::insert_variable(const symbolTableItem& item)
 {
-	if (this->itemTable.find(item.name) == this->itemTable.end()) //Ã»ÓÐÖØ¸´
+	if (this->itemTable.find(item.name) == this->itemTable.end()) //æ²¡æœ‰é‡å¤
 	{
 		this->itemTable.insert({item.name, item});
 		if (item.type == symbolType::Array)
